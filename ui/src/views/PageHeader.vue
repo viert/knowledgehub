@@ -2,8 +2,7 @@
   <div class="page-header">
     <div class="logo">
       <router-link to="/">
-        knowledge
-        <span style="color: #fc2c38;">hub</span>
+        knowledge<span style="color: #fc2c38;">hub</span>
       </router-link>
     </div>
     <div class="panel">

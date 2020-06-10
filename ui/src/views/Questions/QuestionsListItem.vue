@@ -72,7 +72,6 @@ export default {
   &_title {
     flex-grow: 1;
     h4 {
-      font-weight: bold;
       font-size: 1.3em;
       margin-right: 8px;
       a {
