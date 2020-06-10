@@ -1,0 +1,5 @@
+uengine>=3.6.11
+mongomock>=3.19.0
+requests
+
+-r ask/requirements.txt

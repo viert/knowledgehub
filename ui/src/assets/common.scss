@@ -1,0 +1,17 @@
+@import './assets/bootstrap.css';
+@import './assets/fonts.css';
+@import url('/fa/css/all.min.css');
+
+body {
+  font-family: 'Source Sans Pro';
+  font-size: 16px;
+  font-weight: 300;
+}
+
+a {
+  color: #426d98;
+  &:hover {
+    color: #123d68;
+  }
+  transition: color 0.1s linear;
+}
