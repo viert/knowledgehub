@@ -1,4 +1,4 @@
-# ask
+# KnowledgeHub
 an attempt to make a lightweight QA service for using inside corporate infrastructures
 
 
