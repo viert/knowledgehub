@@ -1,6 +1,7 @@
 <template>
   <div class="page-header">
     <div class="logo">
+      <!--prettyhtml-ignore-->
       <router-link to="/">
         knowledge<span style="color: #fc2c38;">hub</span>
       </router-link>
@@ -9,20 +10,40 @@
       <div class="panel-search">
         <input type="text" class="form-control searchbox" />
       </div>
-      <div class="panel-account">
-        <a href>Sign in</a>
+      <div v-if="me" class="panel-account">
+        <User :username="me.username" />
+        <a class="logout" href="" @click.prevent="logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+      <div v-else-if="authInfoAcquired" class="panel-account">
+        <router-link to="/signin">
+          Sign in
+        </router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import User from '@/components/User'
+import { mapGetters, mapState, mapActions } from 'vuex'
+import { AuthStates } from '@/constants'
+
 export default {
+  components: {
+    User
+  },
   computed: {
-    ...mapState({
-      me: state => state.user.user
+    ...mapGetters({
+      me: 'users/me'
     }),
+    ...mapState({
+      authState: 'users/authState'
+    }),
+    authInfoAcquired() {
+      return this.authState !== AuthStates.Unknown
+    },
     avatarURL() {
       if (this.me.avatar) {
         return this.me.avatar
@@ -31,9 +52,7 @@ export default {
     }
   },
   methods: {
-    logout() {
-      this.$store.dispatch('user/logout')
-    }
+    ...mapActions({ logout: 'users/logout' })
   }
 }
 </script>
@@ -99,6 +118,13 @@ $avatar-size: 40px;
       a {
         color: black;
         font-weight: bold;
+      }
+      a.logout {
+        margin-left: 8px;
+        color: gray;
+        &:hover {
+          color: black;
+        }
       }
     }
   }

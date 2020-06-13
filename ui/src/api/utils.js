@@ -8,6 +8,7 @@ const ErrorHandler = err => {
         if (err.response.data && err.response.data.state === 'logged out') {
           store.commit('user/setAuthState', AuthStates.NotLoggedIn)
           store.commit('user/setUser', null)
+          store.commit('user/setProviders', err.response.data.providers)
         }
         break
 

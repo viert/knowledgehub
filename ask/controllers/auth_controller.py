@@ -1,8 +1,9 @@
 import os
 from flask import Blueprint, g, session, request
-from uengine.errors import AuthenticationError
 from uengine.context import ctx
+
 from ask.models import Token, User
+from ask.errors import AuthenticationError
 
 
 class AuthController(Blueprint):

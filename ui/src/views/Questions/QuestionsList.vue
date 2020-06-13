@@ -1,31 +1,40 @@
 <template>
-  <div class="question-list">
-    <h3>Questions</h3>
-    <ul class="question-sort-switch">
-      <li
-        class="question-sort-switch_item"
-        :class="{
+  <div class="page-layout">
+    <main>
+      <div class="question-list">
+        <h3>Questions</h3>
+        <ul class="question-sort-switch">
+          <li
+            class="question-sort-switch_item"
+            :class="{
           'question-sort-switch_item--active': currentSort === 'rating'
         }"
-      >
-        <router-link to="/questions?sort=rating">Interesting</router-link>
-      </li>
-      <li
-        class="question-sort-switch_item"
-        :class="{
+          >
+            <router-link to="/questions?sort=rating">Interesting</router-link>
+          </li>
+          <li
+            class="question-sort-switch_item"
+            :class="{
           'question-sort-switch_item--active': currentSort === 'date'
         }"
-      >
-        <router-link to="/questions?sort=date">Latest</router-link>
-      </li>
-    </ul>
+          >
+            <router-link to="/questions?sort=date">Latest</router-link>
+          </li>
+        </ul>
 
-    <div v-if="dataLoading" class="loading">
-      <Progress text="loading" />
-    </div>
-    <ul v-else class="question-list_list">
-      <QuestionsListItem v-for="question in questions" :key="question._id" :question="question" />
-    </ul>
+        <div v-if="dataLoading" class="loading">
+          <Progress text="loading" />
+        </div>
+        <ul v-else class="question-list_list">
+          <QuestionsListItem
+            v-for="question in questions"
+            :key="question._id"
+            :question="question"
+          />
+        </ul>
+      </div>
+    </main>
+    <aside>aside</aside>
   </div>
 </template>
 

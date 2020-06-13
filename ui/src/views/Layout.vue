@@ -2,12 +2,7 @@
   <div class="page-layout">
     <PageHeader />
     <div class="page-wrapper">
-      <div class="page-wrapper-inner">
-        <main>
-          <router-view />
-        </main>
-        <aside>aside</aside>
-      </div>
+      <router-view></router-view>
     </div>
     <PageFooter />
   </div>
@@ -28,7 +23,7 @@ export default {
 .page-wrapper {
   padding: 8px 0;
   background-color: #f9f9f9;
-  .page-wrapper-inner {
+  .page-layout {
     display: flex;
     width: 82%;
     min-width: 1024px;

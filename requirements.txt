@@ -1,4 +1,4 @@
-uengine>=3.6.11
+uengine>=3.6.12
 mongomock>=3.19.0
 requests
 

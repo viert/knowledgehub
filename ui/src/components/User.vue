@@ -1,26 +1,27 @@
 <template>
-  <router-link :to="userLink" class="user">@{{ user.username }}</router-link>
+  <fragment>
+    <router-link v-if="user" :to="userLink" class="user">@{{ username }}</router-link>
+  </fragment>
 </template>
 
 <script>
 export default {
   props: {
-    id: {
+    username: {
       type: String,
       required: true
     }
   },
   computed: {
     user() {
-      const user = this.$store.getters['users/user'](this.id)
+      const user = this.$store.getters['users/user'](this.username)
       if (!user) {
-        this.$store.dispatch('users/lazyLoadUser', this.id)
+        this.$store.dispatch('users/lazyLoadUser', this.username)
       }
       return user
     },
     userLink() {
-      const userId = this.user ? this.user.username : this.id
-      return `/users/${userId}`
+      return `/users/${this.username}`
     }
   }
 }

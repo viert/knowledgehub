@@ -15,7 +15,7 @@ const Account = {
     return wrap(Axios.patch(`${API_PREFIX}/me`, settings))
   },
   Logout() {
-    return wrap(Axios.post(`${API_PREFIX}/logout`))
+    return Axios.post(`${API_PREFIX}/logout`)
   }
 }
 
