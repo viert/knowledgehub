@@ -85,13 +85,30 @@ class BasePost(StorableSubmodel):
         from .vote import Vote
         return Vote.find({"post_id": self._id})
 
+    @property
+    def update_allowed(self):
+        user = get_user_from_app_context()
+        return self.author_id == user._id or user.moderator
+
+    @property
+    def delete_allowed(self):
+        user = get_user_from_app_context()
+        return self.author_id == user._id or user.moderator
+
     @save_required
     def create_comment(self, **kwargs):
         return Comment(**kwargs, parent_id=self._id)
 
     def update_by(self, user, data, skip_callback=False, invalidate_cache=True):
         self.edited_by_id = user._id
+        self.edited_at = now()
         self.update(data, skip_callback=skip_callback, invalidate_cache=invalidate_cache)
+
+    def delete_by(self, user, skip_callback=False, invalidate_cache=True):
+        self.deleted_by_id = user._id
+        self.deleted_at = now()
+        self.deleted = True
+        self.save(skip_callback=skip_callback, invalidate_cache=invalidate_cache)
 
     def _before_save(self):
         if self.author_id is not None and self.author is None:
@@ -202,6 +219,9 @@ class Question(BasePost):
         if len(self.tags) != len(new_tags):
             raise InvalidTags("tags must be unique")
 
+        if len(self.tags) == 0:
+            raise InvalidTags("questino must have at least one tag")
+
         if self.is_new:
             self._tags_changed = new_tags
         else:
@@ -234,7 +254,7 @@ class Question(BasePost):
         if self.answers.count() > 0:
             raise HasReferences("question have answers attached")
 
-        # at this point there's no not deleted comments and answers,
+        # at this point there's no not deleted comments or answers,
         # let's kill others (i.e. marked as deleted)
 
         Answer.destroy_many({"parent_id": self._id})
@@ -398,10 +418,9 @@ class Answer(BasePost):
             raise InvalidQuestion("parent_id is invalid or question not found")
 
     def _after_save(self, is_new):
-        if is_new:
-            q = self.question
-            q.update_last_activity()
-            q.update_answers_count()
+        q = self.question
+        q.update_last_activity()
+        q.update_answers_count()
 
 
 class Comment(BasePost):
