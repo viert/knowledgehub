@@ -4,10 +4,10 @@ from flask import request
 from uengine.api import (json_response, paginated, default_transform,
                          json_body_required)
 from uengine.utils import get_user_from_app_context, resolve_id
-from uengine.errors import ApiError
+from uengine.errors import ApiError, NotFound, Forbidden
 
 from ask.controllers.auth_controller import AuthController
-from ask.models import Question, Vote, User
+from ask.models import Question, Answer, Comment, Vote, User
 from ask.api import auth_required
 
 questions_ctrl = AuthController("questions", __name__, require_auth=False)
@@ -49,12 +49,23 @@ ANSWER_FIELDS = (
     "_id",
     "body",
     "author_id",
-    "question_id",
+    "parent_id",
     "points",
     "my_vote",
     "created_at",
     "edited_at",
     "accepted",
+)
+
+COMMENT_FIELDS = (
+    "_id",
+    "body",
+    "author_id",
+    "parent_id",
+    "points",
+    "my_vote",
+    "created_at",
+    "edited_at",
 )
 
 SORT_MAP = {
@@ -63,6 +74,21 @@ SORT_MAP = {
     ],
     "date": [("created_at", DESCENDING)]
 }
+
+
+def update_post(post):
+    if not post.update_allowed:
+        raise Forbidden("you can't edit this post")
+    attrs = request.json
+    user = get_user_from_app_context()
+    post.update_by(user, attrs)
+
+
+def delete_post(post):
+    if not post.delete_allowed:
+        raise Forbidden("you can't delete this post")
+    user = get_user_from_app_context()
+    post.delete_by(user)
 
 
 @questions_ctrl.route("/", methods=["GET"])
@@ -95,6 +121,23 @@ def show(question_id):
     return json_response({"data": q.everything()})
 
 
+@questions_ctrl.route("/<question_id>", methods=["PATCH"])
+@json_body_required
+@auth_required
+def update(question_id):
+    q = Question.get(question_id, "question not found")
+    update_post(q)
+    return json_response({"data": q.api_dict(QUESTION_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>", methods=["DELETE"])
+@auth_required
+def delete(question_id):
+    q = Question.get(question_id, "question not found")
+    delete_post(q)
+    return json_response({"data": q.api_dict(QUESTION_FIELDS)})
+
+
 @questions_ctrl.route("/<question_id>/vote", methods=["POST"])
 @json_body_required
 @auth_required
@@ -111,6 +154,17 @@ def vote_question(question_id):
     return json_response({"data": q.api_dict(fields=QUESTION_FIELDS)})
 
 
+@questions_ctrl.route("/", methods=["POST"])
+@json_body_required
+@auth_required
+def create():
+    user = get_user_from_app_context()
+    attrs = request.body
+    q = Question(**attrs, author_id=user._id)
+    q.save()
+    return json_response({"data": q.api_dict(fields=QUESTION_FIELDS)})
+
+
 @questions_ctrl.route("/<question_id>/answers", methods=["POST"])
 @json_body_required
 @auth_required
@@ -120,9 +174,110 @@ def create_answer(question_id):
     attrs = request.json
 
     if "body" not in attrs:
-        raise ApiError("body field is mandatory")
+        raise ApiError("body is missing")
 
     a = q.create_answer(author_id=u._id, body=attrs["body"])
     a.save()
 
     return json_response({"data": a.api_dict()})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>", methods=["PATCH"])
+@json_body_required
+@auth_required
+def update_answer(question_id, answer_id):
+    a = Answer.get(answer_id, "answer not found")
+    if a.parent_id != resolve_id(question_id):
+        raise NotFound("answer not found")
+    update_post(a)
+    return json_response({"data": a.api_dict(ANSWER_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>", methods=["DELETE"])
+@auth_required
+def delete_answer(question_id, answer_id):
+    a = Answer.get(answer_id, "answer not found")
+    if a.parent_id != resolve_id(question_id):
+        raise NotFound("answer not found")
+    delete_post(a)
+    return json_response({"data": a.api_dict(ANSWER_FIELDS)})
+
+
+@questions_ctrl.route("/<quesiton_id>/comments", methods=["POST"])
+@json_body_required
+@auth_required
+def create_comment(question_id):
+    q = Question.get(question_id, "question not found")
+    user = get_user_from_app_context()
+    attrs = request.json
+
+    if "body" not in attrs:
+        raise ApiError("body is missing")
+
+    c = q.create_comment(body=attrs["body"], author_id=user._id)
+    c.save()
+    return json_response({"data": c.api_dict(COMMENT_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/comments/<comment_id>", methods=["PATCH"])
+@json_body_required
+@auth_required
+def update_comment(question_id, comment_id):
+    c = Comment.get(comment_id, "comment not found")
+    if c.parent_id != resolve_id(question_id):
+        raise NotFound("comment not found")
+    update_post(c)
+    return json_response({"data": c.api_dict(COMMENT_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/comments/<comment_id>", methods=["PATCH"])
+@auth_required
+def delete_comment(question_id, comment_id):
+    c = Comment.get(comment_id, "comment not found")
+    if c.parent_id != resolve_id(question_id):
+        raise NotFound("comment not found")
+    delete_post(c)
+    return json_response({"data": c.api_dict(COMMENT_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/comments", methods=["POST"])
+@json_body_required
+@auth_required
+def create_answer_comment(question_id, answer_id):
+    a = Answer.get(answer_id, "answer not found")
+    if a.parent_id != resolve_id(question_id):
+        raise NotFound("answer not found")
+    user = get_user_from_app_context()
+    attrs = request.json
+
+    if "body" not in attrs:
+        raise ApiError("body is missing")
+
+    c = a.create_comment(body=attrs["body"], author_id=user._id)
+    c.save()
+    return json_response({"data": c.api_dict(COMMENT_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/comments/<comment_id>", methods=["PATCH"])
+@json_body_required
+@auth_required
+def update_answer_comment(question_id, answer_id, comment_id):
+    c = Comment.get(comment_id, "comment not found")
+    a = Answer.get(answer_id, "comment not found")
+    q = Question.get(question_id, "comment not found")
+    if a.parent_id != q._id or c.parent_id != a._id:
+        raise NotFound("comment not found")
+    update_post(c)
+    return json_response({"data": c.api_dict(COMMENT_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/comments/<comment_id>", methods=["DELETE"])
+@auth_required
+def delete_answer_comment(question_id, answer_id, comment_id):
+    c = Comment.get(comment_id, "comment not found")
+    a = Answer.get(answer_id, "comment not found")
+    q = Question.get(question_id, "comment not found")
+    if a.parent_id != q._id or c.parent_id != a._id:
+        raise NotFound("comment not found")
+    delete_post(c)
+    return json_response({"data": c.api_dict(COMMENT_FIELDS)})
