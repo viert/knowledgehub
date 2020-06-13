@@ -12,9 +12,9 @@ function storeUser(state, user) {
 const UsersStore = {
   namespaced: true,
   state: {
-    user: {},
-    oauthUrl: null,
-    authState: 'unknown',
+    user: null,
+    providers: [],
+    authState: AuthStates.Unknown,
     users: {},
     loadingUsers: {}
   },
@@ -30,10 +30,10 @@ const UsersStore = {
     },
     setCurrentUser(state, user) {
       state.user = user
-      storeUser(state, user)
+      if (user) storeUser(state, user)
     },
-    setOAuthURL(state, url) {
-      state.oauthUrl = url
+    setProviders(state, providers) {
+      state.providers = providers
     },
     setUser(state, user) {
       storeUser(state, user)
@@ -60,29 +60,27 @@ const UsersStore = {
       return Api.Account.Me(true)
         .then(response => {
           commit('setCurrentUser', response.data.data)
-          commit('setOAuthURL', response.data.oauth)
+          commit('setProviders', response.data.providers)
           commit('setAuthState', AuthStates.LoggedIn)
         })
         .catch(err => {
           if (err.response && err.response.status === 401) {
             commit('setCurrentUser', null)
             commit('setAuthState', AuthStates.LoggedOut)
-            const { data } = err.response
-            if (data && data.oauth) commit('setOAuthURL', data.oauth)
+            commit('setProviders', err.response.data.providers)
           }
         })
     },
-    login({ commit }, { username, password }) {
-      return Api.Account.Authenticate(username, password).then(response => {
-        commit('setCurrentUser', response.data.data)
-        commit('setAuthState', AuthStates.LoggedIn)
-      })
-    },
     logout({ commit, dispatch }) {
-      return Api.Account.Logout().then(() => {
-        commit('setCurrentUser', null)
-        commit('setAuthState', AuthStates.LoggedOut)
-        dispatch('messages/info', 'logged out', { root: true })
+      return Api.Account.Logout().catch(err => {
+        console.log(err.response)
+        if (err.response && err.response.status === 401) {
+          commit('setCurrentUser', null)
+          commit('setAuthState', AuthStates.LoggedOut)
+          dispatch('messages/info', 'logged out', { root: true })
+        } else {
+          throw err
+        }
       })
     },
 

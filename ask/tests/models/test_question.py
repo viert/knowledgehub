@@ -1,6 +1,8 @@
 from uengine.tests.mongo_mock import MongoMockTest
 from ask.models import User, Question, Tag, Answer, Comment
-from ask.tasks.worker import run_task
+from ask.tasks.worker import Worker
+
+wrk = Worker()
 
 
 class TestQuestion(MongoMockTest):
@@ -14,7 +16,7 @@ class TestQuestion(MongoMockTest):
     def run_tasks(self):
         from uengine import ctx
         for task in ctx.queue.tasks:
-            run_task(task)
+            wrk.run_task(task)
 
     def test_tags(self):
         q = Question(

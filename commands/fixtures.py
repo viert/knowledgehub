@@ -4,7 +4,7 @@ import random
 from commands import Command
 from uengine import ctx
 from uengine.queue import DummyQueue
-from ask.tasks.worker import run_task
+from ask.tasks.worker import Worker
 from ask.models import User, Comment, Question, Answer
 
 USERS_COUNT = 20
@@ -12,6 +12,8 @@ QUESTION_COUNT = 20
 MAX_ANSWERS = 5
 MAX_COMMENTS = 10
 MAX_TAGS = 3
+
+wrk = Worker()
 
 
 class Fixtures(Command):
@@ -87,7 +89,7 @@ class Fixtures(Command):
                     c = a.create_comment(author_id=self.random_user()._id, body=text)
                     c.save()
         for task in ctx.queue.tasks:
-            run_task(task)
+            wrk.run_task(task)
 
     def run(self):
         del ctx.queue

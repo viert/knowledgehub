@@ -1,15 +1,29 @@
 <template>
-  <div class="question-view">
-    <div v-if="loading" class="question-loading">
-      <Progress />
-    </div>
-    <fragment v-else>
-      <Question v-if="question._id" :question="question" :comments="comments" />
-      <div v-if="answers.length" class="question-answers">
-        <h2>{{ answers.length }} answers</h2>
-        <Answer v-for="answer in answers" :key="answer._id" :answer="answer" :comments="comments" />
+  <div class="page-layout">
+    <main>
+      <div class="question-view">
+        <div v-if="loading" class="question-loading">
+          <Progress />
+        </div>
+        <fragment v-else>
+          <Question
+            v-if="question._id"
+            :question="question"
+            :comments="comments"
+          />
+          <div v-if="answers.length" class="question-answers">
+            <h2>{{ answers.length }} answers</h2>
+            <Answer
+              v-for="answer in answers"
+              :key="answer._id"
+              :answer="answer"
+              :comments="comments"
+            />
+          </div>
+        </fragment>
       </div>
-    </fragment>
+    </main>
+    <aside>aside</aside>
   </div>
 </template>
 
