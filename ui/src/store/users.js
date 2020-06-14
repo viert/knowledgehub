@@ -9,10 +9,13 @@ function storeUser(state, user) {
   }
 }
 
+var userLoader = null
+
 const UsersStore = {
   namespaced: true,
   state: {
     user: null,
+    userLoader: null,
     providers: [],
     authState: AuthStates.Unknown,
     users: {},
@@ -44,8 +47,11 @@ const UsersStore = {
       })
     },
     setUserLoading(state, payload) {
-      const { username, request } = payload
-      state.loadingUsers[username] = request
+      const { username, promise, resolver } = payload
+      state.loadingUsers = {
+        ...state.loadingUsers,
+        [username]: { promise, resolver }
+      }
     },
     removeUserLoading(state, userId) {
       const users = {
@@ -73,7 +79,6 @@ const UsersStore = {
     },
     logout({ commit, dispatch }) {
       return Api.Account.Logout().catch(err => {
-        console.log(err.response)
         if (err.response && err.response.status === 401) {
           commit('setCurrentUser', null)
           commit('setAuthState', AuthStates.LoggedOut)
@@ -83,25 +88,55 @@ const UsersStore = {
         }
       })
     },
-
     lazyLoadUser({ commit, state }, userId) {
       if (userId in state.users) {
         return Promise.resolve(state.users[userId])
       }
+
       if (userId in state.loadingUsers) {
-        return state.loadingUsers[userId]
+        return state.loadingUsers[userId].promise
       }
-      const request = Api.Users.Get(userId)
-        .then(response => {
-          const user = response.data.data
-          commit('setUser', user)
-          return user
+
+      if (userLoader === null) {
+        // start loading users after a while
+        // to be sure all the necessary users are
+        // in a loading queue
+        userLoader = new Promise((resolve, reject) => {
+          setTimeout(() => {
+            // loader itself
+            const userIds = Object.keys(state.loadingUsers)
+            Api.Users.GetMany(userIds)
+              .then(response => {
+                const users = response.data.data
+                users.forEach(user => {
+                  commit('setUser', user)
+                  const nameResolver = state.loadingUsers[user.username]
+                  if (nameResolver) {
+                    nameResolver.resolver(user)
+                  }
+                  const idResolver = state.loadingUsers[user._id]
+                  if (idResolver) {
+                    idResolver.resolver(user)
+                  }
+                })
+              })
+              .finally(() => {
+                userIds.forEach(userId => {
+                  commit('removeUserLoading', userId)
+                })
+              })
+            userLoader = null
+          }, 20)
         })
-        .finally(() => {
-          commit('removeUserLoading', userId)
+      }
+      // returning a resolver for user
+      const p = new Promise(resolve => {
+        commit('setUserLoading', {
+          username: userId,
+          promise: p,
+          resolver: resolve
         })
-      commit('setUserLoading', { userId, request })
-      return request
+      })
     }
   }
 }

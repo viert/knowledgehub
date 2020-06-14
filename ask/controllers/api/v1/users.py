@@ -2,7 +2,7 @@ from uengine.utils import resolve_id
 from ask.controllers.auth_controller import AuthController
 from ask.models import User
 
-users_ctrl = AuthController("users", __name__, require_auth=True)
+users_ctrl = AuthController("users", __name__, require_auth=False)
 
 USER_FIELDS = (
     "_id",

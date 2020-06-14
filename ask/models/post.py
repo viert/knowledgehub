@@ -185,7 +185,7 @@ class Question(BasePost):
     )
 
     def setup_initial_state(self):
-        setattr(self, "_initial_state", {"tags": self.tags[:]})
+        return {"tags": self.tags[:]}
 
     @property
     def answers(self):
