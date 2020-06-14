@@ -3,7 +3,7 @@
     <div class="author_card-asked">{{ action }} {{ askedAt | duration }}</div>
     <div class="author_card-userinfo">
       <UserPic :url="author.avatar_url" />
-      <User :id="author._id" />
+      <User :username="author.username" />
     </div>
   </div>
 </template>

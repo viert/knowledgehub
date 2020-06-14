@@ -10,7 +10,7 @@ const usernameExt = function() {
       String.raw`(^|[^\pL\pN./=?\\])@([.a-z0-9@_-]*[a-z0-9_])`,
       'g'
     ),
-    replace: '$1<User id="$2"/>'
+    replace: '$1<User username="$2"/>'
   }
 
   const escapedAt = {

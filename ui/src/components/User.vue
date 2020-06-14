@@ -1,7 +1,5 @@
 <template>
-  <fragment>
-    <router-link v-if="user" :to="userLink" class="user">@{{ username }}</router-link>
-  </fragment>
+  <router-link :to="userLink" class="user">@{{ username }}</router-link>
 </template>
 
 <script>
@@ -12,14 +10,10 @@ export default {
       required: true
     }
   },
+  mounted() {
+    this.$store.dispatch('users/lazyLoadUser', this.username)
+  },
   computed: {
-    user() {
-      const user = this.$store.getters['users/user'](this.username)
-      if (!user) {
-        this.$store.dispatch('users/lazyLoadUser', this.username)
-      }
-      return user
-    },
     userLink() {
       return `/users/${this.username}`
     }
@@ -27,5 +21,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>
