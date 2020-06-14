@@ -41,7 +41,7 @@ export default {
 
 <style lang="scss">
 .post-markdown {
-  strong: {
+  strong {
     font-weight: bold;
   }
 
