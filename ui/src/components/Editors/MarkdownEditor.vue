@@ -126,6 +126,8 @@
         :value="value"
         :style="{ height: height + 'px' }"
         @keydown="handleKeydown"
+        @keyup="handleSelectionChange"
+        @mouseup="handleSelectionChange"
         @input="handleInput"
       />
     </div>
@@ -170,16 +172,10 @@ export default {
     PictureOptions,
     UsernamePicker
   },
-  created() {
-    document.addEventListener('selectionchange', this.handleSelectionChange)
-  },
   mounted() {
     if (this.autofocus) {
       this.focus()
     }
-  },
-  beforeDestroy() {
-    document.removeEventListener('selectionchange', this.handleSelectionChange)
   },
   data() {
     return {
@@ -365,6 +361,7 @@ export default {
 
     handleCode() {
       const { start, end } = this.selectedLinesBounds()
+
       let replace = this.value.slice(start, end)
       if (replace.split('\n').length > 2) {
         if (replace.startsWith('```\n') && replace.endsWith('```\n')) {
