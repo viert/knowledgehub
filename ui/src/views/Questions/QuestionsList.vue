@@ -2,7 +2,7 @@
   <div class="page-layout">
     <main>
       <div class="question-list">
-        <h3>Questions</h3>
+        <h3 class="page-title">Questions</h3>
         <ul class="question-sort-switch">
           <li
             class="question-sort-switch_item"
@@ -116,13 +116,6 @@ export default {
 .question-list {
   padding: 8px;
 
-  h3 {
-    text-align: center;
-    font-family: Montserrat;
-    font-weight: 300;
-    margin: 8px 0;
-  }
-
   .loading {
     display: flex;
     flex-direction: column;
@@ -153,5 +146,12 @@ export default {
   padding: 0;
   margin: 0;
   list-style: none;
+}
+
+h3.page-title {
+  text-align: center;
+  font-family: Montserrat;
+  font-weight: 300;
+  margin: 8px 0;
 }
 </style>

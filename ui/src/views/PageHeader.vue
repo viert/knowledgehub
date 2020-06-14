@@ -10,6 +10,11 @@
       <div class="panel-search">
         <input type="text" class="form-control searchbox" />
       </div>
+      <div class="panel-ask">
+        <router-link to="/ask" class="btn btn-primary btn-ask"
+          >Ask Question</router-link
+        >
+      </div>
       <div v-if="me" class="panel-account">
         <User :username="me.username" />
         <a class="logout" href="" @click.prevent="logout">
@@ -88,15 +93,16 @@ $avatar-size: 40px;
     flex-grow: 1;
     display: flex;
     margin-left: 10px;
+    align-items: center;
 
     height: 56px;
 
     .panel-search {
       display: flex;
-      flex-grow: 1;
-      justify-content: flex-end;
       align-items: center;
       position: relative;
+      margin-left: 50px;
+      width: 50%;
 
       &:before {
         display: block;
@@ -106,9 +112,13 @@ $avatar-size: 40px;
       }
 
       input.searchbox {
-        width: 280px;
         margin-left: 12px;
       }
+    }
+
+    .panel-ask {
+      flex-grow: 1;
+      margin-left: 50px;
     }
 
     .panel-account {
@@ -128,5 +138,10 @@ $avatar-size: 40px;
       }
     }
   }
+}
+
+.btn.btn-ask {
+  font-size: 0.9em;
+  white-space: pre;
 }
 </style>

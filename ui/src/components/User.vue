@@ -8,10 +8,14 @@ export default {
     username: {
       type: String,
       required: true
+    },
+    load: {
+      type: Boolean,
+      default: true
     }
   },
   mounted() {
-    this.$store.dispatch('users/lazyLoadUser', this.username)
+    if (this.load) this.$store.dispatch('users/lazyLoadUser', this.username)
   },
   computed: {
     userLink() {
