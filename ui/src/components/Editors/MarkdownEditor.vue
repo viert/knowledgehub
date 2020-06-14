@@ -6,7 +6,7 @@
           tabindex="-1"
           @click="handleHeader"
           title="Header"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <b>h2</b>
         </button>
@@ -14,7 +14,7 @@
           tabindex="-1"
           @click="handleBold"
           title="Bold"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-bold"></i>
         </button>
@@ -22,7 +22,7 @@
           tabindex="-1"
           @click="handleItalic"
           title="Italic"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-italic"></i>
         </button>
@@ -30,7 +30,7 @@
           tabindex="-1"
           @click="handleStrike"
           title="Strike-through"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-strikethrough"></i>
         </button>
@@ -38,12 +38,16 @@
           v-if="linkOptionsOpen"
           :initial-title="currentSelection"
           @add="handleAddLink"
+          @close="
+            linkOptionsOpen = false
+            focus()
+          "
         />
         <button
           tabindex="-1"
           @click="handleLink"
           title="Add Link"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-link"></i>
         </button>
@@ -51,7 +55,7 @@
           tabindex="-1"
           @click="handleUnorderedList"
           title="Unordered List"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-list-ul"></i>
         </button>
@@ -59,26 +63,31 @@
           tabindex="-1"
           @click="handleOrderedList"
           title="Ordered List"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-list-ol"></i>
         </button>
-        <username-picker v-if="usernamePickerOpen" @add="handleAddUsername" />
+        <username-picker
+          v-if="usernamePickerOpen"
+          @add="handleAddUsername"
+          @close="
+            usernamePickerOpen = false
+            focus()
+          "
+        />
         <button
           tabindex="-1"
           @click="handleUsername"
           title="User"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-user"></i>
         </button>
-      </div>
-      <div class="btn-group">
         <button
           tabindex="-1"
           @click="handleQuote"
           title="Blockquote"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-quote-right"></i>
         </button>
@@ -86,12 +95,16 @@
           v-if="pictureOptionsOpen"
           :initial-title="currentSelection"
           @add="handleAddPicture"
+          @close="
+            pictureOptionsOpen = false
+            focus()
+          "
         />
         <button
           tabindex="-1"
           @click="handlePicture"
           title="Picture"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-image"></i>
         </button>
@@ -99,7 +112,7 @@
           tabindex="-1"
           @click="handleCode"
           title="Code Block"
-          class="btn btn-sm btn-outline-dark"
+          class="btn-mdctrl"
         >
           <i class="fas fa-code"></i>
         </button>
@@ -231,6 +244,8 @@ export default {
     },
     resetModals() {
       this.linkOptionsOpen = false
+      this.usernamePickerOpen = false
+      this.pictureOptionsOpen = false
     },
 
     selectedLinesBounds() {
@@ -446,15 +461,9 @@ export default {
 .markdown-editor .btn-group .btn {
   padding-left: 14px;
   padding-right: 14px;
-  &:not(:hover) {
-    background-color: white;
-  }
 }
 
 .markdown-editor_control_buttons {
-  @media only screen and (max-width: 500px) {
-    display: none;
-  }
   .btn-group {
     margin-right: 8px;
     margin-bottom: 8px;
@@ -491,18 +500,19 @@ export default {
 }
 
 .editor_link_options {
-  left: 85px;
+  left: 30px;
 }
 
 .username_picker {
-  left: 220px;
+  left: 150px;
   .suggest-list {
+    position: absolute;
     width: 350px;
   }
 }
 
 .picture_options {
-  left: -90px;
+  left: 206px;
   width: 320px;
 }
 
@@ -529,7 +539,7 @@ export default {
 .picture_options-img_preview::after {
   position: absolute;
   display: block;
-  content: 'Предпросмотр';
+  content: 'Preview';
   width: 100%;
   top: calc(50% - 0.75em);
   text-align: center;
@@ -541,17 +551,20 @@ export default {
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 1px solid #eee;
   font-size: 0.9rem;
+  max-height: 52px * 5;
+  overflow: auto;
 }
 
 .suggest-list-item {
   padding: 4px 12px;
   cursor: pointer;
+  height: 52px;
 }
 
 .suggest-list-item.active {
-  background-color: white;
+  background-color: var(--primary);
+  color: white;
 }
 
 .shadow-block {
@@ -562,5 +575,17 @@ export default {
 .floating-block {
   position: absolute;
   z-index: 300;
+}
+
+.btn-mdctrl {
+  border: none;
+  background-color: white;
+  width: 38px;
+  height: 38px;
+  font-size: 0.9em;
+  transition: background-color 0.15s linear;
+  &:hover {
+    background-color: #eeeeee;
+  }
 }
 </style>

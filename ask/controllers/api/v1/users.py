@@ -1,4 +1,6 @@
+from flask import request
 from uengine.utils import resolve_id
+from uengine.api import json_response
 from ask.controllers.auth_controller import AuthController
 from ask.models import User
 
@@ -25,3 +27,23 @@ def users(ids):
     })
     items = [user.to_dict(USER_FIELDS) for user in items]
     return {"data": items}
+
+
+@users_ctrl.route("/suggest")
+def suggest():
+    import re
+    query = {}
+    prefix = request.values.get("prefix")
+    if prefix:
+        try:
+            prefix = re.compile("^" + prefix)
+            query = {"$or": [
+                {"username": prefix},
+                {"first_name": prefix},
+                {"last_name": prefix},
+            ]}
+        except re.error:
+            pass
+    users = User.find(query).sort("username", 1).limit(10)
+    users = [user.to_dict(fields=["username", "first_name", "last_name"]) for user in users]
+    return json_response({"data": users})

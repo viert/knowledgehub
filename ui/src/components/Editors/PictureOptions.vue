@@ -8,8 +8,9 @@
         ref="linkInput"
         class="form-control form-control-sm"
         type="text"
-        placeholder="Ссылка"
+        placeholder="Link"
         v-model="link"
+        @keydown.esc="$emit('close')"
       />
     </div>
     <div class="picture_options-img_preview">
@@ -20,22 +21,22 @@
         ref="titleInput"
         class="form-control form-control-sm"
         type="text"
-        placeholder="Alt (опционально)"
+        placeholder="Alt Text (optional)"
         v-model="title"
+        @keydown.esc="$emit('close')"
       />
     </div>
     <div class="form-group">
       <input
         class="form-control form-control-sm"
         type="text"
-        placeholder="Ширина (опционально)"
+        placeholder="Width (optional)"
+        @keydown.esc="$emit('close')"
         v-model="width"
       />
     </div>
     <div>
-      <button @click="handleSave" class="btn btn-sm btn-primary"
-        >Добавить</button
-      >
+      <button @click="handleSave" class="btn btn-sm btn-primary">Add</button>
     </div>
   </form>
 </template>

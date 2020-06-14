@@ -7,6 +7,9 @@ const Users = {
       userIds = [userIds]
     }
     return wrap(Axios.get(`/api/v1/users/${userIds.join(',')}`))
+  },
+  Suggest(prefix) {
+    return wrap(Axios.get(`/api/v1/users/suggest?prefix=${prefix}`))
   }
 }
 

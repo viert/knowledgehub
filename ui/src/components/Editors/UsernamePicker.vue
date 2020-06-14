@@ -4,12 +4,14 @@
     class="shadow-block floating-block username_picker"
   >
     <div class="form-group">
-      <username-suggest ref="usernameInput" v-model="username" />
+      <username-suggest
+        ref="usernameInput"
+        v-model="username"
+        @escape="$emit('close')"
+      />
     </div>
     <div>
-      <button @click="handleSave" class="btn btn-sm btn-primary"
-        >Добавить</button
-      >
+      <button @click="handleSave" class="btn btn-sm btn-primary">Add</button>
     </div>
   </form>
 </template>
@@ -35,3 +37,5 @@ export default {
   }
 }
 </script>
+
+<style lang="scss"></style>
