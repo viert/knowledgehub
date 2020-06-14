@@ -162,7 +162,7 @@ export default {
     },
     autofocus: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
   components: {
