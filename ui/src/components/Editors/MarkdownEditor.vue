@@ -159,6 +159,10 @@ export default {
     height: {
       type: Number,
       default: 300
+    },
+    autofocus: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -168,6 +172,11 @@ export default {
   },
   created() {
     document.addEventListener('selectionchange', this.handleSelectionChange)
+  },
+  mounted() {
+    if (this.autofocus) {
+      this.focus()
+    }
   },
   beforeDestroy() {
     document.removeEventListener('selectionchange', this.handleSelectionChange)
