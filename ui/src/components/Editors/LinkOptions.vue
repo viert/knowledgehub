@@ -8,8 +8,9 @@
         ref="linkInput"
         class="form-control form-control-sm"
         type="text"
-        placeholder="Ссылка"
+        placeholder="Link"
         v-model="link"
+        @keydown.esc="$emit('close')"
       />
     </div>
     <div class="form-group">
@@ -17,14 +18,13 @@
         ref="titleInput"
         class="form-control form-control-sm"
         type="text"
-        placeholder="Заголовок"
+        placeholder="Title"
         v-model="title"
+        @keydown.esc="$emit('close')"
       />
     </div>
     <div>
-      <button @click="handleSave" class="btn btn-sm btn-primary"
-        >Добавить</button
-      >
+      <button @click="handleSave" class="btn btn-sm btn-primary">Add</button>
     </div>
   </form>
 </template>

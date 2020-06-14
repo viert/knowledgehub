@@ -9,7 +9,7 @@
         'is-invalid': invalid
       }"
       type="text"
-      placeholder="Имя пользователя"
+      placeholder="Type a user name"
       :value="value"
       :readonly="readonly"
       @keydown="handleKeydown"
@@ -18,18 +18,16 @@
     <ul v-if="optionsOpen" class="suggest-list shadow-block">
       <li
         v-for="user in users"
-        :key="user._id"
+        :key="user.username"
         @click="pickUser(user)"
         @mouseenter="handleListItemMouseEnter(user)"
         class="suggest-list-item"
         :class="{ active: user.active }"
       >
-        <username
-          :link="false"
-          :avatar="true"
-          :appendUsername="true"
-          :username="user.username"
-        />
+        <div class="suggest-username">{{ user.username }}</div>
+        <div class="suggest-name"
+          >{{ user.first_name }} {{ user.last_name }}</div
+        >
       </li>
     </ul>
   </div>
@@ -65,6 +63,13 @@ export default {
     this.loadSoon = _.debounce(this.loadData, 150)
   },
   methods: {
+    scrollActiveIntoViewSoon() {
+      this.$nextTick(() => {
+        document
+          .querySelector('.suggest-list-item.active')
+          .scrollIntoView({ block: 'center' })
+      })
+    },
     handleKeydown(e) {
       let activeIdx = -1
       switch (e.keyCode) {
@@ -72,18 +77,23 @@ export default {
           activeIdx = this.users.findIndex(item => item.active)
           if (activeIdx > 0) {
             activeIdx--
+            this.scrollActiveIntoViewSoon()
           }
           break
         case 40:
           activeIdx = this.users.findIndex(item => item.active)
           if (activeIdx < this.users.length - 1) {
             activeIdx++
+            this.scrollActiveIntoViewSoon()
           }
           break
         case 13:
           e.preventDefault()
           activeIdx = this.users.findIndex(item => item.active)
           this.pickUser(this.users[activeIdx])
+          return
+        case 27:
+          this.$emit('escape')
           return
       }
       if (activeIdx < 0) return
@@ -118,7 +128,7 @@ export default {
       this.users = this.users.map(item => {
         return {
           ...item,
-          active: item._id === user._id
+          active: item.username === user.username
         }
       })
     },
@@ -139,4 +149,10 @@ export default {
 }
 </script>
 
-<style></style>
+<style lang="scss">
+.suggest-list {
+  .suggest-username {
+    font-weight: bold;
+  }
+}
+</style>
