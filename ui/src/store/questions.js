@@ -1,5 +1,12 @@
 import Api from '@/api'
 
+class MaxPage extends Error {
+  constructor(maxPage) {
+    super('maximum page number exceeded')
+    this.maxPage = maxPage
+  }
+}
+
 const QuestionsStore = {
   namespaced: true,
   state: {
@@ -35,6 +42,13 @@ const QuestionsStore = {
       const { page, sort, limit } = payload
       return Api.Questions.List(page, limit, { sort }).then(response => {
         const { questions, authors } = response.data
+        if (
+          questions.total_pages > 0 &&
+          questions.page > questions.total_pages
+        ) {
+          // fixpage
+          throw new MaxPage(questions.total_pages)
+        }
         commit('storeQuestionsList', questions.data)
         commit('setPage', questions.page)
         commit('setTotalPages', questions.total_pages)

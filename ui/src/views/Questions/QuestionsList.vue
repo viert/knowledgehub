@@ -7,16 +7,16 @@
           <li
             class="question-sort-switch_item"
             :class="{
-          'question-sort-switch_item--active': currentSort === 'rating'
-        }"
+              'question-sort-switch_item--active': currentSort === 'rating'
+            }"
           >
             <router-link to="/questions?sort=rating">Interesting</router-link>
           </li>
           <li
             class="question-sort-switch_item"
             :class="{
-          'question-sort-switch_item--active': currentSort === 'date'
-        }"
+              'question-sort-switch_item--active': currentSort === 'date'
+            }"
           >
             <router-link to="/questions?sort=date">Latest</router-link>
           </li>
@@ -32,6 +32,11 @@
             :question="question"
           />
         </ul>
+        <Pagination
+          :current="currentPage"
+          :total="totalPages"
+          @page="pageChanged"
+        />
       </div>
     </main>
     <aside>aside</aside>
@@ -41,6 +46,7 @@
 <script>
 import { mapState } from 'vuex'
 import QuestionsListItem from './QuestionsListItem'
+import Pagination from '@/components/Pagination'
 
 export default {
   data() {
@@ -49,23 +55,50 @@ export default {
     }
   },
   components: {
-    QuestionsListItem
+    QuestionsListItem,
+    Pagination
   },
   computed: {
     ...mapState({
-      questions: state => state.questions.questionsList
+      questions: state => state.questions.questionsList,
+      currentPage: state => state.questions.page,
+      totalPages: state => state.questions.totalPages
     }),
     currentSort() {
       return this.$route.query.sort ? this.$route.query.sort : 'rating'
+    },
+    page() {
+      let page = 1
+      if (this.$route.query.page) {
+        page = parseInt(this.$route.query.page)
+        if (isNaN(page)) {
+          page = 1
+        }
+      }
+      return page
     }
   },
   methods: {
+    pageChanged(page) {
+      const { query } = this.$route
+      this.$router.push({ query: { ...query, page: page } })
+    },
     reload() {
+      document.body.scrollTop = 0
+      document.documentElement.scrollTop = 0
       this.dataLoading = true
       const sort = this.currentSort
-      this.$store.dispatch('questions/loadQuestions', { sort }).finally(() => {
-        this.dataLoading = false
-      })
+      const page = this.page
+      this.$store
+        .dispatch('questions/loadQuestions', { sort, page })
+        .catch(err => {
+          if (err && err.maxPage) {
+            this.pageChanged(err.maxPage)
+          }
+        })
+        .finally(() => {
+          this.dataLoading = false
+        })
     }
   },
   mounted() {
