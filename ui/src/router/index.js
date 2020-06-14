@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import QuestionsList from '@/views/Questions/QuestionsList'
 import QuestionView from '@/views/Questions/QuestionView'
 import SigninPage from '@/views/SignIn/SigninPage'
+import AskPage from '@/views/AskPage'
 
 Vue.use(VueRouter)
 
@@ -21,6 +22,11 @@ const routes = [
     path: '/questions/:questionId',
     name: 'QuestionView',
     component: QuestionView
+  },
+  {
+    path: '/ask',
+    name: 'Ask',
+    component: AskPage
   },
   {
     path: '/*',
