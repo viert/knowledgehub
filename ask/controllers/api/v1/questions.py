@@ -93,16 +93,16 @@ def delete_post(post):
 
 @questions_ctrl.route("/", methods=["GET"])
 def index():
-    if "sort" in request.values:
-        sort = request.values["sort"]
+    if "_sort" in request.values:
+        srt = request.values["_sort"]
     else:
-        sort = "rating"
+        srt = "rating"
 
-    sortExpr = SORT_MAP.get(sort)
+    sortExpr = SORT_MAP.get(srt)
     if sortExpr is None:
-        raise ApiError(f"unknown sort operator \"{sort}\"")
+        raise ApiError(f"unknown sort operator \"{srt}\"")
 
-    questions = Question.find({"deleted": False}).sort(sort)
+    questions = Question.find({"deleted": False}).sort(sortExpr)
     results = paginated(questions,
                         transform=default_transform(fields=QUESTION_LIST_FIELDS))
     author_ids = set()
@@ -159,7 +159,7 @@ def vote_question(question_id):
 @auth_required
 def create():
     user = get_user_from_app_context()
-    attrs = request.body
+    attrs = request.json
     q = Question(**attrs, author_id=user._id)
     q.save()
     return json_response({"data": q.api_dict(fields=QUESTION_FIELDS)})

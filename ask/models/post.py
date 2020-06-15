@@ -122,7 +122,8 @@ class BasePost(StorableSubmodel):
         d = self.to_dict(fields, include_restricted)
         if self.deleted:
             d["body"] = None
-        del d["submodel"]
+        if "submodel" in d:
+            del d["submodel"]
         return d
 
     def recalculate_points(self):

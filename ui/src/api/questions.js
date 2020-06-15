@@ -12,6 +12,10 @@ const Questions = {
   Get(questionId) {
     const url = `${API_PREFIX}/${questionId}`
     return wrap(Axios.get(url))
+  },
+  Create(title, body, tags) {
+    const payload = { title, body, tags }
+    return wrap(Axios.post(`${API_PREFIX}/`, payload))
   }
 }
 

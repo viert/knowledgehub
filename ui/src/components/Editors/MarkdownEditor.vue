@@ -2,36 +2,16 @@
   <div class="markdown-editor">
     <div class="markdown-editor_control_buttons">
       <div class="btn-group">
-        <button
-          tabindex="-1"
-          @click="handleHeader"
-          title="Header"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleHeader" title="Header" class="btn-mdctrl">
           <b>h2</b>
         </button>
-        <button
-          tabindex="-1"
-          @click="handleBold"
-          title="Bold"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleBold" title="Bold" class="btn-mdctrl">
           <i class="fas fa-bold"></i>
         </button>
-        <button
-          tabindex="-1"
-          @click="handleItalic"
-          title="Italic"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleItalic" title="Italic" class="btn-mdctrl">
           <i class="fas fa-italic"></i>
         </button>
-        <button
-          tabindex="-1"
-          @click="handleStrike"
-          title="Strike-through"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleStrike" title="Strike-through" class="btn-mdctrl">
           <i class="fas fa-strikethrough"></i>
         </button>
         <link-options
@@ -43,12 +23,7 @@
             focus()
           "
         />
-        <button
-          tabindex="-1"
-          @click="handleLink"
-          title="Add Link"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleLink" title="Add Link" class="btn-mdctrl">
           <i class="fas fa-link"></i>
         </button>
         <button
@@ -59,12 +34,7 @@
         >
           <i class="fas fa-list-ul"></i>
         </button>
-        <button
-          tabindex="-1"
-          @click="handleOrderedList"
-          title="Ordered List"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleOrderedList" title="Ordered List" class="btn-mdctrl">
           <i class="fas fa-list-ol"></i>
         </button>
         <username-picker
@@ -75,20 +45,10 @@
             focus()
           "
         />
-        <button
-          tabindex="-1"
-          @click="handleUsername"
-          title="User"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleUsername" title="User" class="btn-mdctrl">
           <i class="fas fa-user"></i>
         </button>
-        <button
-          tabindex="-1"
-          @click="handleQuote"
-          title="Blockquote"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleQuote" title="Blockquote" class="btn-mdctrl">
           <i class="fas fa-quote-right"></i>
         </button>
         <picture-options
@@ -100,20 +60,10 @@
             focus()
           "
         />
-        <button
-          tabindex="-1"
-          @click="handlePicture"
-          title="Picture"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handlePicture" title="Picture" class="btn-mdctrl">
           <i class="fas fa-image"></i>
         </button>
-        <button
-          tabindex="-1"
-          @click="handleCode"
-          title="Code Block"
-          class="btn-mdctrl"
-        >
+        <button tabindex="-1" @click="handleCode" title="Code Block" class="btn-mdctrl">
           <i class="fas fa-code"></i>
         </button>
       </div>
@@ -123,6 +73,7 @@
         @focus="resetModals"
         ref="input"
         class="form-control"
+        :class="{'is-invalid': error }"
         :value="value"
         :style="{ height: height + 'px' }"
         @keydown="handleKeydown"
@@ -165,6 +116,10 @@ export default {
     autofocus: {
       type: Boolean,
       default: true
+    },
+    error: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -334,8 +289,8 @@ export default {
           wrapper &&
         selectionEnd + wrapperLength <= this.value.length &&
         this.value.slice(selectionEnd, selectionEnd + wrapperLength) === wrapper
-      let newValue
 
+      let newValue
       const selection = this.value.slice(selectionStart, selectionEnd)
 
       if (unwrap) {
@@ -363,10 +318,14 @@ export default {
       const { start, end } = this.selectedLinesBounds()
 
       let replace = this.value.slice(start, end)
-      if (replace.split('\n').length > 2) {
+      if (replace.split('\n').length > 1) {
         if (replace.startsWith('```\n') && replace.endsWith('```\n')) {
           replace = replace.slice(4, replace.length - 4)
         } else {
+          if (end >= this.value.length && !this.value.endsWith('\n')) {
+            // force add a newline
+            replace = replace + '\n'
+          }
           replace = '```\n' + replace + '```\n'
         }
         this.$emit(
