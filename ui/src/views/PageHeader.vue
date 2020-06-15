@@ -11,20 +11,16 @@
         <input type="text" class="form-control searchbox" />
       </div>
       <div class="panel-ask">
-        <router-link to="/ask" class="btn btn-primary btn-ask"
-          >Ask Question</router-link
-        >
+        <router-link to="/ask" class="btn btn-primary btn-ask">Ask Question</router-link>
       </div>
       <div v-if="me" class="panel-account">
         <User :username="me.username" />
-        <a class="logout" href="" @click.prevent="logout">
+        <a class="logout" href @click.prevent="logout">
           <i class="fas fa-sign-out-alt"></i>
         </a>
       </div>
       <div v-else-if="authInfoAcquired" class="panel-account">
-        <router-link to="/signin">
-          Sign in
-        </router-link>
+        <router-link to="/signin">Sign in</router-link>
       </div>
     </div>
   </div>
