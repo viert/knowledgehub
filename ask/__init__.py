@@ -1,8 +1,8 @@
 import os
 
 from lazy_object_proxy import Proxy
-from uengine.base import Base
-from uengine import ctx
+from glasskit.base import Base
+from glasskit import ctx
 
 from ask.errors import ConfigurationError
 from ask.controllers.main import gen_main_ctrl
@@ -24,8 +24,8 @@ class App(Base):
 
     VERSION = get_version()
 
-    def configure_routes(self):
-        ctx.log.info("Configuring endpoints")
+    def setup_controllers(self):
+        ctx.log.info("Configuring controllers")
 
         endpoints = [
             {"prefix": "", "ctrl": gen_main_ctrl(self), "name": "main"},

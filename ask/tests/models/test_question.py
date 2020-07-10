@@ -1,4 +1,5 @@
-from uengine.tests.mongo_mock import MongoMockTest
+from glasskit import ctx
+from glasskit.tests.mongo_mock_test import MongoMockTest
 from ask.models import User, Question, Tag, Answer, Comment
 from ask.tasks.worker import Worker
 
@@ -10,16 +11,16 @@ class TestQuestion(MongoMockTest):
     @classmethod
     def setUpClass(cls):
         super(TestQuestion, cls).setUpClass()
-        cls.user = User(username='test_user')
+        cls.user = User({"username": "test_user", "ext_id": "test_user"})
         cls.user.save()
 
-    def run_tasks(self):
-        from uengine import ctx
+    @staticmethod
+    def run_tasks():
         for task in ctx.queue.tasks:
             wrk.run_task(task)
 
     def test_tags(self):
-        q = Question(
+        q = Question.create(
             author_id=self.user._id,
             title='How to patch KDE on FreeBSD?',
             body="subj",
@@ -34,7 +35,7 @@ class TestQuestion(MongoMockTest):
             self.assertEqual(tag.questions_count, 1)
         self.assertEqual(cnt, len(q.tags))
 
-        q2 = Question(
+        q2 = Question.create(
             author_id=self.user._id,
             title='TCPDump on FreeBSD',
             body="Does FreeBSD has a linux-like tcpdump or it's been as usual",
