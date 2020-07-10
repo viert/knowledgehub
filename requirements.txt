@@ -1,5 +1,2 @@
-uengine>=3.6.12
-mongomock>=3.19.0
-requests
-
--r ask/requirements.txt
+glasskit>=3.9.24
+line_profiler

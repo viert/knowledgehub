@@ -1,6 +1,8 @@
-from uengine.models.storable_model import StorableModel
-from uengine.models.abstract_model import DoNotSave
-from uengine.utils import now
+from bson import ObjectId
+from glasskit.uorm.models.storable_model import StorableModel
+from glasskit.uorm.models.fields import ObjectIdField, IntField, DatetimeField
+from glasskit.uorm.errors import DoNotSave
+from glasskit.utils import now
 
 from ask.errors import InvalidVote, InvalidUser, InvalidPost
 
@@ -9,44 +11,24 @@ class Vote(StorableModel):
 
     COLLECTION = "votes"
 
-    FIELDS = (
-        "_id",
-        "user_id",
-        "post_id",
-        "value",
-        "added_at",
-    )
-
-    REQUIRED_FIELDS = (
-        "user_id",
-        "post_id",
-        "value",
-    )
-
-    VALIDATION_TYPES = {
-        "value": int,
-    }
-
-    DEFAULTS = {
-        "value": 1,
-        "added_at": now
-    }
+    user_id: ObjectIdField(required=True, rejected=True)
+    post_id: ObjectIdField(required=True, rejected=True)
+    value: IntField(required=True, default=1, rejected=True)
+    added_at: DatetimeField(required=True, default=now, rejected=True)
 
     INDEXES = (
-        ["post_id", "user_id", {"unique": True}],
+        [[("post_id", 1), ("user_id", 1)], {"unique": True}],
     )
 
     @property
-    def post(self):
-        from .post import BasePost
+    def post(self) -> 'BasePost':
         return BasePost.find_one({"_id": self.post_id})
 
     @property
-    def user(self):
-        from .user import User
+    def user(self) -> 'User':
         return User.find_one({"_id": self.user_id})
 
-    def _before_save(self):
+    def _before_save(self) -> None:
         if self.value == 0:
             if not self.is_new:
                 self.destroy()
@@ -61,9 +43,7 @@ class Vote(StorableModel):
             raise InvalidUser("user_id is invalid or user not found")
 
     @classmethod
-    def vote(cls, post_id, user_id, value):
-        from .post import BasePost
-
+    def vote(cls, post_id: ObjectId, user_id: ObjectId, value: int) -> 'Vote':
         v = cls.find_one({"post_id": post_id, "user_id": user_id})
         if v:
             if value != v.value:
@@ -73,7 +53,11 @@ class Vote(StorableModel):
             else:
                 return v
         else:
-            v = cls(post_id=post_id, user_id=user_id, value=value)
+            v = cls({
+                "post_id": post_id,
+                "user_id": user_id,
+                "value": value
+            })
             v.save()
 
         p = BasePost.find_one({"_id": post_id})
@@ -86,3 +70,7 @@ class Vote(StorableModel):
         p.save(skip_callback=True)
 
         return v
+
+
+from .post import BasePost
+from .user import User
