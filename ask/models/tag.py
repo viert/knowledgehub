@@ -1,29 +1,16 @@
-from uengine.models.storable_model import StorableModel
-from uengine.models.abstract_model import DoNotSave, save_required
+from glasskit.uorm.models.storable_model import StorableModel
+from glasskit.uorm.models.fields import StringField, IntField
+from glasskit.uorm.errors import DoNotSave
+from glasskit.uorm.utils import save_required
 from ask.errors import HasReferences
 
 
 class Tag(StorableModel):
 
-    FIELDS = (
-        "_id",
-        "name",
-        "questions_count",
-    )
-
-    DEFAULTS = {
-        "questions_count": 0
-    }
-
-    REQUIRED_FIELDS = (
-        "name",
-    )
+    name: StringField(required=True, rejected=True, min_length=1, unique=True)
+    questions_count: IntField(required=True, rejected=True, default=0)
 
     KEY_FIELD = "name"
-
-    INDEXES = (
-        ["name", {"unique": True}],
-    )
 
     def questions(self):
         from .post import Question
@@ -31,9 +18,9 @@ class Tag(StorableModel):
 
     @save_required
     def recalculate_questions_count(self):
-        qcount = self.questions().count()
-        if qcount != self.questions_count:
-            self.questions_count = qcount
+        q_count = self.questions().count()
+        if q_count != self.questions_count:
+            self.questions_count = q_count
             if self.questions_count == 0:
                 self.destroy(skip_callback=True)
             else:

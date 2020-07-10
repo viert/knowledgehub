@@ -1,6 +1,6 @@
 from flask import request
-from uengine.utils import resolve_id
-from uengine.api import json_response
+from glasskit.utils import resolve_id
+from glasskit.api import json_response
 from ask.controllers.auth_controller import AuthController
 from ask.models import User
 

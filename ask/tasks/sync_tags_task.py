@@ -1,4 +1,4 @@
-from uengine.queue.task import BaseTask
+from glasskit.queue.task import BaseTask
 
 
 class SyncTagsTask(BaseTask):
