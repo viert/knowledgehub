@@ -1,4 +1,4 @@
-from uengine.errors import ApiError, IntegrityError
+from glasskit.errors import ApiError, IntegrityError
 
 
 class AuthenticationError(ApiError):

@@ -1,6 +1,7 @@
-from uengine.utils import uuid4_string, now
-from uengine.models.storable_model import StorableModel
-from uengine.context import ctx
+from glasskit.utils import uuid4_string, now
+from glasskit.uorm.models.storable_model import StorableModel
+from glasskit.uorm.models.fields import StringField, ObjectIdField, DatetimeField
+from glasskit import ctx
 
 DEFAULT_TOKEN_EXPIRATION_TIME = 87600 * 7 * 2
 DEFAULT_TOKEN_AUTO_PROLONGATION = True
@@ -8,34 +9,16 @@ DEFAULT_TOKEN_AUTO_PROLONGATION = True
 
 class Token(StorableModel):
 
-    FIELDS = (
-        "token",
-        "type",
-        "user_id",
-        "created_at",
-        "updated_at",
-    )
+    token: StringField(required=True, default=uuid4_string, unique=True, rejected=True)
+    type: StringField(required=True, default="auth", choices=["auth"])
+    user_id: ObjectIdField(required=True)
+    created_at: DatetimeField(required=True, default=now)
+    updated_at: DatetimeField(required=True, default=now)
 
     KEY_FIELD = "token"
 
-    REQUIRED_FIELDS = (
-        "type",
-        "token",
-        "user_id",
-        "created_at",
-        "updated_at",
-    )
-
-    DEFAULTS = {
-        "type": "auth",
-        "token": uuid4_string,
-        "created_at": now,
-        "updated_at": now,
-    }
-
     INDEXES = (
-        ["token", {"unique": True}],
-        ["user_id", "type"]
+        [[("user_id", 1), ("type", 1)], {}],
     )
 
     # pylint: disable=attribute-defined-outside-init

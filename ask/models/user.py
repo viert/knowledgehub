@@ -1,57 +1,21 @@
-from uengine.utils import now
-from uengine.models.storable_model import StorableModel
+from glasskit.utils import now
+from glasskit.uorm.models.storable_model import StorableModel
+from glasskit.uorm.models.fields import StringField, BoolField, DatetimeField
 
 
 class User(StorableModel):
 
-    FIELDS = (
-        "_id",
-        "ext_id",
-        "username",
-        "first_name",
-        "last_name",
-        "email",
-        "avatar_url",
-        "created_at",
-        "updated_at",
-        "supervisor",
-        "moderator",
-    )
+    ext_id: StringField(required=True, rejected=True, unique=True)
+    username: StringField(required=True, unique=True)
+    first_name: StringField(default="")
+    last_name: StringField(default="")
+    email: StringField(default="")
+    avatar_url: StringField(default="")
+    created_at: DatetimeField(required=True, rejected=True, default=now)
+    updated_at: DatetimeField(required=True, rejected=True, default=now)
+    moderator: BoolField(required=True, default=False, rejected=True)
 
     KEY_FIELD = "username"
-
-    DEFAULTS = {
-        "first_name": "",
-        "last_name": "",
-        "avatar_url": "",
-        "supervisor": False,
-        "moderator": False,
-        "email": "",
-        "ext_id": None,
-        "created_at": now,
-        "updated_at": now,
-    }
-
-    REJECTED_FIELDS = (
-        "password_hash",
-        "supervisor",
-        "created_at",
-        "updated_at",
-    )
-
-    REQUIRED_FIELDS = (
-        "username",
-    )
-
-    VALIDATION_TYPES = {
-        "supervisor": bool,
-        "moderator": bool,
-    }
-
-    INDEXES = (
-        ["username", {"unique": True}],
-        "ext_id",
-    )
 
     def touch(self):
         self.updated_at = now()

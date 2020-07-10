@@ -1,9 +1,9 @@
 import re
 import requests
 import random
-from commands import Command
-from uengine import ctx
-from uengine.queue import DummyQueue
+from glasskit import ctx
+from glasskit.commands import Command
+from glasskit.queue import DummyQueue
 from ask.tasks.worker import Worker
 from ask.models import User, Comment, Question, Answer
 
