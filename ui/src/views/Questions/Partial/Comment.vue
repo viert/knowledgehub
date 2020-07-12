@@ -44,6 +44,7 @@ li.comment {
 
   .comment-body {
     flex-grow: 1;
+    font-size: 0.9em;
   }
 }
 </style>
