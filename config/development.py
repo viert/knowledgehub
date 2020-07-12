@@ -28,7 +28,7 @@ database = {
 
 log_level = "debug"
 log_format = "[%(asctime)s] %(levelname)s\t%(module)-8.8s:%(lineno)-3d %(request_id)-8s %(message)s"
-debug = True
+debug = False
 
 base_uri = "http://localhost:8080/"
 oauth = {

@@ -23,7 +23,7 @@ class TestQuestion(MongoMockTest):
         q = Question.create(
             author_id=self.user._id,
             title='How to patch KDE on FreeBSD?',
-            body="subj",
+            body="subjxxxxxx",
             tags=["kde", "freebsd", "anime"],
         )
         q.save()
