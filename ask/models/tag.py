@@ -1,7 +1,7 @@
 from glasskit.uorm.models.storable_model import StorableModel
 from glasskit.uorm.models.fields import StringField, IntField
-from glasskit.uorm.errors import DoNotSave
 from glasskit.uorm.utils import save_required
+from glasskit import ctx
 from ask.errors import HasReferences
 
 
@@ -14,7 +14,6 @@ class Tag(StorableModel):
     KEY_FIELD = "name"
 
     def questions(self):
-        from .post import Question
         return Question.find({"tags": self.name})
 
     @save_required
@@ -44,6 +43,9 @@ class Tag(StorableModel):
         if self.subscriptions().count() > 0:
             raise HasReferences("tag has references")
 
+    def empty(self) -> bool:
+        return self.questions_count == 0 and self.subscribers_count == 0
+
     @classmethod
     def sync(cls, tags):
         """
@@ -53,9 +55,32 @@ class Tag(StorableModel):
             t: 'Tag' = cls.get(tag)
             if t is None:
                 cls({"name": tag}).save()
+                ctx.log.info("tag %s has been created", tag)
             else:
                 t.recalculate_subscribers()
                 t.recalculate_questions_count()
 
+    @classmethod
+    def full_sync(cls):
+        """
+        This is designed to be called from shell only
+        """
+        tags_set = set()
+        for tag in cls.find():
+            tags_set.add(tag.name)
+        for ts in TagSubscription.find():
+            for tag in ts.tags:
+                tags_set.add(tag)
+        for q in Question.find():
+            for tag in q.tags:
+                tags_set.add(tag)
+        cls.sync(tags_set)
+
+        for tag in cls.find():
+            if tag.empty():
+                ctx.log.info("tag %s destroyed due to having no references", tag.name)
+                tag.destroy()
+
 
 from .tag_subscription import TagSubscription
+from .post import Question
