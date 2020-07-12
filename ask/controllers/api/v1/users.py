@@ -1,7 +1,7 @@
 from flask import request
 from glasskit.utils import resolve_id
 from glasskit.api import json_response
-from ask.controllers.auth_controller import AuthController
+from ask.controllers import AuthController
 from ask.models import User
 
 users_ctrl = AuthController("users", __name__, require_auth=False)

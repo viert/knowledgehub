@@ -6,7 +6,7 @@ from glasskit.api import (json_response, paginated, default_transform,
 from glasskit.utils import get_user_from_app_context, resolve_id
 from glasskit.errors import ApiError, NotFound, Forbidden
 
-from ask.controllers.auth_controller import AuthController
+from ask.controllers import AuthController
 from ask.models import Question, Answer, Comment, Vote, User
 from ask.api import auth_required
 

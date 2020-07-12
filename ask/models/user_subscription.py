@@ -1,6 +1,7 @@
 from glasskit.uorm.db import ObjectsCursor
 from glasskit.uorm.models.storable_model import StorableModel
 from glasskit.uorm.models.fields import ListField, ObjectIdField
+from glasskit.errors import InputDataError
 
 
 class UserSubscription(StorableModel):
@@ -15,6 +16,14 @@ class UserSubscription(StorableModel):
     @property
     def subscribed_to(self) -> ObjectsCursor:
         return User.find({"_id": {"$in": self.subs_user_ids}})
+
+    def _before_save(self):
+        if self.user is None:
+            raise InputDataError("user_id is invalid or user not found")
+        for user_id in self.subs_user_ids:
+            u = User.find_one({"_id": user_id})
+            if u is None:
+                raise InputDataError(f"subscription user_id {user_id} is invalid or user not found")
 
 
 from .user import User
