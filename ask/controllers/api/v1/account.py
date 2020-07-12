@@ -4,7 +4,7 @@ from glasskit.utils import get_user_from_app_context
 from glasskit.api import json_response
 from glasskit.errors import AuthenticationError
 
-from ask.controllers.auth_controller import AuthController
+from ask.controllers import AuthController
 from ask.idconnect.provider import BaseProvider
 from ask.models import User
 

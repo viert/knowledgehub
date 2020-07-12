@@ -9,6 +9,7 @@ from ask.controllers.main import gen_main_ctrl
 from ask.controllers.api.v1.account import account_ctrl
 from ask.controllers.api.v1.questions import questions_ctrl
 from ask.controllers.api.v1.users import users_ctrl
+from ask.controllers.api.v1.subscriptions import subs_ctrl
 
 
 def get_version():
@@ -32,6 +33,7 @@ class App(Base):
             {"prefix": "/api/v1/account", "ctrl": account_ctrl, "name": "account"},
             {"prefix": "/api/v1/users", "ctrl": users_ctrl, "name": "users"},
             {"prefix": "/api/v1/questions", "ctrl": questions_ctrl, "name": "questions"},
+            {"prefix": "/api/v1/subscriptions", "ctrl": subs_ctrl, "name": "subscriptions"},
         ]
 
         for ep in endpoints:
