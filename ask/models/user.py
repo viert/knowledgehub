@@ -24,11 +24,15 @@ class User(StorableModel):
         self.touch()
 
     def _after_save(self, is_new):
-        if is_new and not self.tag_subscription:
-            TagSubscription({"user_id": self._id}).save()
+        if is_new:
+            if not self.tag_subscription:
+                TagSubscription({"user_id": self._id}).save()
+            if not self.user_subscription:
+                UserSubscription({"user_id": self._id}).save()
 
     def _before_delete(self):
         self.tag_subscription.destroy()
+        self.user_subscription.destroy()
 
     def create_auth_token(self):
         from .token import Token
@@ -52,5 +56,10 @@ class User(StorableModel):
     def tag_subscription(self) -> 'TagSubscription':
         return TagSubscription.find_one({"user_id": self._id})
 
+    @property
+    def user_subscription(self) -> 'UserSubscription':
+        return UserSubscription.find_one({"user_id": self._id})
+
 
 from .tag_subscription import TagSubscription
+from .user_subscription import UserSubscription
