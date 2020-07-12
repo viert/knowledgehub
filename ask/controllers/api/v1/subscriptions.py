@@ -5,6 +5,7 @@ from glasskit.utils import get_user_from_app_context, resolve_id
 
 from ask.controllers import AuthController
 from ask.models import User
+from .users import USER_FIELDS
 
 subs_ctrl = AuthController("subscriptions", __name__, require_auth=True)
 
@@ -14,11 +15,22 @@ TAG_SUBSCRIPTION_FIELDS = (
     "user_id",
 )
 
-USER_SUBSCRIPTION_FIELDS = (
-    "_id",
-    "subs_user_ids",
-    "user_id",
-)
+
+@subs_ctrl.route("/tags", methods=["GET"])
+def tag_subscription():
+    user: User = get_user_from_app_context()
+    ts = user.tag_subscription
+    return json_response({"data": ts.tags})
+
+
+@subs_ctrl.route("/users", methods=["GET"])
+def users_subscription():
+    user: User = get_user_from_app_context()
+    ts = user.user_subscription
+    users = []
+    for user in ts.subscribed_to:
+        users.append(user.to_dict(fields=USER_FIELDS))
+    return json_response({"data": users})
 
 
 @subs_ctrl.route("/tags", methods=["POST"])
@@ -37,17 +49,19 @@ def tags_subscribe():
     json_response({"data": ts.to_dict(fields=TAG_SUBSCRIPTION_FIELDS)})
 
 
-@subs_ctrl.route("/users", methods=["POST"])
+@subs_ctrl.route("/users/:user_id/subscribe", methods=["POST"])
 @json_body_required
-def users_subscribe():
-    user: User = get_user_from_app_context()
-    user_ids = request.json.get("user_ids")
-    if user_ids is None:
-        raise InputDataError("user_ids field is mandatory")
-    user_ids = [resolve_id(user_id) for user_id in user_ids]
+def users_subscribe(user_id):
+    current: User = get_user_from_app_context()
+    user = User.get(user_id, "user not found")
+    current.subscribe_to_user(user)
+    return users_subscription()
 
-    us = user.user_subscription
-    us.subs_user_ids = user_ids
-    us.save()
 
-    json_response({"data": us.to_dict(fields=USER_SUBSCRIPTION_FIELDS)})
+@subs_ctrl.route("/users/:user_id/unsubscribe", methods=["POST"])
+@json_body_required
+def users_unsubscribe(user_id):
+    current: User = get_user_from_app_context()
+    user = User.get(user_id, "user not found")
+    current.unsubscribe_from_user(user)
+    return users_subscription()

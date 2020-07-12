@@ -1,6 +1,7 @@
 from glasskit.utils import now
 from glasskit.uorm.models.storable_model import StorableModel
 from glasskit.uorm.models.fields import StringField, BoolField, DatetimeField
+from ask.errors import AlreadySubscribed, NotSubscribed
 
 
 class User(StorableModel):
@@ -59,6 +60,20 @@ class User(StorableModel):
     @property
     def user_subscription(self) -> 'UserSubscription':
         return UserSubscription.find_one({"user_id": self._id})
+
+    def subscribe_to_user(self, other: 'User') -> None:
+        us = self.user_subscription
+        if other._id in us.subs_user_ids:
+            raise AlreadySubscribed("you are already subscribed to this user")
+        us.subs_user_ids.append(other._id)
+        us.save()
+
+    def unsubscribe_from_user(self, other: 'User') -> None:
+        us = self.user_subscription
+        if other._id not in us.subs_user_ids:
+            raise NotSubscribed("you are not subscribed to this user")
+        us.subs_user_ids.remove(other._id)
+        us.save()
 
 
 from .tag_subscription import TagSubscription

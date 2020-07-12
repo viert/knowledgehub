@@ -15,7 +15,7 @@ USER_FIELDS = (
 )
 
 
-@users_ctrl.route("/<ids>")
+@users_ctrl.route("/list/<ids>")
 def users(ids):
     ids = ids.split(",")
     ids = [resolve_id(id_) for id_ in ids]

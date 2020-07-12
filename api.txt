@@ -1,0 +1,104 @@
+API reference
+
+
+ACCOUNT:
+
+GET /api/v1/account/me
+Get current user info, along with OAuth providers
+
+GET /api/v1/account/oauthinfo
+Get OAuth providers list
+
+GET /api/v1/account/oauth_callback
+OAuth-compliant callback
+
+POST /api/v1/account/logout
+Logout user (resets the cookie session)
+
+
+QUESTIONS:
+
+GET /api/v1/questions/
+Get paginated questions list, sorted by either rating+last_activity or date 
+in descending fasion.
+?mine=true should only return user's own posts
+
+GET /api/v1/questions/:id
+Get a particular question along with its answers, all comments and authors of those
+
+PATCH /api/v1/questions/:id
+Update a particular post body
+
+DELETE /api/v1/questions/:id
+Set a particular post as deleted
+
+POST /api/v1/questions/:id/vote
+Vote for a post. Accepts {"value": one of [0, 1, -1]}
+
+POST /api/v1/questions/
+Create a post.
+
+POST /api/v1/quetions/:id/answers/
+Create an answer to a given question
+
+PATCH /api/v1/questions/:id/answers/:answer_id
+Update an answer
+
+DELETE /api/v1/questions/:id/answers/:answer_id
+Delete an answer
+
+
+POST /api/v1/questions/:id/comments/
+Create a comment to a given question
+
+PATCH /api/v1/quetions/:id/comments/:comment_id
+Update a comment
+
+DELETE /api/v1/quetions/:id/comments/:comment_id
+Delete a comment
+
+
+POST /api/v1/questions/:id/answers/:answer_id/comments/
+Create a comment to a given answer
+
+PATCH /api/v1/questions/:id/answers/:answer_id/comments/:comment_id
+Update a comment to an answer
+
+DELETE /api/v1/questions/:id/answers/:answer_id/comments/:comment_id
+Delete a comment to an answer
+
+
+USERS:
+
+GET /api/v1/users/list/:user_ids
+
+Get a list of users with given user ids (comma-separated string).
+This handler is optimized for UI users lazy loading, i.e. the UI app 
+gathers a number of unknown user ids and/or usernames and bulk-requests 
+user objects via this handler
+
+
+GET /api/v1/users/suggest
+
+Get a limited (10 items max) list of users starting with a 
+given prefix (querystring param ?prefix=). The handler responds with
+username, first_name and last_name fields only to reduce bandwidth for
+supposed-to-be-fast username suggest requests.
+
+
+SUBSCRIPTIONS:
+
+GET /api/v1/subscriptions/tags
+Get a list of tags the current user is subscribed to
+
+POST /api/v1/subscriptions/tags
+Updates user tag subscriptions
+
+GET /api/v1/subscriptions/users/
+Get a list of users the current user is subscribed to
+
+POST /api/v1/subscriptions/users/:user_id/subscribe
+Subscribe to a user
+
+POST /api/v1/subscriptions/users/:user_id/unsubscribe
+Unsubscribe from a user
