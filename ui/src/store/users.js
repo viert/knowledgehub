@@ -18,6 +18,7 @@ const UsersStore = {
     userLoader: null,
     providers: [],
     authState: AuthStates.Unknown,
+    signinOrigin: '/',
     users: {},
     loadingUsers: {}
   },
@@ -30,6 +31,9 @@ const UsersStore = {
   mutations: {
     setAuthState(state, payload) {
       state.authState = payload
+    },
+    setSigninOrigin(state, origin) {
+      state.signinOrigin = origin
     },
     setCurrentUser(state, user) {
       state.user = user
@@ -62,6 +66,9 @@ const UsersStore = {
     }
   },
   actions: {
+    setSigninOrigin({ commit }, origin) {
+      commit('setSigninOrigin', origin)
+    },
     loadAuthInfo({ commit }) {
       return Api.Account.Me(true)
         .then(response => {

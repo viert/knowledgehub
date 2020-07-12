@@ -47,7 +47,7 @@ class App(Base):
         FacebookProvider().register()
         YandexProvider().register()
 
-    def after_configured(self):
+    def after_setup(self):
         if "base_uri" not in ctx.cfg:
             raise ConfigurationError("base_uri is missing from configuration")
         self.setup_oauth()

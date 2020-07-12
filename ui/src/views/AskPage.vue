@@ -12,7 +12,7 @@
           v-model="title"
         />
         <div v-if="titleError" class="error-msg">{{ titleError }}</div>
-        <MarkdownEditor ref="editor" :error="!!bodyError" v-model="body"></MarkdownEditor>
+        <MarkdownEditor ref="editor" :autofocus="false" :error="!!bodyError" v-model="body"></MarkdownEditor>
         <div v-if="bodyError" class="error-msg">{{ bodyError }}</div>
         <TagEditor
           ref="tagEditor"
@@ -38,11 +38,10 @@
 
 <script>
 import Api from '@/api'
-import { AuthStates } from '@/constants'
-import { mapState } from 'vuex'
 import MarkdownEditor from '@/components/Editors/MarkdownEditor'
 import TagEditor from '@/components/Editors/TagEditor'
 import Post from '@/components/Post'
+import RequireAuth from '@/mixins/RequireAuth'
 
 export default {
   data() {
@@ -55,21 +54,11 @@ export default {
       titleError: null
     }
   },
+  mixins: [RequireAuth],
   components: {
     MarkdownEditor,
     TagEditor,
     Post
-  },
-  computed: {
-    ...mapState({
-      authState: state => state.users.authState
-    }),
-    loggedIn() {
-      return this.authState === AuthStates.LoggedIn
-    }
-  },
-  mounted() {
-    this.checkAuthState()
   },
   methods: {
     addTag(tag) {
@@ -104,16 +93,13 @@ export default {
         .catch(() => {
           // TODO enable controls, reset loading flag
         })
-    },
-    checkAuthState() {
-      if (this.authState === AuthStates.LoggedOut) {
-        this.$router.replace('/signin')
-      }
     }
   },
   watch: {
-    authState() {
-      this.checkAuthState()
+    ready(value) {
+      if (value) {
+        this.$refs.title.focus()
+      }
     },
     body(nv) {
       if (nv !== '') this.bodyError = null

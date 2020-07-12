@@ -31,7 +31,7 @@ class BaseProvider:
         if self.PROVIDER_NAME is None:
             raise RuntimeError(f"error registering {self.__class__.__name__} provider: PROVIDER_NAME is not defined")
         BaseProvider.PROVIDER_MAP[self.PROVIDER_NAME] = self
-        ctx.log.info(f"oauth2 provider \"{self.PROVIDER_NAME}\" registered")
+        ctx.log.info(f"OAuth2 provider \"{self.PROVIDER_NAME}\" registered")
 
     @classmethod
     def get_provider(cls, provider_name):
