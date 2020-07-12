@@ -1,13 +1,16 @@
 import os
 from typing import Union
-from flask import g, session, request
+from flask import session, request
 from glasskit import ctx
 from glasskit.controller import Controller
 
 from ask.models import Token, User
+from ask.errors import AuthenticationError
 
 
 class AuthController(Controller):
+
+    auth_error = AuthenticationError
 
     @staticmethod
     def _get_user_from_session() -> Union[User, None]:

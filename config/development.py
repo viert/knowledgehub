@@ -19,9 +19,8 @@ pymongo_extra = {
 
 database = {
     "meta": {
-        "uri": "mongodb://localhost",
+        "uri": "mongodb://localhost/ask_dev",
         "pymongo_extra": pymongo_extra,
-        "dbname": "ask_dev",
     },
     "shards": {}
 }
