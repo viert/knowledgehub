@@ -45,6 +45,6 @@ class Tag(StorableModel):
         for tag in tags:
             t = cls.get(tag)
             if t is None:
-                cls(name=tag).save()
+                cls({"name": tag}).save()
             else:
                 t.recalculate_questions_count()
