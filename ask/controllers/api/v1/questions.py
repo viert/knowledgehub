@@ -159,9 +159,10 @@ def vote_question(question_id):
 @json_body_required
 @auth_required
 def create():
-    user = get_user_from_app_context()
+    user: User = get_user_from_app_context()
     attrs = request.json
-    q = Question(**attrs, author_id=user._id)
+    attrs["author_id"] = user._id
+    q = Question(attrs)
     q.save()
     return json_response({"data": q.api_dict(fields=QUESTION_FIELDS)})
 
@@ -171,13 +172,13 @@ def create():
 @auth_required
 def create_answer(question_id):
     q = Question.get(question_id, "question not found")
-    u = get_user_from_app_context()
+    user: User = get_user_from_app_context()
     attrs = request.json
 
     if "body" not in attrs:
         raise ApiError("body is missing")
 
-    a = q.create_answer(author_id=u._id, body=attrs["body"])
+    a = q.create_answer({"author_id": user._id, "body": attrs["body"]})
     a.save()
 
     return json_response({"data": a.api_dict()})
@@ -209,13 +210,13 @@ def delete_answer(question_id, answer_id):
 @auth_required
 def create_comment(question_id):
     q = Question.get(question_id, "question not found")
-    user = get_user_from_app_context()
+    user: User = get_user_from_app_context()
     attrs = request.json
 
     if "body" not in attrs:
         raise ApiError("body is missing")
 
-    c = q.create_comment(body=attrs["body"], author_id=user._id)
+    c = q.create_comment({"body": attrs["body"], "author_id": user._id})
     c.save()
     return json_response({"data": c.api_dict(COMMENT_FIELDS)})
 
@@ -248,13 +249,13 @@ def create_answer_comment(question_id, answer_id):
     a = Answer.get(answer_id, "answer not found")
     if a.parent_id != resolve_id(question_id):
         raise NotFound("answer not found")
-    user = get_user_from_app_context()
+    user: User = get_user_from_app_context()
     attrs = request.json
 
     if "body" not in attrs:
         raise ApiError("body is missing")
 
-    c = a.create_comment(body=attrs["body"], author_id=user._id)
+    c = a.create_comment({"body": attrs["body"], "author_id": user._id})
     c.save()
     return json_response({"data": c.api_dict(COMMENT_FIELDS)})
 
