@@ -26,10 +26,13 @@ class User(StorableModel):
 
     def _after_save(self, is_new):
         if is_new:
-            if not self.tag_subscription:
-                TagSubscription({"user_id": self._id}).save()
-            if not self.user_subscription:
-                UserSubscription({"user_id": self._id}).save()
+            self.create_subscriptions()
+
+    def create_subscriptions(self):
+        if not self.tag_subscription:
+            TagSubscription({"user_id": self._id}).save()
+        if not self.user_subscription:
+            UserSubscription({"user_id": self._id}).save()
 
     def _before_delete(self):
         self.tag_subscription.destroy()

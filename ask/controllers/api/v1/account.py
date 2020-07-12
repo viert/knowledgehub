@@ -16,6 +16,8 @@ ACCOUNT_FIELDS = (
     "first_name",
     "last_name",
     "ext_id",
+    "tag_subscription",
+    "user_subscription",
 )
 
 

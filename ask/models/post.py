@@ -117,15 +117,14 @@ class Question(BasePost):
     closed: BoolField(required=True, default=False, rejected=True)
 
     SUBMODEL = "question"
-    USE_INITIAL_STATE = False
+    USE_INITIAL_STATE = True
 
     INDEXES = (
         [[("tags", 1), ("points", -1)], {}],
     )
 
     def setup_initial_state(self) -> Dict[str, Any]:
-        # return {"tags": self.tags[:]}
-        return {}
+        return {"tags": self.tags[:]}
 
     @property
     def answers(self) -> ObjectsCursor:
@@ -174,8 +173,9 @@ class Question(BasePost):
             self.update_last_activity()
 
     def _after_save(self, is_new) -> None:
+        # create task only after assuring the new data is saved to db
         if self._tags_changed:
-            task = SyncTagsTask.create(self.tags)
+            task = SyncTagsTask.create(self._tags_changed)
             task.publish()
 
     def _before_delete(self) -> None:

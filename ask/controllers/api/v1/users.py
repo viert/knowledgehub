@@ -16,7 +16,7 @@ USER_FIELDS = (
 
 
 @users_ctrl.route("/list/<ids>")
-def users(ids):
+def list_users(ids):
     ids = ids.split(",")
     ids = [resolve_id(id_) for id_ in ids]
     items = User.find({
