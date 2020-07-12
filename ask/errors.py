@@ -53,3 +53,11 @@ class ConfigurationError(ApiError):
 
 class OAuthError(AuthenticationError):
     pass
+
+
+class AlreadySubscribed(IntegrityError):
+    pass
+
+
+class NotSubscribed(IntegrityError):
+    pass

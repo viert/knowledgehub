@@ -93,6 +93,7 @@ def delete_post(post):
 
 @questions_ctrl.route("/", methods=["GET"])
 def index():
+    # TODO: mine=true param
     if "_sort" in request.values:
         srt = request.values["_sort"]
     else:
@@ -165,7 +166,7 @@ def create():
     return json_response({"data": q.api_dict(fields=QUESTION_FIELDS)})
 
 
-@questions_ctrl.route("/<question_id>/answers", methods=["POST"])
+@questions_ctrl.route("/<question_id>/answers/", methods=["POST"])
 @json_body_required
 @auth_required
 def create_answer(question_id):
@@ -203,7 +204,7 @@ def delete_answer(question_id, answer_id):
     return json_response({"data": a.api_dict(ANSWER_FIELDS)})
 
 
-@questions_ctrl.route("/<quesiton_id>/comments", methods=["POST"])
+@questions_ctrl.route("/<question_id>/comments/", methods=["POST"])
 @json_body_required
 @auth_required
 def create_comment(question_id):
