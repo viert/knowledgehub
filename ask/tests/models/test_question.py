@@ -1,6 +1,7 @@
 from glasskit import ctx
 from glasskit.tests.mongo_mock_test import MongoMockTest
-from ask.models import User, Question, Tag, Answer, Comment
+from ask.models import User, Question, Tag
+from ask.models.post import BasePost
 from ask.tasks.worker import Worker
 
 wrk = Worker()
@@ -13,6 +14,10 @@ class TestQuestion(MongoMockTest):
         super(TestQuestion, cls).setUpClass()
         cls.user = User({"username": "test_user", "ext_id": "test_user"})
         cls.user.save()
+
+    def setUp(self) -> None:
+        BasePost.destroy_all()
+        Tag.destroy_all()
 
     @staticmethod
     def run_tasks():
@@ -50,4 +55,4 @@ class TestQuestion(MongoMockTest):
         q2.destroy()
         q.destroy()
         self.run_tasks()
-        self.assertEqual(Tag.find().count(), 0)
+        self.assertEqual(Tag.find().count(), 4)  # tags are not deleted automatically anymore

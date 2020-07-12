@@ -10,6 +10,7 @@ from ask.controllers.api.v1.account import account_ctrl
 from ask.controllers.api.v1.questions import questions_ctrl
 from ask.controllers.api.v1.users import users_ctrl
 from ask.controllers.api.v1.subscriptions import subs_ctrl
+from ask.controllers.api.v1.tags import tags_ctrl
 
 
 def get_version():
@@ -32,6 +33,7 @@ class App(Base):
             {"prefix": "", "ctrl": gen_main_ctrl(self), "name": "main"},
             {"prefix": "/api/v1/account", "ctrl": account_ctrl, "name": "account"},
             {"prefix": "/api/v1/users", "ctrl": users_ctrl, "name": "users"},
+            {"prefix": "/api/v1/tags", "ctrl": tags_ctrl, "name": "tags"},
             {"prefix": "/api/v1/questions", "ctrl": questions_ctrl, "name": "questions"},
             {"prefix": "/api/v1/subscriptions", "ctrl": subs_ctrl, "name": "subscriptions"},
         ]
@@ -40,7 +42,8 @@ class App(Base):
             ctx.log.debug("Controller[%s] @ %s/", ep["name"], ep["prefix"])
             self.flask.register_blueprint(ep["ctrl"], url_prefix=ep["prefix"])
 
-    def setup_oauth(self):
+    @staticmethod
+    def setup_oauth():
         from ask.idconnect.config import get_conf
         from ask.idconnect.facebook import FacebookProvider
         from ask.idconnect.yandex import YandexProvider

@@ -6,8 +6,13 @@ from glasskit.errors import InputDataError
 
 class UserSubscription(StorableModel):
 
+    USE_INITIAL_STATE = True
+
     user_id: ObjectIdField(required=True, rejected=True, index=True)
     subs_user_ids: ListField(required=True, rejected=True, index=True, default=list)
+
+    def setup_initial_state(self):
+        return {"subs_user_ids": self.subs_user_ids[:]}
 
     @property
     def user(self) -> 'User':
