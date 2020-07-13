@@ -30,3 +30,30 @@ input.form-control {
   font-size: 1em;
   line-height: 1em;
 }
+
+$flash-color: #ffffcc;
+
+@keyframes flash {
+  0% {
+    background-color: $flash-color;
+  }
+  20% {
+    background-color: white;
+  }
+  40% {
+    background-color: $flash-color;
+  }
+  60% {
+    background-color: white;
+  }
+  80% {
+    background-color: $flash-color;
+  }
+  100% {
+    background-color: white;
+  }
+}
+
+.flash {
+  animation: flash 2s linear;
+}

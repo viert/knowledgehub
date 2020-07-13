@@ -10,10 +10,14 @@ class Tag(StorableModel):
     name: StringField(required=True, rejected=True, min_length=1, unique=True)
     questions_count: IntField(required=True, rejected=True, default=0)
     subscribers_count: IntField(required=True, rejected=True, default=0)
+    description: StringField()
 
     KEY_FIELD = "name"
 
-    def questions(self):
+    def questions(self, include_deleted=False):
+        query = {"tags": self.name}
+        if not include_deleted:
+            query["deleted"] = False
         return Question.find({"tags": self.name})
 
     @save_required
@@ -34,6 +38,8 @@ class Tag(StorableModel):
             self.save(skip_callback=True)
 
     def _before_save(self):
+        if self.description is None:
+            self.description = f"Questions related to {self.name}"
         self.questions_count = self.questions().count()
         self.subscribers_count = self.subscriptions().count()
 
