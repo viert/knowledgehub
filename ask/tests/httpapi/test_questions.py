@@ -1,5 +1,5 @@
 from .httpapi_testcase import HTTPAPITestCase
-from ask.models import Question, Answer, Tag
+from ask.models import Question, Answer, Comment, Tag
 
 
 class TestQuestions(HTTPAPITestCase):
@@ -270,3 +270,23 @@ class TestQuestions(HTTPAPITestCase):
         self.assertFalse(q1.has_accepted_answer)
         self.assertFalse(a1.accepted)
         self.assertFalse(a2.accepted)
+
+    def test_create_comment(self):
+        q1, _, _ = self.create_questions()
+
+        attrs = {
+            "body": "I have something to show you"
+        }
+
+        resp = self.post(f"/api/v1/questions/{q1._id}/comments/", json=attrs)
+        self.assertEqual(resp.status_code, 401)
+
+        resp = self.post(f"/api/v1/questions/{q1._id}/comments/", user=self.user1, json=attrs)
+        self.assertEqual(resp.status_code, 200)
+
+        q1.reload()
+        self.assertEqual(q1.comments.count(), 1)
+
+        c: Comment = q1.comments[0]
+        self.assertEqual(c.body, attrs["body"])
+

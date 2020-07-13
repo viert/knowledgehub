@@ -2,6 +2,7 @@ from bson import ObjectId
 from glasskit.uorm.models.storable_model import StorableModel
 from glasskit.uorm.models.fields import ObjectIdField, IntField, DatetimeField
 from glasskit.uorm.errors import DoNotSave
+from glasskit.errors import NotFound
 from glasskit.utils import now
 
 from ask.errors import InvalidVote, InvalidUser, InvalidPost
@@ -44,6 +45,14 @@ class Vote(StorableModel):
 
     @classmethod
     def vote(cls, post_id: ObjectId, user_id: ObjectId, value: int) -> 'Vote':
+        p = BasePost.find_one({"_id": post_id})
+        if p is None:
+            raise NotFound("post not found")
+
+        if isinstance(p, Comment):
+            if value < 0:
+                raise InvalidVote("comments can only be up-voted")
+        
         v = cls.find_one({"post_id": post_id, "user_id": user_id})
         if v:
             if value != v.value:
@@ -60,7 +69,6 @@ class Vote(StorableModel):
             })
             v.save()
 
-        p = BasePost.find_one({"_id": post_id})
         p.recalculate_points()
 
         if p.submodel != "question":
@@ -72,5 +80,5 @@ class Vote(StorableModel):
         return v
 
 
-from .post import BasePost
+from .post import BasePost, Comment
 from .user import User
