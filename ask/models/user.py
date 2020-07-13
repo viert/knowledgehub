@@ -44,7 +44,7 @@ class User(StorableModel):
         for token in tokens:
             if not token.expired:
                 return token
-        token = Token(type="auth", user_id=self._id)
+        token = Token({"type": "auth", "user_id": self._id})
         token.save()
         return token
 

@@ -2,12 +2,13 @@ from pymongo import DESCENDING
 from flask import request
 
 from glasskit.api import (json_response, paginated, default_transform,
-                          json_body_required)
+                          json_body_required, get_boolean_request_param)
 from glasskit.utils import get_user_from_app_context, resolve_id
 from glasskit.errors import ApiError, NotFound, Forbidden
 
 from ask.controllers import AuthController
 from ask.models import Question, Answer, Comment, Vote, User
+from ask.errors import NotAccepted
 from ask.api import auth_required
 
 questions_ctrl = AuthController("questions", __name__, require_auth=False)
@@ -91,9 +92,14 @@ def delete_post(post):
     post.delete_by(user)
 
 
+def restore_post(post):
+    if not post.restore_allowed:
+        raise Forbidden("you can't restore this post")
+    post.restore()
+
+
 @questions_ctrl.route("/", methods=["GET"])
 def index():
-    # TODO: mine=true param
     if "_sort" in request.values:
         srt = request.values["_sort"]
     else:
@@ -103,7 +109,13 @@ def index():
     if sortExpr is None:
         raise ApiError(f"unknown sort operator \"{srt}\"")
 
-    questions = Question.find({"deleted": False}).sort(sortExpr)
+    query = {"deleted": False}
+    if get_boolean_request_param("_mine"):
+        u: User = get_user_from_app_context()
+        if u:
+            query["author_id"] = u._id
+
+    questions = Question.find(query).sort(sortExpr)
     results = paginated(questions,
                         transform=default_transform(fields=QUESTION_LIST_FIELDS))
     author_ids = set()
@@ -139,12 +151,23 @@ def delete(question_id):
     return json_response({"data": q.api_dict(QUESTION_FIELDS)})
 
 
+@questions_ctrl.route("/<question_id>/restore", methods=["POST"])
+@auth_required
+def restore(question_id):
+    q = Question.get(question_id, "question not found")
+    restore_post(q)
+    return json_response({"data": q.api_dict(QUESTION_FIELDS)})
+
+
 @questions_ctrl.route("/<question_id>/vote", methods=["POST"])
 @json_body_required
 @auth_required
 def vote_question(question_id):
-    q = Question.get(question_id, "question not found")
-    u = get_user_from_app_context()
+    q: Question = Question.get(question_id, "question not found")
+    u: User = get_user_from_app_context()
+    if q.author_id == u._id:
+        raise Forbidden("you can't vote for your own question")
+
     attrs = request.json
 
     if "value" not in attrs:
@@ -202,6 +225,46 @@ def delete_answer(question_id, answer_id):
     if a.parent_id != resolve_id(question_id):
         raise NotFound("answer not found")
     delete_post(a)
+    return json_response({"data": a.api_dict(ANSWER_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/restore", methods=["POST"])
+@auth_required
+def restore_answer(question_id, answer_id):
+    a = Answer.get(answer_id, "answer not found")
+    if a.parent_id != resolve_id(question_id):
+        raise NotFound("answer not found")
+    restore_post(a)
+    return json_response({"data": a.api_dict(ANSWER_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/accept", methods=["POST"])
+@auth_required
+def accept_answer(question_id, answer_id):
+    u: User = get_user_from_app_context()
+    q: Question = Question.get(question_id, "answer not found")
+    a: Answer = Answer.get(answer_id, "answer not found")
+    if a.parent_id != q._id:
+        raise NotFound("answer not found")
+    if q.author_id != u._id:
+        raise Forbidden("only question's author can accept answers")
+    q.set_accepted_answer(a)
+    return json_response({"data": a.api_dict(ANSWER_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/revoke", methods=["POST"])
+@auth_required
+def revoke_answer(question_id, answer_id):
+    u: User = get_user_from_app_context()
+    q: Question = Question.get(question_id, "answer not found")
+    a: Answer = Answer.get(answer_id, "answer not found")
+    if a.parent_id != q._id:
+        raise NotFound("answer not found")
+    if q.author_id != u._id:
+        raise Forbidden("only question's author can revoke answers")
+    if not a.accepted:
+        raise NotAccepted("answer is not accepted so can't be revoked")
+    q.set_accepted_answer(None)
     return json_response({"data": a.api_dict(ANSWER_FIELDS)})
 
 
