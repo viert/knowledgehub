@@ -238,6 +238,27 @@ def restore_answer(question_id, answer_id):
     return json_response({"data": a.api_dict(ANSWER_FIELDS)})
 
 
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/vote", methods=["POST"])
+@json_body_required
+@auth_required
+def vote_answer(question_id, answer_id):
+    a = Answer.get(answer_id, "answer not found")
+    if a.parent_id != resolve_id(question_id):
+        raise NotFound("answer not found")
+    u: User = get_user_from_app_context()
+    if a.author_id == u._id:
+        raise Forbidden("you can't vote for your own answers")
+
+    attrs = request.json
+
+    if "value" not in attrs:
+        raise ApiError("value field is mandatory")
+
+    Vote.vote(a._id, u._id, attrs["value"])
+    a.reload()
+    return json_response({"data": a.api_dict(fields=QUESTION_FIELDS)})
+
+
 @questions_ctrl.route("/<question_id>/answers/<answer_id>/accept", methods=["POST"])
 @auth_required
 def accept_answer(question_id, answer_id):
@@ -295,7 +316,7 @@ def update_comment(question_id, comment_id):
     return json_response({"data": c.api_dict(COMMENT_FIELDS)})
 
 
-@questions_ctrl.route("/<question_id>/comments/<comment_id>", methods=["PATCH"])
+@questions_ctrl.route("/<question_id>/comments/<comment_id>", methods=["DELETE"])
 @auth_required
 def delete_comment(question_id, comment_id):
     c = Comment.get(comment_id, "comment not found")
@@ -305,7 +326,17 @@ def delete_comment(question_id, comment_id):
     return json_response({"data": c.api_dict(COMMENT_FIELDS)})
 
 
-@questions_ctrl.route("/<question_id>/answers/<answer_id>/comments", methods=["POST"])
+@questions_ctrl.route("/<question_id>/comments/<comment_id>/restore", methods=["POST"])
+@auth_required
+def restore_comment(question_id, comment_id):
+    c = Comment.get(comment_id, "comment not found")
+    if c.parent_id != resolve_id(question_id):
+        raise NotFound("comment not found")
+    restore_post(c)
+    return json_response({"data": c.api_dict(COMMENT_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/comments/", methods=["POST"])
 @json_body_required
 @auth_required
 def create_answer_comment(question_id, answer_id):
@@ -345,4 +376,16 @@ def delete_answer_comment(question_id, answer_id, comment_id):
     if a.parent_id != q._id or c.parent_id != a._id:
         raise NotFound("comment not found")
     delete_post(c)
+    return json_response({"data": c.api_dict(COMMENT_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/comments/<comment_id>/restore", methods=["POST"])
+@auth_required
+def restore_answer_comment(question_id, answer_id, comment_id):
+    c = Comment.get(comment_id, "comment not found")
+    a = Answer.get(answer_id, "comment not found")
+    q = Question.get(question_id, "comment not found")
+    if a.parent_id != q._id or c.parent_id != a._id:
+        raise NotFound("comment not found")
+    restore_post(c)
     return json_response({"data": c.api_dict(COMMENT_FIELDS)})
