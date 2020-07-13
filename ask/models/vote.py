@@ -52,7 +52,7 @@ class Vote(StorableModel):
         if isinstance(p, Comment):
             if value < 0:
                 raise InvalidVote("comments can only be up-voted")
-        
+
         v = cls.find_one({"post_id": post_id, "user_id": user_id})
         if v:
             if value != v.value:
