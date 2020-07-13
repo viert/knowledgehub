@@ -256,7 +256,7 @@ def vote_answer(question_id, answer_id):
 
     Vote.vote(a._id, u._id, attrs["value"])
     a.reload()
-    return json_response({"data": a.api_dict(fields=QUESTION_FIELDS)})
+    return json_response({"data": a.api_dict(fields=ANSWER_FIELDS)})
 
 
 @questions_ctrl.route("/<question_id>/answers/<answer_id>/accept", methods=["POST"])
@@ -336,6 +336,27 @@ def restore_comment(question_id, comment_id):
     return json_response({"data": c.api_dict(COMMENT_FIELDS)})
 
 
+@questions_ctrl.route("/<question_id>/comments/<comment_id>/vote", methods=["POST"])
+@json_body_required
+@auth_required
+def vote_comment(question_id, comment_id):
+    c = Comment.get(comment_id, "comment not found")
+    if c.parent_id != resolve_id(question_id):
+        raise NotFound("comment not found")
+    u: User = get_user_from_app_context()
+    if c.author_id == u._id:
+        raise Forbidden("you can't vote for your own comments")
+
+    attrs = request.json
+
+    if "value" not in attrs:
+        raise ApiError("value field is mandatory")
+
+    Vote.vote(c._id, u._id, attrs["value"])
+    c.reload()
+    return json_response({"data": c.api_dict(fields=COMMENT_FIELDS)})
+
+
 @questions_ctrl.route("/<question_id>/answers/<answer_id>/comments/", methods=["POST"])
 @json_body_required
 @auth_required
@@ -389,3 +410,26 @@ def restore_answer_comment(question_id, answer_id, comment_id):
         raise NotFound("comment not found")
     restore_post(c)
     return json_response({"data": c.api_dict(COMMENT_FIELDS)})
+
+
+@questions_ctrl.route("/<question_id>/answers/<answer_id>/comments/<comment_id>/vote", methods=["POST"])
+@json_body_required
+@auth_required
+def vote_answer_comment(question_id, answer_id, comment_id):
+    c = Comment.get(comment_id, "comment not found")
+    a = Answer.get(answer_id, "comment not found")
+    q = Question.get(question_id, "comment not found")
+    if a.parent_id != q._id or c.parent_id != a._id:
+        raise NotFound("comment not found")
+    u: User = get_user_from_app_context()
+    if c.author_id == u._id:
+        raise Forbidden("you can't vote for your own comments")
+
+    attrs = request.json
+
+    if "value" not in attrs:
+        raise ApiError("value field is mandatory")
+
+    Vote.vote(c._id, u._id, attrs["value"])
+    c.reload()
+    return json_response({"data": c.api_dict(fields=COMMENT_FIELDS)})
