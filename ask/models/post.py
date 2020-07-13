@@ -8,8 +8,10 @@ from glasskit.uorm.models.fields import (StringField, ObjectIdField, DatetimeFie
 from glasskit.uorm.utils import save_required
 from glasskit.uorm.db import ObjectsCursor
 from glasskit.utils import now, get_user_from_app_context
+from glasskit.errors import NotFound
 
-from ask.errors import InvalidUser, InvalidParent, InvalidQuestion, InvalidTags, HasReferences
+from ask.errors import (InvalidUser, InvalidParent, InvalidQuestion,
+                        InvalidTags, HasReferences, AlreadyDeleted, NotDeleted)
 from ask.tasks import SyncTagsTask
 
 
@@ -67,6 +69,11 @@ class BasePost(StorableSubmodel):
         user: User = get_user_from_app_context()
         return self.author_id == user._id or user.moderator
 
+    @property
+    def restore_allowed(self) -> bool:
+        user: User = get_user_from_app_context()
+        return user._id == self.deleted_by_id
+
     @save_required
     def create_comment(self, attrs):
         attrs["parent_id"] = self._id
@@ -78,9 +85,19 @@ class BasePost(StorableSubmodel):
         self.update(attrs, skip_callback=skip_callback, invalidate_cache=invalidate_cache)
 
     def delete_by(self, user: 'User', skip_callback=False, invalidate_cache=True) -> None:
+        if self.deleted:
+            raise AlreadyDeleted("post is already deleted")
         self.deleted_by_id = user._id
         self.deleted_at = now()
         self.deleted = True
+        self.save(skip_callback=skip_callback, invalidate_cache=invalidate_cache)
+
+    def restore(self, skip_callback=False, invalidate_cache=True) -> None:
+        if not self.deleted:
+            raise NotDeleted("post is already deleted")
+        self.deleted_by_id = None
+        self.deleted_at = None
+        self.deleted = False
         self.save(skip_callback=skip_callback, invalidate_cache=invalidate_cache)
 
     def _before_save(self) -> None:
@@ -104,6 +121,23 @@ class BasePost(StorableSubmodel):
         negative = Vote.find({"post_id": self._id, "value": -1}).count()
         self.points = positive - negative
         self.save(skip_callback=True)
+
+    @classmethod
+    def get(cls, expression, raise_if_none=None):
+        post = super().get(expression, raise_if_none)
+        if post and post.deleted:
+            user: User = get_user_from_app_context()
+            # if user logged in and he is moderator or post.author
+            # he can view deleted post
+            if not user or (user._id != post.author_id and not user.moderator):
+                post = None
+
+        if post is None and raise_if_none:
+            if isinstance(raise_if_none, str):
+                raise NotFound(raise_if_none)
+            else:
+                raise raise_if_none
+        return post
 
 
 class Question(BasePost):
@@ -227,6 +261,7 @@ class Question(BasePost):
     def everything(self, user: Union['User', None] = None) -> Dict[str, Any]:
         if user is None:
             user = get_user_from_app_context()
+
         user_id = user._id if user else None
 
         qa_pipeline = [
@@ -272,6 +307,10 @@ class Question(BasePost):
             if doc["submodel"] == "question":
                 results["question"] = doc
             elif doc["submodel"] == "answer":
+                if doc["deleted"]:
+                    # skip deleted answers unless user is the author or a moderator
+                    if not user.moderator and user._id != doc["author_id"]:
+                        continue
                 results["answers"].append(doc)
             author_ids.add(doc["author_id"])
 
@@ -305,6 +344,10 @@ class Question(BasePost):
         for doc in BasePost.aggregate(c_pipeline):
             doc["my_vote"] = doc["votes"][0]["value"] if doc["votes"] else 0
             del doc["votes"]
+            if doc["deleted"]:
+                # skip deleted answers unless user is the author or a moderator
+                if not user.moderator and user._id != doc["author_id"]:
+                    continue
             results["comments"].append(doc)
             author_ids.add(doc["author_id"])
 

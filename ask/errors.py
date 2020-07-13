@@ -61,3 +61,15 @@ class AlreadySubscribed(IntegrityError):
 
 class NotSubscribed(IntegrityError):
     pass
+
+
+class AlreadyDeleted(IntegrityError):
+    pass
+
+
+class NotDeleted(IntegrityError):
+    pass
+
+
+class NotAccepted(IntegrityError):
+    pass
