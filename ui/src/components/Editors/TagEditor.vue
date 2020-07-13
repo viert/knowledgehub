@@ -145,7 +145,7 @@ export default {
   display: inline-block;
   padding: 1px 8px;
   border: 1px solid #ccc;
-  background-color: rgb(232, 253, 232);
+  background-color: #f9f9f9;
   margin-right: 4px;
   margin-bottom: 3px;
   overflow-wrap: normal;

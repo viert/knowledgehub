@@ -28,7 +28,7 @@
             <Post :body="body" />
           </div>
         </div>
-        <div class="control">
+        <div class="post-control">
           <button @click="handleSave" class="btn btn-primary">Post Question</button>
         </div>
       </div>
@@ -116,26 +116,26 @@ export default {
   .markdown-editor {
     margin-top: 1.4em;
   }
+}
 
-  .preview {
-    background: #eeeeee;
-    padding: 8px;
-    margin-top: 1em;
-    h4 {
-      font-family: Montserrat;
-    }
-    .preview-inner {
-      padding: 8px;
-      background: white;
-    }
+.post-control {
+  text-align: right;
+  margin-top: 2em;
+  .btn {
+    font-size: 1em;
   }
+}
 
-  .control {
-    text-align: right;
-    margin-top: 2em;
-    .btn {
-      font-size: 1em;
-    }
+.preview {
+  background: #eeeeee;
+  padding: 8px;
+  margin-top: 1em;
+  h4 {
+    font-family: Montserrat;
+  }
+  .preview-inner {
+    padding: 8px;
+    background: white;
   }
 }
 
