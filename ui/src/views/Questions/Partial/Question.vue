@@ -16,7 +16,7 @@
             <AuthorCard action="Asked" :author="author" :askedAt="question.created_at" />
           </div>
         </div>
-        <CommentsList :comments="selfComments" />
+        <CommentsList :parentId="question._id" :comments="selfComments" />
       </div>
     </div>
   </div>

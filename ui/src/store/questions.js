@@ -87,13 +87,19 @@ const QuestionsStore = {
           return response.data.data._id
         })
     },
-    createQuestionComment({ state, commit }, body) {
-      return Api.Comments(state.question._id)
-        .Create(body)
-        .then(response => {
-          commit('addComment', response.data.data)
-          return response.data.data._id
-        })
+    createComment({ state, commit }, payload) {
+      const { parentId, body } = payload
+
+      // determine if it's a comment to a quesiton or one of its answers
+      const api =
+        parentId === state.question._id
+          ? Api.Comments(state.question._id)
+          : Api.Comments(state.question._id, parentId)
+
+      return api.Create(body).then(response => {
+        commit('addComment', response.data.data)
+        return response.data.data._id
+      })
     }
   }
 }

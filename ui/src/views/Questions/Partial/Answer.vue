@@ -12,7 +12,7 @@
           </div>
         </div>
         <ul class="comments-section">
-          <Comment v-for="comment in selfComments" :key="comment._id" :comment="comment" />
+          <CommentsList :parentId="answer._id" :comments="selfComments" />
         </ul>
       </div>
     </div>
@@ -21,7 +21,7 @@
 
 <script>
 import Post from '@/components/Post'
-import Comment from './Comment'
+import CommentsList from './CommentsList'
 import AuthorCard from './AuthorCard'
 
 export default {
@@ -37,7 +37,7 @@ export default {
   },
   components: {
     Post,
-    Comment,
+    CommentsList,
     AuthorCard
   },
   computed: {

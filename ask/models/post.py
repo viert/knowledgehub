@@ -20,7 +20,6 @@ class BasePost(StorableSubmodel):
     COLLECTION = "posts"
 
     author_id: ObjectIdField(required=True, rejected=True, index=True)
-    body: StringField(required=True, min_length=10, max_length=65536)
     created_at: DatetimeField(required=True, rejected=True, default=now, index=-1)
     edited_at: DatetimeField(rejected=True, default=None)
     deleted_at: DatetimeField(rejected=True, default=None)
@@ -143,6 +142,7 @@ class BasePost(StorableSubmodel):
 class Question(BasePost):
 
     title: StringField(required=True, min_length=5, max_length=120)
+    body: StringField(required=True, min_length=10, max_length=65536)
     tags: ListField(required=True, min_length=1, default=list)
     views_count: IntField(required=True, default=0, rejected=True, index=True)
     answers_count: IntField(required=True, default=0, rejected=True, index=True)
@@ -360,6 +360,7 @@ class Answer(BasePost):
 
     SUBMODEL = "answer"
 
+    body: StringField(required=True, min_length=10, max_length=65536)
     accepted: BoolField(required=True, default=False, rejected=True)
     parent_id: ObjectIdField(required=True, rejected=True)
 
@@ -392,6 +393,7 @@ class Comment(BasePost):
 
     SUBMODEL = "comment"
 
+    body: StringField(required=True, min_length=2, max_length=1024)
     parent_id: ObjectIdField(required=True, rejected=True)
 
     INDEXES = (
