@@ -4,7 +4,7 @@
     <hr />
     <div class="question-post">
       <div class="question-vote">
-        <Voter :points="question.points" :value="question.my_vote" />
+        <Voter @input="handleVote" :points="question.points" :value="question.my_vote" />
       </div>
       <div class="question-body">
         <Post :body="question.body" />
@@ -36,6 +36,11 @@ export default {
     comments: {
       type: Array,
       default: () => []
+    }
+  },
+  methods: {
+    handleVote(value) {
+      this.$store.dispatch('questions/voteQuestion', value)
     }
   },
   components: {

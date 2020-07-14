@@ -49,6 +49,16 @@ const QuestionsStore = {
     },
     storeComments(state, comments) {
       state.comments = comments
+    },
+    replaceComment(state, comment) {
+      state.comments = state.comments.map(item => {
+        return comment._id === item._id ? comment : item
+      })
+    },
+    replaceAnswer(state, answer) {
+      state.answers = state.answers.map(item => {
+        return answer._id === item._id ? answer : item
+      })
     }
   },
   actions: {
@@ -100,6 +110,31 @@ const QuestionsStore = {
         commit('addComment', response.data.data)
         return response.data.data._id
       })
+    },
+    voteQuestion({ state, commit }, value) {
+      return Api.Questions.Vote(state.question._id, value).then(response => {
+        commit('storeQuestion', response.data.data)
+      })
+    },
+    voteComment({ state, commit }, payload) {
+      const { commentId, value } = payload
+      const comment = state.comments.find(item => item._id === commentId)
+      const api =
+        comment.parent_id === state.question._id
+          ? Api.Comments(state.question._id)
+          : Api.Comments(state.question._id, comment.parent_id)
+
+      return api.Vote(comment._id, value).then(response => {
+        commit('replaceComment', response.data.data)
+      })
+    },
+    voteAnswer({ state, commit }, payload) {
+      const { answerId, value } = payload
+      Api.Answers(state.question._id)
+        .Vote(answerId, value)
+        .then(response => {
+          commit('replaceAnswer', response.data.data)
+        })
     }
   }
 }

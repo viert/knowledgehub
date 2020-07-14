@@ -41,11 +41,15 @@ export default {
     voteUp() {
       if (this.value <= 0) {
         this.$emit('input', 1)
+      } else {
+        this.$emit('input', 0)
       }
     },
     voteDown() {
       if (this.value >= 0) {
         this.$emit('input', -1)
+      } else {
+        this.$emit('input', 0)
       }
     }
   }
