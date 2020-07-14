@@ -18,6 +18,7 @@ ACCOUNT_FIELDS = (
     "ext_id",
     "tag_subscription",
     "user_subscription",
+    "avatar_url",
 )
 
 
@@ -58,7 +59,7 @@ def oauth_callback():
 
     user = User.find_one({"ext_id": user_data["ext_id"]})
     if not user:
-        user = User(**user_data)
+        user = User(user_data)
         user.save()
     session["user_id"] = user._id
     session.modified = True

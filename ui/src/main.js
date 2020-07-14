@@ -7,6 +7,7 @@ import Tag from '@/components/Tag'
 import Progress from '@/components/Progress'
 import Voter from '@/components/Voter'
 import User from '@/components/User'
+import SpinnerButton from '@/components/SpinnerButton'
 import Fragment from 'vue-fragment'
 
 Vue.use(Fragment.Plugin)
@@ -16,6 +17,7 @@ Vue.component('Tag', Tag)
 Vue.component('Progress', Progress)
 Vue.component('Voter', Voter)
 Vue.component('User', User)
+Vue.component('SpinnerButton', SpinnerButton)
 
 Vue.filter('duration', duration)
 

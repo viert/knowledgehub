@@ -28,7 +28,7 @@
             <Post :body="body" />
           </div>
         </div>
-        <div class="post-control">
+        <div class="post-form-control">
           <button @click="handleSave" class="btn btn-primary">Post Question</button>
         </div>
       </div>
@@ -118,7 +118,7 @@ export default {
   }
 }
 
-.post-control {
+.post-form-control {
   text-align: right;
   margin-top: 2em;
   .btn {

@@ -20,7 +20,18 @@
             </div>
             <p class="tag-expand_description">{{ tag && tag.description || defaultTagDescription }}</p>
             <div class="tag-expand_ctrl">
-              <button class="btn btn-sm btn-block btn-outline-primary">Subscribe</button>
+              <SpinnerButton
+                v-if="subscribed"
+                :loading="subscribeInProgress"
+                @click="handleUnsubscribe"
+                class="btn btn-sm btn-block btn-outline-danger"
+              >Unsubscribe</SpinnerButton>
+              <SpinnerButton
+                v-else
+                :loading="subscribeInProgress"
+                @click="handleSubscribe"
+                class="btn btn-sm btn-block btn-outline-primary"
+              >Subscribe</SpinnerButton>
             </div>
           </fragment>
         </div>
@@ -34,6 +45,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   props: {
     name: {
@@ -56,12 +68,19 @@ export default {
   data() {
     return {
       showDetails: false,
-      tagLoading: false
+      tagLoading: false,
+      subscribeInProgress: false
     }
   },
   computed: {
+    ...mapState({
+      tagSubscriptions: state => state.users.tagSubscriptions
+    }),
     defaultTagDescription() {
       return `Questions related to ${this.name}`
+    },
+    subscribed() {
+      return this.tagSubscriptions.includes(this.name)
     },
     tag() {
       const tag = this.$store.getters['tags/getTag'](this.name)
@@ -72,6 +91,20 @@ export default {
     }
   },
   methods: {
+    handleSubscribe() {
+      this.subscribeInProgress = true
+      this.$store.dispatch('users/subscribeToTag', this.name).finally(() => {
+        this.subscribeInProgress = false
+      })
+    },
+    handleUnsubscribe() {
+      this.subscribeInProgress = true
+      this.$store
+        .dispatch('users/unsubscribeFromTag', this.name)
+        .finally(() => {
+          this.subscribeInProgress = false
+        })
+    },
     loadTag() {
       this.tagLoading = true
       this.$store.dispatch('tags/lazyLoadTag', this.name).finally(() => {

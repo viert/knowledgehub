@@ -39,10 +39,15 @@ class YandexProvider(BaseProvider):
         if resp.status_code != 200:
             raise OAuthError("non-successful status code from oauth provider userdata handler", payload={"status_code": resp.status_code})
         attrs = resp.json()
-        print(attrs)
-        return {
+
+        user_data = {
             "ext_id": f"yandex_{attrs['id']}",
             "username": attrs["display_name"],
             "first_name": attrs["first_name"],
             "last_name": attrs["last_name"],
         }
+
+        if not attrs["is_avatar_empty"]:
+            user_data["avatar_url"] = f"//avatars.mds.yandex.net/get-yapic/{attrs['default_avatar_id']}/islands-200"
+
+        return user_data

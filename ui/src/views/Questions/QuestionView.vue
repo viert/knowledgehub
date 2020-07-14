@@ -34,7 +34,7 @@
               <Post :body="answerBody" />
             </div>
           </div>
-          <div class="post-control">
+          <div class="post-form-control">
             <button @click="handlePostAnswer" class="btn btn-primary">Post Answer</button>
           </div>
         </fragment>

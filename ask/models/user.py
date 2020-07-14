@@ -78,6 +78,21 @@ class User(StorableModel):
         us.subs_user_ids.remove(other._id)
         us.save()
 
+    def subscribe_to_tag(self, tag: str) -> None:
+        ts = self.tag_subscription
+        if tag in ts.tags:
+            raise AlreadySubscribed("you are already subscribed to this tag")
+        ts.tags.append(tag)
+        ts.save()
+
+    def unsubscribe_from_tag(self, tag: str) -> None:
+        ts = self.tag_subscription
+        if tag not in ts.tags:
+            raise NotSubscribed("you are not subscribed to this tag")
+        ts.tags.remove(tag)
+        ts.save()
+
 
 from .tag_subscription import TagSubscription
 from .user_subscription import UserSubscription
+from .tag import Tag

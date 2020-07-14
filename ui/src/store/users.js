@@ -16,6 +16,8 @@ const UsersStore = {
   state: {
     user: null,
     userLoader: null,
+    tagSubscriptions: [],
+    userSubscriptions: [],
     providers: [],
     authState: AuthStates.Unknown,
     signinOrigin: '/',
@@ -57,6 +59,12 @@ const UsersStore = {
         [username]: { promise, resolver }
       }
     },
+    setTagSubscriptions(state, tags) {
+      state.tagSubscriptions = tags
+    },
+    setUserSubscriptions(state, users) {
+      state.userSubscriptions = users
+    },
     removeUserLoading(state, userId) {
       const users = {
         ...state.loadingUsers
@@ -69,12 +77,31 @@ const UsersStore = {
     setSigninOrigin({ commit }, origin) {
       commit('setSigninOrigin', origin)
     },
-    loadAuthInfo({ commit }) {
+    loadSubscriptionUsers({ commit }, userIds) {
+      Api.Users.GetMany(userIds).then(response => {
+        commit('setUserSubscriptions', response.data.data)
+      })
+    },
+    loadAuthInfo({ commit, dispatch }) {
       return Api.Account.Me(true)
         .then(response => {
-          commit('setCurrentUser', response.data.data)
+          const { data } = response.data
+          const tagSubscriptions = data.tags_subscription.tags
+          const useridSubscriptions = data.user_subscription.subs_user_ids
+          const userData = {
+            _id: data._id,
+            avatar_url: data.avatar_url,
+            ext_id: data.ext_id,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            username: data.username
+          }
+
+          commit('setCurrentUser', userData)
+          commit('setTagSubscriptions', tagSubscriptions)
           commit('setProviders', response.data.providers)
           commit('setAuthState', AuthStates.LoggedIn)
+          dispatch('loadSubscriptionUsers', useridSubscriptions)
         })
         .catch(err => {
           if (err.response && err.response.status === 401) {
@@ -83,6 +110,16 @@ const UsersStore = {
             commit('setProviders', err.response.data.providers)
           }
         })
+    },
+    subscribeToTag({ commit }, tag) {
+      Api.Tags.Subscribe(tag).then(response => {
+        commit('setTagSubscriptions', response.data.data.tags)
+      })
+    },
+    unsubscribeFromTag({ commit }, tag) {
+      Api.Tags.Unsubscribe(tag).then(response => {
+        commit('setTagSubscriptions', response.data.data.tags)
+      })
     },
     logout({ commit, dispatch }) {
       return Api.Account.Logout().catch(err => {
