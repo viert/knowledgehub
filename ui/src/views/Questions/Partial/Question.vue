@@ -16,9 +16,7 @@
             <AuthorCard action="Asked" :author="author" :askedAt="question.created_at" />
           </div>
         </div>
-        <ul class="comments-section">
-          <Comment v-for="comment in selfComments" :key="comment._id" :comment="comment" />
-        </ul>
+        <CommentsList :comments="selfComments" />
       </div>
     </div>
   </div>
@@ -26,7 +24,7 @@
 
 <script>
 import Post from '@/components/Post'
-import Comment from './Comment'
+import CommentsList from './CommentsList'
 import AuthorCard from './AuthorCard'
 
 export default {
@@ -42,7 +40,7 @@ export default {
   },
   components: {
     Post,
-    Comment,
+    CommentsList,
     AuthorCard
   },
   computed: {
@@ -57,12 +55,6 @@ export default {
 </script>
 
 <style lang="scss">
-ul.comments-section {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 .question,
 .answer {
   h2 {

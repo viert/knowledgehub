@@ -40,6 +40,13 @@ const QuestionsStore = {
       }
       state.answers = [...state.answers, answer]
     },
+    addComment(state, comment) {
+      comment = {
+        ...comment,
+        flash: true
+      }
+      state.comments = [...state.comments, comment]
+    },
     storeComments(state, comments) {
       state.comments = comments
     }
@@ -77,6 +84,14 @@ const QuestionsStore = {
         .Create(body)
         .then(response => {
           commit('addAnswer', response.data.data)
+          return response.data.data._id
+        })
+    },
+    createQuestionComment({ state, commit }, body) {
+      return Api.Comments(state.question._id)
+        .Create(body)
+        .then(response => {
+          commit('addComment', response.data.data)
           return response.data.data._id
         })
     }
