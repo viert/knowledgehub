@@ -2,19 +2,19 @@
 
 
 Ask a question page:
-  - Form
+  - ~~Form~~
 
 List questions page:
 
 
 Show question with answers and comments page:
-  - Answer a question
-  - Accept an answer
-  - Create a comment for a question
-  - Create a comment for an answer
-  - Vote for question
-  - Vote for answer
-  - Upvote for comment
+  - ~~Answer a question~~
+  - ~~Accept an answer~~
+  - ~~Create a comment for a question~~
+  - ~~Create a comment for an answer~~
+  - ~~Vote for question~~
+  - ~~Vote for answer~~
+  - ~~Upvote for comment~~
 
 Profile/Settings page:
   - firstname/lastname
