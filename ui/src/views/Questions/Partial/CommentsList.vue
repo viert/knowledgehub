@@ -27,6 +27,10 @@ export default {
     comments: {
       type: Array,
       default: () => []
+    },
+    parentId: {
+      type: String,
+      required: true
     }
   },
   data() {
@@ -39,8 +43,14 @@ export default {
   methods: {
     handlePostComment() {
       this.commentPostRequest = true
+
+      const payload = {
+        parentId: this.parentId,
+        body: this.commentBody
+      }
+
       this.$store
-        .dispatch('questions/createQuestionComment', this.commentBody)
+        .dispatch('questions/createComment', payload)
         .then(() => {
           this.commentBody = ''
           this.formOpened = false

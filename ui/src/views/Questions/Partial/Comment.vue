@@ -3,18 +3,12 @@
     <div class="comment-voter">
       <Voter :mini="true" :points="comment.points" :value="comment.my_vote" />
     </div>
-    <div class="comment-body" :class="{flash: comment.flash}">
-      <Post :body="commentBody" />
-    </div>
+    <div class="comment-body" :class="{flash: comment.flash}">{{ commentBody }}</div>
   </li>
 </template>
 
 <script>
-import Post from '@/components/Post'
 export default {
-  components: {
-    Post
-  },
   props: {
     comment: {
       type: Object,
