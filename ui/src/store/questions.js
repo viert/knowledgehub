@@ -17,6 +17,11 @@ const QuestionsStore = {
     page: 1,
     totalPages: 1
   },
+  getters: {
+    isMyQuestion(state, _, rootState) {
+      return state.question.author_id === rootState.users.user._id
+    }
+  },
   mutations: {
     storeQuestionsList(state, questions) {
       state.questionsList = questions
@@ -132,6 +137,20 @@ const QuestionsStore = {
       const { answerId, value } = payload
       Api.Answers(state.question._id)
         .Vote(answerId, value)
+        .then(response => {
+          commit('replaceAnswer', response.data.data)
+        })
+    },
+    acceptAnswer({ state, commit }, answerId) {
+      return Api.Answers(state.question._id)
+        .Accept(answerId)
+        .then(response => {
+          commit('replaceAnswer', response.data.data)
+        })
+    },
+    revokeAnswer({ state, commit }, answerId) {
+      return Api.Answers(state.question._id)
+        .Revoke(answerId)
         .then(response => {
           commit('replaceAnswer', response.data.data)
         })
