@@ -3,7 +3,7 @@
     <div class="comment-voter">
       <Voter :mini="true" :points="comment.points" :value="comment.my_vote" />
     </div>
-    <div class="comment-body">
+    <div class="comment-body" :class="{flash: comment.flash}">
       <Post :body="commentBody" />
     </div>
   </li>

@@ -3,6 +3,7 @@ import { wrap } from './utils'
 import Account from './account'
 import Questions from './questions'
 import Answers from './answers'
+import Comments from './comments'
 import Users from './users'
 import Tags from './tags'
 
@@ -10,6 +11,7 @@ const Api = {
   Account,
   Questions,
   Answers,
+  Comments,
   Users,
   Tags,
   AppInfo() {
