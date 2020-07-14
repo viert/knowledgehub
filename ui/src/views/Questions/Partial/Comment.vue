@@ -1,7 +1,7 @@
 <template>
   <li class="comment">
     <div class="comment-voter">
-      <Voter :mini="true" :points="comment.points" :value="comment.my_vote" />
+      <Voter :mini="true" @input="handleVote" :points="comment.points" :value="comment.my_vote" />
     </div>
     <div class="comment-body" :class="{flash: comment.flash}">
       <Post :body="comment.body" :strict="true" :inline="true" />&mdash;
@@ -22,6 +22,14 @@ export default {
   },
   components: {
     Post
+  },
+  methods: {
+    handleVote(value) {
+      this.$store.dispatch('questions/voteComment', {
+        commentId: this.comment._id,
+        value
+      })
+    }
   },
   computed: {
     commentAuthor() {

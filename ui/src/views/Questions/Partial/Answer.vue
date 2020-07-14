@@ -2,7 +2,7 @@
   <div class="answer">
     <div class="answer-post">
       <div class="answer-vote">
-        <Voter :points="answer.points" :value="answer.my_vote" />
+        <Voter @input="handleVote" :points="answer.points" :value="answer.my_vote" />
       </div>
       <div class="answer-body">
         <Post :body="answer.body" />
@@ -39,6 +39,14 @@ export default {
     Post,
     CommentsList,
     AuthorCard
+  },
+  methods: {
+    handleVote(value) {
+      this.$store.dispatch('questions/voteAnswer', {
+        answerId: this.answer._id,
+        value
+      })
+    }
   },
   computed: {
     selfComments() {
