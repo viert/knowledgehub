@@ -206,6 +206,10 @@ class Question(BasePost):
         if not self.is_new:
             self.update_last_activity()
 
+    def inc_views(self):
+        self.views_count += 1
+        self.save(skip_callback=True)
+
     def _after_save(self, is_new) -> None:
         # create task only after assuring the new data is saved to db
         if self._tags_changed:

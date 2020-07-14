@@ -130,7 +130,8 @@ def index():
 
 @questions_ctrl.route("/<question_id>", methods=["GET"])
 def show(question_id):
-    q = Question.get(question_id, "question not found")
+    q: Question = Question.get(question_id, "question not found")
+    q.inc_views()
     return json_response({"data": q.everything()})
 
 
