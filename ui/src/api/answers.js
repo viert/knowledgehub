@@ -9,6 +9,12 @@ const Answers = questionId => {
     },
     Vote(answerId, value) {
       return wrap(Axios.post(`${prefix}/${answerId}/vote`, { value }))
+    },
+    Accept(answerId) {
+      return wrap(Axios.post(`${prefix}/${answerId}/accept`))
+    },
+    Revoke(answerId) {
+      return wrap(Axios.post(`${prefix}/${answerId}/revoke`))
     }
   }
 }

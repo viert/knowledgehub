@@ -148,4 +148,8 @@ export default {
   flex-direction: column;
   justify-content: space-around;
 }
+
+.question-answers {
+  margin-top: 3em;
+}
 </style>

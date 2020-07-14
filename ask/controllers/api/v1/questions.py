@@ -286,6 +286,7 @@ def revoke_answer(question_id, answer_id):
     if not a.accepted:
         raise NotAccepted("answer is not accepted so can't be revoked")
     q.set_accepted_answer(None)
+    a.reload()
     return json_response({"data": a.api_dict(ANSWER_FIELDS)})
 
 
