@@ -16,6 +16,9 @@ const Questions = {
   Create(title, body, tags) {
     const payload = { title, body, tags }
     return wrap(Axios.post(`${API_PREFIX}/`, payload))
+  },
+  Vote(questionId, value) {
+    return wrap(Axios.post(`${API_PREFIX}/${questionId}/vote`, { value }))
   }
 }
 

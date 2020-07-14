@@ -1,18 +1,26 @@
 <template>
-  <div class="post-markdown">
+  <div class="post-markdown" :class="{'post-markdown--inline': inline}">
     <component :is="compiledBody" />
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
-import MarkDown from '@/markdown'
+import MarkDown, { plainConverter } from '@/markdown'
 
 export default {
   props: {
     body: {
       type: String,
       required: true
+    },
+    strict: {
+      type: Boolean,
+      default: false
+    },
+    inline: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -22,9 +30,13 @@ export default {
   },
   methods: {
     recompile() {
-      const html = MarkDown.makeHtml(this.body)
-        .replace(/{/g, '<span>&lbrace;</span>')
-        .replace(/}/g, '<span>&rbrace;</span>')
+      let html
+      if (this.strict) html = plainConverter(this.body)
+      else {
+        html = MarkDown.makeHtml(this.body)
+          .replace(/{/g, '<span>&lbrace;</span>')
+          .replace(/}/g, '<span>&rbrace;</span>')
+      }
       this.compiledBody = Vue.compile(`<fragment>${html}</fragment>`)
     }
   },
@@ -53,6 +65,10 @@ export default {
     p {
       margin: 0;
     }
+  }
+
+  &.post-markdown--inline {
+    display: inline;
   }
 }
 </style>

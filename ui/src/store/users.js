@@ -78,6 +78,7 @@ const UsersStore = {
       commit('setSigninOrigin', origin)
     },
     loadSubscriptionUsers({ commit }, userIds) {
+      if (userIds.length === 0) return
       Api.Users.GetMany(userIds).then(response => {
         commit('setUserSubscriptions', response.data.data)
       })
@@ -86,7 +87,7 @@ const UsersStore = {
       return Api.Account.Me(true)
         .then(response => {
           const { data } = response.data
-          const tagSubscriptions = data.tags_subscription.tags
+          const tagSubscriptions = data.tag_subscription.tags
           const useridSubscriptions = data.user_subscription.subs_user_ids
           const userData = {
             _id: data._id,
@@ -108,6 +109,8 @@ const UsersStore = {
             commit('setCurrentUser', null)
             commit('setAuthState', AuthStates.LoggedOut)
             commit('setProviders', err.response.data.providers)
+          } else {
+            throw err
           }
         })
     },

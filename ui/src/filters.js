@@ -1,3 +1,8 @@
+export function countable(c, single, plural) {
+  if (c % 10 === 1) return `${c} ${single}`
+  return `${c} ${plural}`
+}
+
 export function duration(dt) {
   // TODO: singles and plurals
   const moment = new Date(dt).getTime()
@@ -5,30 +10,35 @@ export function duration(dt) {
 
   let dur = Math.floor((now - moment) / 1000)
   if (dur < 60) {
-    return `${dur} seconds ago`
+    return `${countable(dur, 'second', 'seconds')} ago`
   }
 
   dur = Math.floor(dur / 60)
   if (dur < 60) {
-    return `${dur} minutes ago`
+    return `${countable(dur, 'minute', 'minutes')} ago`
   }
 
   dur = Math.floor(dur / 60)
   if (dur < 24) {
-    return `${dur} hours ago`
+    return `${countable(dur, 'hour', 'hours')} ago`
   }
 
   if (dur < 24 * 7) {
-    return `${Math.floor(dur / 24)} days ago`
+    dur = Math.floor(dur / 24)
+    return `${countable(dur, 'day', 'days')} ago`
   }
 
   if (dur < 24 * 30) {
-    return `${Math.floor(dur / 24 / 7)} weeks ago`
+    dur = Math.floor(dur / 24 / 7)
+    return `${countable(dur, 'week', 'weeks')} ago`
   }
 
   if (dur < 24 * 365) {
-    return `${Math.floor(dur / 24 / 30)} months ago`
+    dur = Math.floor(dur / 24 / 30)
+    return `${countable(dur, 'month', 'months')} ago`
   }
 
-  return `${Math.floor(dur / 24 / 365)} years ago`
+  dur = Math.floor(dur / 24 / 365)
+
+  return `${countable(dur, 'year', 'years')} ago`
 }

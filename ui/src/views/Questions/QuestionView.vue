@@ -8,7 +8,7 @@
         <fragment v-else>
           <Question v-if="question._id" :question="question" :comments="comments" />
           <div v-if="answers.length" class="question-answers">
-            <h2>{{ answers.length }} answers</h2>
+            <h2>{{ answersCount }}</h2>
             <Answer
               v-for="answer in answers"
               :key="answer._id"
@@ -50,6 +50,7 @@ import Question from './Partial/Question'
 import Answer from './Partial/Answer'
 import Post from '@/components/Post'
 import MarkdownEditor from '@/components/Editors/MarkdownEditor'
+import { countable } from '@/filters'
 
 export default {
   data() {
@@ -71,7 +72,10 @@ export default {
       question: state => state.questions.question,
       answers: state => state.questions.answers,
       comments: state => state.questions.comments
-    })
+    }),
+    answersCount() {
+      return countable(this.answers.length, 'answer', 'answers')
+    }
   },
   methods: {
     waitScroll(answerId) {

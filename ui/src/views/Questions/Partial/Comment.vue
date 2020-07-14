@@ -3,11 +3,16 @@
     <div class="comment-voter">
       <Voter :mini="true" :points="comment.points" :value="comment.my_vote" />
     </div>
-    <div class="comment-body" :class="{flash: comment.flash}">{{ commentBody }}</div>
+    <div class="comment-body" :class="{flash: comment.flash}">
+      <Post :body="comment.body" :strict="true" :inline="true" />&mdash;
+      <User :username="commentAuthor.username" />
+      {{ comment.created_at | duration }}
+    </div>
   </li>
 </template>
 
 <script>
+import Post from '@/components/Post'
 export default {
   props: {
     comment: {
@@ -15,12 +20,12 @@ export default {
       required: true
     }
   },
+  components: {
+    Post
+  },
   computed: {
     commentAuthor() {
       return this.$store.getters['users/user'](this.comment.author_id)
-    },
-    commentBody() {
-      return this.comment.body + ` — @${this.commentAuthor.username}`
     }
   }
 }
