@@ -6,6 +6,9 @@ const Answers = questionId => {
   return {
     Create(body) {
       return wrap(Axios.post(`${prefix}/`, { body }))
+    },
+    Vote(answerId, value) {
+      return wrap(Axios.post(`${prefix}/${answerId}/vote`, { value }))
     }
   }
 }

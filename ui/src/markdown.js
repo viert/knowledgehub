@@ -29,6 +29,15 @@ const converter = new showdown.Converter({
   excludeTrailingPunctuationFromURLs: true,
   extensions: [showdownHTMLEscape, showdownHighlight, usernameExt]
 })
-window.converter = converter
+
+const plainConverter = function(input) {
+  const ext = usernameExt()
+  input = input.replace('<', '&lt;').replace('>', '&gt;')
+  ext.forEach(rule => {
+    input = input.replace(rule.regex, rule.replace)
+  })
+  return input
+}
 
 export default converter
+export { plainConverter }

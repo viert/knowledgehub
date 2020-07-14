@@ -11,6 +11,9 @@ const Comments = (questionId, answerId = null) => {
   return {
     Create(body) {
       return wrap(Axios.post(`${prefix}/`, { body }))
+    },
+    Vote(commentId, value) {
+      return wrap(Axios.post(`${prefix}/${commentId}/vote`, { value }))
     }
   }
 }
