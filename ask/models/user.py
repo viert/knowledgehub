@@ -92,7 +92,10 @@ class User(StorableModel):
         ts.tags.remove(tag)
         ts.save()
 
+    def get_new_events(self):
+        return Event.find({"user_id": self._id, "dismissed": False})
+
 
 from .tag_subscription import TagSubscription
 from .user_subscription import UserSubscription
-from .tag import Tag
+from .event import Event

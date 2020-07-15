@@ -250,10 +250,12 @@ class Question(BasePost):
         for current in self.answers:
             if current.accepted:
                 current.accepted = False
+                current.accepted_at = None
                 current.save(skip_callback=True)
 
         if answer is not None:
             answer.accepted = True
+            answer.accepted_at = now()
             answer.save(skip_callback=True)
             self.has_accepted_answer = True
         else:
@@ -366,6 +368,7 @@ class Answer(BasePost):
 
     body: StringField(required=True, min_length=10, max_length=65536)
     accepted: BoolField(required=True, default=False, rejected=True)
+    accepted_at: DatetimeField(default=None, rejected=True)
     parent_id: ObjectIdField(required=True, rejected=True)
 
     INDEXES = (
@@ -386,6 +389,11 @@ class Answer(BasePost):
         super()._before_save()
         if self.question is None:
             raise InvalidQuestion("parent_id is invalid or question not found")
+
+        if self.accepted and self.accepted_at is None:
+            self.accepted_at = now()
+        if self.accepted_at is not None and not self.accepted:
+            self.accepted_at = None
 
     def _after_save(self, is_new) -> None:
         q = self.question
