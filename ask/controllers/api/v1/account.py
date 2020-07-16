@@ -16,14 +16,27 @@ ACCOUNT_FIELDS = (
     "username",
     "first_name",
     "last_name",
-    "email",
-    "telegram_id",
-    "icq_id",
     "ext_id",
     "tag_subscription",
     "user_subscription",
     "avatar_url",
 )
+
+ACCOUNT_RESTRICTED_FIELDS = (
+    "email",
+    "telegram_id",
+    "icq_id",
+    "notify_by_email",
+    "notify_by_telegram",
+    "notify_by_icq",
+)
+
+
+def account_dict(user):
+    data = user.to_dict(ACCOUNT_FIELDS)
+    for field in ACCOUNT_RESTRICTED_FIELDS:
+        data[field] = getattr(user, field)
+    return data
 
 
 @account_ctrl.route("/me", methods=["GET"])
@@ -31,19 +44,19 @@ ACCOUNT_FIELDS = (
 def me():
     user = get_user_from_app_context()
     return json_response({
-        "data": user.to_dict(ACCOUNT_FIELDS),
+        "data": account_dict(user),
         "providers": BaseProvider.list_provider_info()
     })
 
 
-@account_ctrl.route("/me", methods=["POST"])
+@account_ctrl.route("/me", methods=["PATCH"])
 @auth_required
 @json_body_required
 def update_settings():
     user: User = get_user_from_app_context()
     user.update(request.json)
     return json_response({
-        "data": user.to_dict(ACCOUNT_FIELDS),
+        "data": account_dict(user),
     })
 
 

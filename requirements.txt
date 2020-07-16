@@ -1,2 +1,2 @@
-glasskit>=3.9.27
+glasskit>=3.9.29
 line_profiler
