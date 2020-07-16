@@ -116,6 +116,7 @@ export default {
 
   .user-settings_avatar {
     width: 150px;
+    min-width: 150px;
     height: 150px;
     overflow: hidden;
     border-radius: 50%;
