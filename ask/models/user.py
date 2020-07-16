@@ -10,13 +10,16 @@ class User(StorableModel):
     username: StringField(required=True, unique=True)
     first_name: StringField(default="")
     last_name: StringField(default="")
-    email: StringField(default="")
     avatar_url: StringField(default="")
     created_at: DatetimeField(required=True, rejected=True, default=now)
     updated_at: DatetimeField(required=True, rejected=True, default=now)
-    moderator: BoolField(required=True, default=False, rejected=True)
-    telegram_id: IntField(default=None)
-    icq_id: StringField(default=None)
+    moderator: BoolField(required=True, restricted=True, default=False, rejected=True)
+    email: StringField(default="", restricted=True)
+    telegram_id: IntField(default=None, restricted=True)
+    icq_id: StringField(default=None, restricted=True)
+    notify_by_email: BoolField(required=True, restricted=True, default=False)
+    notify_by_telegram: BoolField(required=True, restricted=True, default=False)
+    notify_by_icq: BoolField(required=True, restricted=True, default=False)
 
     KEY_FIELD = "username"
 

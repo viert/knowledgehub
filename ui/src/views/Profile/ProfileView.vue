@@ -2,7 +2,7 @@
   <div class="page-layout">
     <main>
       <h3 class="page-title">Profile</h3>
-      <div v-if="!ready" class="loading loading--user-settings">
+      <div v-if="loading" class="loading loading--user-settings">
         <Progress text="loading" />
       </div>
       <fragment v-else>
@@ -10,19 +10,25 @@
           <div class="user-settings_avatar">
             <img :src="user.avatar_url" />
           </div>
-          <form class="user-settings_form">
-            <FormRow label="Your ID" v-model="user.ext_id" :readonly="true" />
-            <FormRow label="Username" v-model="user.username" />
-            <FormRow label="First Name" v-model="user.first_name" />
-            <FormRow label="Last Name" v-model="user.last_name" />
+          <form @submit.prevent="handleSave" class="user-settings_form">
+            <FormRow label="Your ID" v-model="user.ext_id" :disabled="saving" :readonly="true" />
+            <FormRow label="Username" v-model="user.username" :disabled="saving" />
+            <FormRow label="First Name" v-model="user.first_name" :disabled="saving" />
+            <FormRow label="Last Name" v-model="user.last_name" :disabled="saving" />
             <hr />
-            <FormRow label="Email" v-model="user.email" />
-            <FormRow label="Telegram ID" v-model="user.telegram_id" />
-            <FormRow label="ICQ ID" v-model="user.icq_id" />
+            <FormRow label="Email" v-model="user.email" :disabled="saving" />
+            <FormRow label="Telegram ID" v-model="user.telegram_id" :disabled="saving" />
+            <FormRow label="ICQ ID" v-model="user.icq_id" :disabled="saving" />
+            <FormRow label="Notifications">
+              <ButtonSwitch v-model="notificationOptions" :disabled="saving" />
+            </FormRow>
             <p>
               To get Telegram and/or ICQ notifications, set your account ID here, then add %TODO_BOT_ACCOUNT% and run
               <code>/start</code> command.
             </p>
+            <div class="post-form-control">
+              <SpinnerButton :loading="saving" class="btn btn-primary">Save Settings</SpinnerButton>
+            </div>
           </form>
         </div>
       </fragment>
@@ -42,7 +48,44 @@ export default {
   },
   data() {
     return {
-      user: {}
+      user: {},
+      notificationOptions: {
+        email: true,
+        telegram: false,
+        icq: false
+      },
+      loading: true,
+      saving: false
+    }
+  },
+  mounted() {},
+  methods: {
+    handleSave() {
+      const settings = {
+        ...this.user,
+        notify_by_email: this.notificationOptions.email,
+        notify_by_icq: this.notificationOptions.icq,
+        notify_by_telegram: this.notificationOptions.telegram
+      }
+      this.saving = true
+      this.$store
+        .dispatch('users/saveSettings', settings)
+        .then(() => {
+          this.fillUser()
+          this.$store.dispatch('messages/info', 'Settings saved successfully')
+        })
+        .finally(() => {
+          this.saving = false
+        })
+    },
+    fillUser() {
+      this.user = { ...this.me }
+      this.notificationOptions = {
+        email: this.me.notify_by_email,
+        telegram: this.me.notify_by_telegram,
+        icq: this.me.notify_by_icq
+      }
+      this.loading = false
     }
   },
   computed: {
@@ -52,7 +95,7 @@ export default {
   },
   watch: {
     ready() {
-      this.user = { ...this.me }
+      this.fillUser()
     }
   }
 }

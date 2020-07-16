@@ -8,6 +8,7 @@ import Progress from '@/components/Progress'
 import Voter from '@/components/Voter'
 import User from '@/components/User'
 import SpinnerButton from '@/components/SpinnerButton'
+import ButtonSwitch from '@/components/Editors/ButtonSwitch'
 import Fragment from 'vue-fragment'
 
 Vue.use(Fragment.Plugin)
@@ -18,6 +19,7 @@ Vue.component('Progress', Progress)
 Vue.component('Voter', Voter)
 Vue.component('User', User)
 Vue.component('SpinnerButton', SpinnerButton)
+Vue.component('ButtonSwitch', ButtonSwitch)
 
 Vue.filter('duration', duration)
 

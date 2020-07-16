@@ -9,6 +9,23 @@ function storeUser(state, user) {
   }
 }
 
+function extractUserData(data) {
+  return {
+    _id: data._id,
+    avatar_url: data.avatar_url,
+    ext_id: data.ext_id,
+    first_name: data.first_name,
+    last_name: data.last_name,
+    username: data.username,
+    email: data.email,
+    telegram_id: data.telegram_id,
+    icq_id: data.icq_id,
+    notify_by_email: data.notify_by_email,
+    notify_by_telegram: data.notify_by_telegram,
+    notify_by_icq: data.notify_by_icq
+  }
+}
+
 var userLoader = null
 
 const UsersStore = {
@@ -89,14 +106,7 @@ const UsersStore = {
           const { data } = response.data
           const tagSubscriptions = data.tag_subscription.tags
           const useridSubscriptions = data.user_subscription.subs_user_ids
-          const userData = {
-            _id: data._id,
-            avatar_url: data.avatar_url,
-            ext_id: data.ext_id,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            username: data.username
-          }
+          const userData = extractUserData(data)
 
           commit('setCurrentUser', userData)
           commit('setTagSubscriptions', tagSubscriptions)
@@ -183,6 +193,12 @@ const UsersStore = {
           promise: p,
           resolver: resolve
         })
+      })
+    },
+    saveSettings({ commit }, settings) {
+      return Api.Account.Update(settings).then(response => {
+        const userData = extractUserData(response.data.data)
+        commit('setCurrentUser', userData)
       })
     }
   }
