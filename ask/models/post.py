@@ -107,6 +107,10 @@ class BasePost(StorableSubmodel):
         if self.deleted_by_id is not None and self.deleted_by is None:
             raise InvalidUser("deleted_by_id is invalid or user not found")
 
+    def _after_save(self, is_new):
+        if is_new:
+            self.generate_events()
+
     def api_dict(self, fields=None, include_restricted=False) -> Dict[str, Any]:
         d = self.to_dict(fields, include_restricted)
         if self.deleted:
@@ -137,6 +141,9 @@ class BasePost(StorableSubmodel):
             else:
                 raise raise_if_none
         return post
+
+    def generate_events(self):
+        pass
 
 
 class Question(BasePost):

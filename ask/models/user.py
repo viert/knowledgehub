@@ -1,6 +1,6 @@
 from glasskit.utils import now
 from glasskit.uorm.models.storable_model import StorableModel
-from glasskit.uorm.models.fields import StringField, BoolField, DatetimeField
+from glasskit.uorm.models.fields import StringField, BoolField, DatetimeField, IntField
 from ask.errors import AlreadySubscribed, NotSubscribed
 
 
@@ -15,6 +15,8 @@ class User(StorableModel):
     created_at: DatetimeField(required=True, rejected=True, default=now)
     updated_at: DatetimeField(required=True, rejected=True, default=now)
     moderator: BoolField(required=True, default=False, rejected=True)
+    telegram_id: IntField(default=None)
+    icq_id: StringField(default=None)
 
     KEY_FIELD = "username"
 

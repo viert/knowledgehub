@@ -37,5 +37,9 @@ class TagSubscription(StorableModel):
             task = SyncTagsTask.create(self._tags_changed)
             task.publish()
 
+    def _after_delete(self):
+        task = SyncTagsTask.create(self.tags)
+        task.publish()
+
 
 from .user import User

@@ -1,8 +1,9 @@
 from flask import session, request, redirect
 from glasskit import ctx
 from glasskit.utils import get_user_from_app_context
-from glasskit.api import json_response
+from glasskit.api import json_response, json_body_required
 
+from ask.api import auth_required
 from ask.controllers import AuthController
 from ask.idconnect.provider import BaseProvider
 from ask.models import User
@@ -15,6 +16,9 @@ ACCOUNT_FIELDS = (
     "username",
     "first_name",
     "last_name",
+    "email",
+    "telegram_id",
+    "icq_id",
     "ext_id",
     "tag_subscription",
     "user_subscription",
@@ -22,14 +26,24 @@ ACCOUNT_FIELDS = (
 )
 
 
-@account_ctrl.route("/me")
+@account_ctrl.route("/me", methods=["GET"])
+@auth_required
 def me():
     user = get_user_from_app_context()
-    if user is None:
-        raise AuthenticationError()
     return json_response({
         "data": user.to_dict(ACCOUNT_FIELDS),
         "providers": BaseProvider.list_provider_info()
+    })
+
+
+@account_ctrl.route("/me", methods=["POST"])
+@auth_required
+@json_body_required
+def update_settings():
+    user: User = get_user_from_app_context()
+    user.update(request.json)
+    return json_response({
+        "data": user.to_dict(ACCOUNT_FIELDS),
     })
 
 

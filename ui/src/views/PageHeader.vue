@@ -14,7 +14,7 @@
         <router-link to="/ask" class="btn btn-primary btn-ask">Ask Question</router-link>
       </div>
       <div v-if="me" class="panel-account">
-        <User :username="me.username" />
+        <router-link to="/profile">@{{me.username}}</router-link>
         <a class="logout" href @click.prevent="logout">
           <i class="fas fa-sign-out-alt"></i>
         </a>
@@ -27,14 +27,10 @@
 </template>
 
 <script>
-import User from '@/components/User'
 import { mapGetters, mapState, mapActions } from 'vuex'
 import { AuthStates } from '@/constants'
 
 export default {
-  components: {
-    User
-  },
   computed: {
     ...mapGetters({
       me: 'users/me'
