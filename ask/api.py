@@ -1,6 +1,6 @@
 from functools import wraps
 from glasskit.utils import get_user_from_app_context
-from glasskit.errors import AuthenticationError
+from ask.errors import AuthenticationError
 
 
 def auth_required(func):
