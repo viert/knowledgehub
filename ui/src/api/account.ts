@@ -1,7 +1,6 @@
 import Axios from 'axios'
 import { wrap } from './utils'
 import { UserSettings } from './types'
-import { User } from '@/types'
 
 const API_PREFIX = '/api/v1/account'
 

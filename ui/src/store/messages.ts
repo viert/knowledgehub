@@ -12,6 +12,7 @@ const TYPE2CLASS = {
 }
 
 const messagesStore: Module<MessagesState, RootState> = {
+  namespaced: true,
   state: {
     messages: []
   },

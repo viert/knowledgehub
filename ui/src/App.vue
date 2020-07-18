@@ -1,32 +1,42 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+    <MaintenancePage v-if="maintenance" @finished="getAuthStatus" />
+    <Layout v-else />
+    <AlertBox />
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { AuthState } from './constants'
+import { namespace } from 'vuex-class'
+import AlertBox from '@/components/AlertBox.vue'
+import MaintenancePage from '@/views/MaintenancePage.vue'
+import Layout from '@/Layout.vue'
+const users = namespace('users')
 
-#nav {
-  padding: 30px;
+@Component({
+  components: {
+    MaintenancePage,
+    AlertBox,
+    Layout
+  }
+})
+export default class App extends Vue {
+  @users.State('authState') authState!: AuthState
+  @users.Action('loadAuthInfo') loadAuthInfo!: () => void
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+  get maintenance() {
+    return this.authState === AuthState.Maintenance
+  }
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+  created() {
+    this.$store.dispatch('data/loadAppInfo')
+    this.$store.dispatch('users/loadAuthInfo')
   }
 }
+</script>
+
+<style lang="scss">
+@import './assets/common.scss';
 </style>
