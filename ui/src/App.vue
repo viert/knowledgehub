@@ -1,49 +1,32 @@
 <template>
   <div id="app">
-    <MaintenancePage
-      v-if="authState === AuthStates.Maintenance"
-      @finished="getAuthStatus"
-    />
-    <Layout v-else />
-    <AlertBox />
+    <div id="nav">
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link>
+    </div>
+    <router-view />
   </div>
 </template>
 
-<script>
-import { mapActions, mapState } from 'vuex'
-import Layout from '@/views/Layout'
-import MaintenancePage from '@/views/MaintenancePage'
-import AlertBox from '@/components/AlertBox'
-import { AuthStates } from '@/constants'
+<style lang="scss">
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
 
-export default {
-  data() {
-    return {
-      AuthStates
+#nav {
+  padding: 30px;
+
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+
+    &.router-link-exact-active {
+      color: #42b983;
     }
-  },
-  computed: {
-    ...mapState({
-      authState: state => state.users.authState
-    })
-  },
-  components: {
-    Layout,
-    MaintenancePage,
-    AlertBox
-  },
-  created() {
-    this.$store.dispatch('data/loadAppInfo')
-    this.$store.dispatch('users/loadAuthInfo')
-  },
-  methods: {
-    ...mapActions({
-      getAuthStatus: 'users/loadAuthInfo'
-    })
   }
 }
-</script>
-
-<style lang="scss">
-@import './assets/common.scss';
 </style>

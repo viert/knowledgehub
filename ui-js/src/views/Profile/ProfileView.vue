@@ -27,7 +27,7 @@
               <code>/start</code> command.
             </p>
             <div class="post-form-control">
-              <SpinnerButton :loading="saving" class="btn btn-primary">Save Settings</SpinnerButton>
+              <SpinnerButton type="submit" :loading="saving" class="btn btn-primary">Save Settings</SpinnerButton>
             </div>
           </form>
         </div>
