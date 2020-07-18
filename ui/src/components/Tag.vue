@@ -44,156 +44,22 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { mapState } from 'vuex'
-export default {
-  props: {
-    name: {
-      type: String,
-      required: true
-    },
-    cross: {
-      type: Boolean,
-      default: false
-    },
-    expandable: {
-      type: Boolean,
-      default: true
-    },
-    clickable: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data() {
-    return {
-      showDetails: false,
-      tagLoading: false,
-      subscribeInProgress: false
-    }
-  },
-  computed: {
-    ...mapState({
-      tagSubscriptions: state => state.users.tagSubscriptions
-    }),
-    defaultTagDescription() {
-      return `Questions related to ${this.name}`
-    },
-    subscribed() {
-      return this.tagSubscriptions.includes(this.name)
-    },
-    tag() {
-      const tag = this.$store.getters['tags/getTag'](this.name)
-      if (!tag) {
-        this.loadTag()
-      }
-      return tag
-    }
-  },
-  methods: {
-    handleSubscribe() {
-      this.subscribeInProgress = true
-      this.$store.dispatch('users/subscribeToTag', this.name).finally(() => {
-        this.subscribeInProgress = false
-      })
-    },
-    handleUnsubscribe() {
-      this.subscribeInProgress = true
-      this.$store
-        .dispatch('users/unsubscribeFromTag', this.name)
-        .finally(() => {
-          this.subscribeInProgress = false
-        })
-    },
-    loadTag() {
-      this.tagLoading = true
-      this.$store.dispatch('tags/lazyLoadTag', this.name).finally(() => {
-        this.tagLoading = false
-      })
-    },
-    crossClick(e) {
-      this.$emit('close', e)
-    },
-    tagClick(e) {
-      this.$emit('click', e)
-    }
-  }
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { namespace } from 'vuex-class'
+
+@Component
+export default class Tag extends Vue {
+  @Prop({ type: String, required: true }) readonly name!: string
+  @Prop({ type: Boolean, default: false }) readonly cross!: boolean
+  @Prop({ type: Boolean, default: true }) readonly expandable!: boolean
+  @Prop({ type: Boolean, default: false }) readonly clickable!: boolean
+
+  private showDetails = false
+  private tagLoading = false
+  private subscribeInProgress = false
 }
 </script>
 
-<style lang='scss'>
-.tag {
-  font-size: 80%;
-  position: relative;
-  padding: 1px 8px;
-  box-sizing: border-box;
-  border-radius: 3px;
-  color: black;
-  display: inline-block;
-  margin-right: 4px;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-
-  &.tag--clickable {
-    cursor: pointer;
-  }
-
-  a.tag-cross {
-    color: black;
-    font-size: 0.9em;
-    margin-left: 1px;
-  }
-
-  .tag-expand {
-    z-index: 10;
-    box-sizing: border-box;
-    border-radius: 3px;
-    color: black;
-    display: block;
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    width: 250px;
-    border: 1px solid #ccc;
-    background: white;
-
-    .tag-expand_name {
-      background: #f9f9f9;
-      padding: 1px 8px;
-      font-weight: bold;
-    }
-
-    .tag-expand_content {
-      padding: 8px;
-
-      .tag-expand_description {
-        margin-bottom: 12px;
-      }
-
-      .tag-expand_counters {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 12px;
-        div {
-          margin-right: 1em;
-        }
-      }
-
-      .tag-expand_loading {
-        text-align: center;
-        margin: 20px 0;
-      }
-    }
-  }
-
-  .expand-enter-active,
-  .expand-leave-active {
-    transition: opacity 0.3s;
-  }
-
-  .expand-enter,
-  .expand-leave-to {
-    opacity: 0;
-  }
-}
-</style>
+<style scoped></style>
