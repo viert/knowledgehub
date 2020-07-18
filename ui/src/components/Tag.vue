@@ -69,7 +69,7 @@ export default class Tag extends Vue {
   private subscribeInProgress = false
 
   @users.State
-  public tagSubscriptions: any
+  public tagSubscriptions!: string[]
 
   public get defaultTagDescription() {
     return `Questions related to ${this.name}`
