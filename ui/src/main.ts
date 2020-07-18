@@ -3,9 +3,11 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import Fragment from 'vue-fragment'
+import Tag from '@/components/Tag'
 
 Vue.use(Fragment.Plugin)
 Vue.config.productionTip = false
+Vue.component('Tag', Tag)
 
 new Vue({
   router,
