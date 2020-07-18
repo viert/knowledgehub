@@ -8,30 +8,38 @@
   >
     <transition v-if="expandable" name="expand">
       <div v-if="showDetails" class="tag-expand">
-        <div class="tag-expand_name">{{ tag && tag.name || name }}</div>
+        <div class="tag-expand_name">{{ (tag && tag.name) || name }}</div>
         <div class="tag-expand_content">
           <div class="tag-expand_loading" v-if="tagLoading">
             <i class="fa fa-spinner fa-spin fa-2x"></i>
           </div>
           <fragment v-else>
             <div v-if="tag" class="tag-expand_counters">
-              <div class="tag-expand_counters-subs">{{ tag.subscribers_count }} subscribers</div>
-              <div class="tag-expand_counters-questions">{{ tag.questions_count }} questions</div>
+              <div class="tag-expand_counters-subs"
+                >{{ tag.subscribers_count }} subscribers</div
+              >
+              <div class="tag-expand_counters-questions"
+                >{{ tag.questions_count }} questions</div
+              >
             </div>
-            <p class="tag-expand_description">{{ tag && tag.description || defaultTagDescription }}</p>
+            <p class="tag-expand_description">{{
+              (tag && tag.description) || defaultTagDescription
+            }}</p>
             <div class="tag-expand_ctrl">
               <SpinnerButton
                 v-if="subscribed"
                 :loading="subscribeInProgress"
                 @click="handleUnsubscribe"
                 class="btn btn-sm btn-block btn-outline-danger"
-              >Unsubscribe</SpinnerButton>
+                >Unsubscribe</SpinnerButton
+              >
               <SpinnerButton
                 v-else
                 :loading="subscribeInProgress"
                 @click="handleSubscribe"
                 class="btn btn-sm btn-block btn-outline-primary"
-              >Subscribe</SpinnerButton>
+                >Subscribe</SpinnerButton
+              >
             </div>
           </fragment>
         </div>
@@ -48,6 +56,7 @@
 import { mapState } from 'vuex'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
+const users = namespace('users')
 
 @Component
 export default class Tag extends Vue {
@@ -59,6 +68,9 @@ export default class Tag extends Vue {
   private showDetails = false
   private tagLoading = false
   private subscribeInProgress = false
+
+  @users.State
+  public tagSubscriptions: any
 }
 </script>
 
