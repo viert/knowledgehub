@@ -173,7 +173,7 @@ const usersStore: Module<UsersState, RootState> = {
             const userIds = Object.keys(state.loadingUsers)
             Api.Users.GetMany(userIds)
               .then(response => {
-                const users = response.data.data
+                const users: User[] = response.data.data
                 users.forEach(user => {
                   commit('setUser', user)
                   const nameResolver = state.loadingUsers[user.username]
