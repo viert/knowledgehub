@@ -21,6 +21,8 @@ export interface Question {
   title: string
   tags: string[]
   author_id: string
+  answers_count: number
+  has_accepted_answer: boolean
 }
 
 export interface Answer {
@@ -71,7 +73,7 @@ export interface UsersState {
 }
 
 export interface QuestionsState {
-  questionList: Question[]
+  questionsList: Question[]
   question: Question | null
   answers: Answer[]
   comments: Comment[]

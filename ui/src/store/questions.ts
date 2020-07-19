@@ -14,7 +14,7 @@ class MaxPage extends Error {
 const questionsStore: Module<QuestionsState, RootState> = {
   namespaced: true,
   state: {
-    questionList: [],
+    questionsList: [],
     question: null,
     answers: [],
     comments: [],
@@ -28,7 +28,7 @@ const questionsStore: Module<QuestionsState, RootState> = {
   },
   mutations: {
     storeQuestionsList(state, questions: Array<Question>) {
-      state.questionList = questions
+      state.questionsList = questions
     },
     setPage(state, page: number) {
       state.page = page

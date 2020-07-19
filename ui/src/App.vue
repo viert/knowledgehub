@@ -12,7 +12,7 @@ import { AuthState } from './constants'
 import { namespace } from 'vuex-class'
 import AlertBox from '@/components/AlertBox.vue'
 import MaintenancePage from '@/views/MaintenancePage.vue'
-import Layout from '@/Layout.vue'
+import Layout from '@/views/Layout.vue'
 const users = namespace('users')
 
 @Component({

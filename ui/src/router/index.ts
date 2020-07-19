@@ -1,14 +1,18 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import PageHeader from '@/views/PageHeader.vue'
+import QuestionsList from '@/views/Questions/QuestionsList.vue'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/',
-    name: 'Page',
-    component: PageHeader
+    path: '/questions',
+    name: 'QuestionsList',
+    component: QuestionsList
+  },
+  {
+    path: '/*',
+    redirect: '/questions'
   }
 ]
 
