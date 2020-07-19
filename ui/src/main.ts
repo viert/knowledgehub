@@ -9,6 +9,7 @@ import Voter from '@/components/Voter.vue'
 import User from '@/components/User.vue'
 import SpinnerButton from '@/components/SpinnerButton.vue'
 import ButtonSwitch from '@/components/ButtonSwitch.vue'
+import { duration } from './filters'
 
 Vue.use(Fragment.Plugin)
 Vue.config.productionTip = false
@@ -18,6 +19,7 @@ Vue.component('Voter', Voter)
 Vue.component('User', User)
 Vue.component('SpinnerButton', SpinnerButton)
 Vue.component('ButtonSwitch', ButtonSwitch)
+Vue.filter('duration', duration)
 
 new Vue({
   router,
