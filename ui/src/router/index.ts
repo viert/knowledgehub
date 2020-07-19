@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import QuestionsList from '@/views/Questions/QuestionsList.vue'
+import QuestionPage from '@/views/Questoins/QuestionPage.vue'
 import AskPage from '@/views/AskPage.vue'
 import SigninPage from '@/views/SignIn/SigninPage.vue'
 
@@ -19,8 +20,8 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/questions/:questionId',
-    name: 'QuestionView',
-    component: QuestionView
+    name: 'QuestionPage',
+    component: QuestionPage
   },
   {
     path: '/profile',
