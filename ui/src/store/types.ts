@@ -58,6 +58,41 @@ export interface Message {
   text: string
 }
 
+interface MongoDBShardInfo {
+  allocator: string
+  bits: number
+  debug: boolean
+  gitVersion: string
+  javascriptEngine: string
+  maxBsonObjectSize: number
+  modules: string[]
+  ok: number
+  openssl: {
+    running: string
+  }
+  storageEngines: string[]
+  sysInfo: string
+  version: string
+  versionArray: number[]
+}
+
+interface MongoDBInfo {
+  meta: MongoDBShardInfo
+  shards: { [key: string]: MongoDBShardInfo }
+}
+
+export interface AppInfo {
+  app: {
+    name: string
+    version: string
+  }
+  cache: {
+    active: boolean
+    type: string
+  }
+  mongodb: MongoDBInfo
+}
+
 export interface UsersState {
   user: User | null
   userLoader: Promise<any> | null
@@ -82,7 +117,7 @@ export interface QuestionsState {
 }
 
 export interface DataState {
-  appInfo: { [key: string]: any }
+  appInfo: AppInfo | null
 }
 
 export interface TagsState {

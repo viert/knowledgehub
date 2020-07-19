@@ -1,5 +1,5 @@
 <template>
-  <div v-if="appInfo.app" class="page-footer">
+  <div v-if="appInfo" class="page-footer">
     &copy; 2020 {{ appInfo.app.name }} v.{{ appInfo.app.version }}
     <span class="details">
       Flask {{ appInfo.flask_version }} / MongoDB
@@ -11,12 +11,13 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
+import { AppInfo } from '../store/types'
 
 const data = namespace('data')
 
 @Component
 export default class PageFooter extends Vue {
-  @data.State('appInfo') appInfo!: () => { [key: string]: any }
+  @data.State('appInfo') appInfo!: () => AppInfo | null
 }
 </script>
 
