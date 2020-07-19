@@ -1,14 +1,14 @@
-import { DataState, RootState } from './types'
+import { DataState, RootState, AppInfo } from './types'
 import { Module } from 'vuex'
 import Api from '@/api'
 
 const dataStore: Module<DataState, RootState> = {
   namespaced: true,
   state: {
-    appInfo: {}
+    appInfo: null
   },
   mutations: {
-    setAppInfo(state, appInfo) {
+    setAppInfo(state, appInfo: AppInfo) {
       state.appInfo = appInfo
     }
   },
