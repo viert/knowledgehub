@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
+    "@types/lodash": "^4.14.157",
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
+    "lodash": "^4.17.19",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-fragment": "^1.5.1",
