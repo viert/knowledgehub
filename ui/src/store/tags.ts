@@ -12,9 +12,15 @@ function defaultTag(tagName: string): Tag {
 }
 
 const tagsStore: Module<TagsState, RootState> = {
+  namespaced: true,
   state: {
     tags: {},
     tagLoaders: {}
+  },
+  getters: {
+    getTag(state) {
+      return (tagName: string) => state.tags[tagName]
+    }
   },
   mutations: {
     setTag(state, tag: Tag) {
