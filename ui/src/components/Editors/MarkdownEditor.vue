@@ -168,7 +168,6 @@ export default class MarkdownEditor extends Vue {
   @Prop({ type: Boolean, default: true }) autofocus!: boolean
   @Prop({ type: Boolean, default: false }) error!: boolean
 
-  private preview = ''
   private linkOptionsOpen = false
   private pictureOptionsOpen = false
   private usernamePickerOpen = false
@@ -306,7 +305,7 @@ export default class MarkdownEditor extends Vue {
     this.setSelectionAndFocus(newStart, newEnd)
   }
 
-  setSelectionAndFocus(start: number, end: number) {
+  setSelectionAndFocus(start: number, end?: number) {
     this.$nextTick(() => {
       if (typeof end === 'undefined') {
         end = start
