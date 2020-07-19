@@ -42,6 +42,7 @@ export default class CommentForm extends Vue {
   }
 
   handleEnter(e: KeyboardEvent) {
+    // TODO reuse isCtrlEnter from MarkdownEditor
     const onMac = window.navigator.platform.startsWith('Mac')
     const needSubmit = (onMac && e.metaKey) || (!onMac && e.ctrlKey)
     if (needSubmit) {
