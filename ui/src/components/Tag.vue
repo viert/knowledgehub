@@ -56,6 +56,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 const users = namespace('users')
+const tags = namespace('tags')
 
 @Component
 export default class Tag extends Vue {
@@ -68,8 +69,8 @@ export default class Tag extends Vue {
   private tagLoading = false
   private subscribeInProgress = false
 
-  @users.State
-  public tagSubscriptions!: string[]
+  @users.State('tagSubscriptions') tagSubscriptions!: string[]
+  @tags.Getter('getTag') getTag!: (tagName: string) => Tag
 
   public get defaultTagDescription() {
     return `Questions related to ${this.name}`
@@ -80,7 +81,7 @@ export default class Tag extends Vue {
   }
 
   public get tag() {
-    const tag = this.$store.getters['tags/getTag'](this.name)
+    const tag = this.getTag(this.name)
     if (!tag) {
       this.loadTag()
     }
@@ -88,6 +89,7 @@ export default class Tag extends Vue {
   }
 
   loadTag() {
+    // TODO catch 404 to avoid refetching
     this.tagLoading = true
     this.$store.dispatch('tags/lazyLoadTag', this.name).finally(() => {
       this.tagLoading = false
