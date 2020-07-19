@@ -93,12 +93,19 @@ export interface AppInfo {
   mongodb: MongoDBInfo
 }
 
+export interface ProviderInfo {
+  authorize_uri: string
+  btn_class: string
+  fa_icon: string
+  provider_name: string
+}
+
 export interface UsersState {
   user: User | null
   userLoader: Promise<any> | null
   tagSubscriptions: string[]
   userSubscriptions: string[]
-  providers: string[]
+  providers: ProviderInfo[]
   authState: AuthState
   signinOrigin: string
   users: { [key: string]: User }

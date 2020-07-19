@@ -197,6 +197,7 @@ export default class MarkdownEditor extends Vue {
         }
       }
     }
+    this.$emit('input', value)
   }
 
   handleKeydown(e: KeyboardEvent) {
