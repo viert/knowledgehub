@@ -111,7 +111,7 @@ export default class AskPage extends mixins(RequireAuth) {
         const questionId = response.data.data._id
         this.$router.replace(`/questions/${questionId}`)
       })
-      .catch(() => {
+      .finally(() => {
         // TODO enable controls, reset loading flag
       })
   }
