@@ -28,6 +28,7 @@
             v-if="me"
             v-model="answerBody"
             :error="answerBodyError"
+            :disabled="isSaving"
             @submit="handlePostAnswer"
           />
           <SigninBanner v-else message="Sign in to post answers" />
@@ -68,6 +69,7 @@ export default class QuestionPage extends Vue {
   private loading = true
   private answerBody = ''
   private answerBodyError = ''
+  private isSaving = false
 
   @questions.State('question') readonly question!: Question
   @questions.State('answers') readonly answers!: Answer[]
@@ -89,6 +91,7 @@ export default class QuestionPage extends Vue {
       return
     }
     // TODO disable controls, set loading flag
+    this.isSaving = true
     this.$store
       .dispatch('questions/createAnswer', this.answerBody)
       .then(answerId => {
@@ -101,7 +104,7 @@ export default class QuestionPage extends Vue {
         console.log(err)
       })
       .finally(() => {
-        // TODO reset loading flag, enable controls
+        this.isSaving = false
       })
   }
 

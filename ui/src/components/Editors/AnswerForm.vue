@@ -5,6 +5,7 @@
       ref="editor"
       :autofocus="false"
       :error="!!error"
+      :disabled="disabled"
       :value="value"
       @input="$emit('input', $event)"
     />
@@ -16,9 +17,13 @@
       </div>
     </div>
     <div class="post-form-control">
-      <button @click="$emit('submit')" class="btn btn-primary">
-        Post Answer
-      </button>
+      <SpinnerButton
+        @click="$emit('submit')"
+        class="btn btn-primary"
+        type="submit"
+        :loading="disabled"
+        >Post Answer</SpinnerButton
+      >
     </div>
   </div>
 </template>
@@ -37,6 +42,7 @@ export default class AnswerForm extends Vue {
   @Prop({ type: String, default: '' }) readonly value!: string
   @Prop({ type: String, default: '' }) readonly error!: string
   @questions.State('question') readonly question!: Question
+  @Prop({ type: Boolean, default: false }) disabled!: boolean
 }
 </script>
 
