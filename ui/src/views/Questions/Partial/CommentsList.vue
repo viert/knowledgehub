@@ -10,11 +10,14 @@
     <CommentForm
       v-model="commentBody"
       @submit="handlePostComment"
-      :posting="commentPostRequest"
+      :posting="commentPostRequestInProgress"
       @close="formOpened = false"
       v-if="formOpened"
     />
-    <a v-else @click.prevent="formOpened = true" href="#">add a comment</a>
+    <a v-else-if="me" @click.prevent="formOpened = true" href="#">
+      add a comment
+    </a>
+    <router-link to="/signin" v-else>sign in to add a comment</router-link>
   </div>
 </template>
 
@@ -22,12 +25,16 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import CommentView from './CommentView.vue'
 import CommentForm from '@/components/Editors/CommentForm.vue'
-import { Comment } from '@/store/types'
+import { Comment, User } from '@/store/types'
+import { namespace } from 'vuex-class'
+
+const users = namespace('users')
 
 @Component({ components: { CommentView, CommentForm } })
 export default class CommentsList extends Vue {
   @Prop({ type: Array, default: () => [] }) readonly comments!: Comment[]
   @Prop({ type: String, required: true }) readonly parentId!: string
+  @users.Getter('me') readonly me!: User
 
   private formOpened = false
   private commentBody = ''

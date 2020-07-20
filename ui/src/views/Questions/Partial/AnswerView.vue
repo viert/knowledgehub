@@ -1,5 +1,5 @@
 <template>
-  <div class="answer">
+  <div ref="root" class="answer">
     <div class="answer-post">
       <div class="answer-vote">
         <Voter

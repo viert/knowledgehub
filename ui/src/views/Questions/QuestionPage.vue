@@ -24,27 +24,13 @@
           </div>
           <!-- Answer form -->
           <hr />
-          <h3>Post Your Answer</h3>
-          <MarkdownEditor
-            ref="editor"
-            :autofocus="false"
-            :error="!!answerBodyError"
+          <AnswerForm
+            v-if="me"
             v-model="answerBody"
-          ></MarkdownEditor>
-          <div v-if="answerBodyError" class="error-msg">{{
-            answerBodyError
-          }}</div>
-          <div class="preview">
-            <h4>Preview</h4>
-            <div class="preview-inner">
-              <Post :body="answerBody" />
-            </div>
-          </div>
-          <div class="post-form-control">
-            <button @click="handlePostAnswer" class="btn btn-primary"
-              >Post Answer</button
-            >
-          </div>
+            :error="answerBodyError"
+            @submit="handlePostAnswer"
+          />
+          <SigninBanner v-else message="Sign in to post answers" />
         </fragment>
       </div>
     </main>
@@ -54,26 +40,39 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
+
 import QuestionView from './Partial/QuestionView.vue'
 import AnswerView from './Partial/AnswerView.vue'
-import Post from '@/components/Post.vue'
+
 import MarkdownEditor from '@/components/Editors/MarkdownEditor.vue'
+import AnswerForm from '@/components/Editors/AnswerForm.vue'
+import SigninBanner from '@/components/SignIn/SigninBanner.vue'
+
 import { namespace } from 'vuex-class'
-import { Question, Answer, Comment } from '@/store/types'
 import { countable } from '@/filters'
+import { Question, Answer, Comment, User } from '@/store/types'
 
 const questions = namespace('questions')
+const users = namespace('users')
 
-@Component({ components: { QuestionView, AnswerView, MarkdownEditor, Post } })
+@Component({
+  components: {
+    QuestionView,
+    AnswerView,
+    MarkdownEditor,
+    AnswerForm,
+    SigninBanner
+  }
+})
 export default class QuestionPage extends Vue {
-  private loading = false
+  private loading = true
   private answerBody = ''
   private answerBodyError = ''
-  private scrollAwaitedId: string | null = null
 
   @questions.State('question') readonly question!: Question
   @questions.State('answers') readonly answers!: Answer[]
   @questions.State('comments') readonly comments!: Comment[]
+  @users.Getter('me') readonly me!: User
 
   get answersCount() {
     return countable(this.answers.length, 'answer', 'answers')
@@ -81,10 +80,6 @@ export default class QuestionPage extends Vue {
 
   get editor() {
     return this.$refs.editor as MarkdownEditor
-  }
-
-  waitScroll(answerId: string) {
-    this.scrollAwaitedId = answerId
   }
 
   handlePostAnswer() {
@@ -99,7 +94,7 @@ export default class QuestionPage extends Vue {
       .then(answerId => {
         this.answerBody = ''
         this.answerBodyError = ''
-        this.scrollAwaitedId = answerId
+        this.scrollToAnswerSoon(answerId)
       })
       .catch(err => {
         // TODO catch
@@ -108,6 +103,13 @@ export default class QuestionPage extends Vue {
       .finally(() => {
         // TODO reset loading flag, enable controls
       })
+  }
+
+  scrollToAnswerSoon(answerId: string) {
+    this.$nextTick(() => {
+      const answerElement = this.$refs[answerId] as AnswerView[]
+      answerElement[0].scrollIntoView()
+    })
   }
 
   reload() {
@@ -121,28 +123,14 @@ export default class QuestionPage extends Vue {
 
   mounted() {
     this.reload()
+    if (!this.me) {
+      this.$store.commit('users/setSigninOrigin', this.$route.fullPath)
+    }
   }
 
   @Watch('$route.params.questionId')
   onParamsQuestionIdChange() {
     this.reload()
-  }
-
-  @Watch('answers')
-  onAnswersChange() {
-    if (this.scrollAwaitedId) {
-      for (const answer of this.answers) {
-        if (answer._id === this.scrollAwaitedId) {
-          const id = this.scrollAwaitedId
-          this.$nextTick(() => {
-            const answerElement = this.$refs[id] as HTMLElement
-            answerElement.scrollIntoView({ block: 'center' })
-          })
-          this.scrollAwaitedId = null
-          break
-        }
-      }
-    }
   }
 }
 </script>
@@ -150,6 +138,15 @@ export default class QuestionPage extends Vue {
 <style lang="scss">
 .question-view {
   padding: 12px;
+
+  .signin {
+    h3 {
+      margin-bottom: 1em;
+    }
+    padding: 50px;
+    background-color: #f9f9f9;
+    border: 1px solid #cccccc;
+  }
 }
 
 .question-loading {

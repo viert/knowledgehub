@@ -1,10 +1,11 @@
 import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
+import VueRouter, { RouteConfig, NavigationGuardNext, Route } from 'vue-router'
 import QuestionsList from '@/views/Questions/QuestionsList.vue'
 import QuestionPage from '@/views/Questions/QuestionPage.vue'
 import ProfileView from '@/views/Profile/ProfileView.vue'
 import AskPage from '@/views/AskPage.vue'
 import SigninPage from '@/views/SignIn/SigninPage.vue'
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -42,6 +43,14 @@ const routes: Array<RouteConfig> = [
 
 const router = new VueRouter({
   routes
+})
+
+router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
+  if (to.name === 'SignIn') {
+    const fullPath = from.fullPath ? from.fullPath : ''
+    store.commit('users/setSigninOrigin', fullPath)
+  }
+  next()
 })
 
 export default router
