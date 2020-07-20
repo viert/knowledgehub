@@ -9,6 +9,7 @@
       :name="tag"
       :key="tag"
       :cross="true"
+      :expandable="false"
       @close="removeTag(tag)"
     />
     <input

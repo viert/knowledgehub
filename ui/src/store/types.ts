@@ -102,7 +102,6 @@ export interface ProviderInfo {
 
 export interface UsersState {
   user: User | null
-  userLoader: Promise<any> | null
   tagSubscriptions: string[]
   userSubscriptions: string[]
   providers: ProviderInfo[]

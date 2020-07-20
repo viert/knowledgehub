@@ -3,7 +3,9 @@ import { RootState, UsersState, User } from './types'
 import { AuthState } from '@/constants'
 import Api from '@/api'
 
-let userLoader: Promise<any> | null
+// this variable is holding a timeout handler
+// when users bulk request is going to happen soon
+let userLoader: number | null
 
 function storeUser(state: UsersState, user: User) {
   state.users = {
@@ -34,7 +36,6 @@ const usersStore: Module<UsersState, RootState> = {
   namespaced: true,
   state: {
     user: null,
-    userLoader: null,
     tagSubscriptions: [],
     userSubscriptions: [],
     providers: [],
@@ -164,33 +165,31 @@ const usersStore: Module<UsersState, RootState> = {
         // start loading users after a while
         // to be sure all the necessary users are
         // in a loading queue
-        userLoader = new Promise((resolve, reject) => {
-          setTimeout(() => {
-            // loader itself
-            const userIds = Object.keys(state.loadingUsers)
-            Api.Users.GetMany(userIds)
-              .then(response => {
-                const users: User[] = response.data.data
-                users.forEach(user => {
-                  commit('setUser', user)
-                  const nameResolver = state.loadingUsers[user.username]
-                  if (nameResolver) {
-                    nameResolver.resolver(user)
-                  }
-                  const idResolver = state.loadingUsers[user._id]
-                  if (idResolver) {
-                    idResolver.resolver(user)
-                  }
-                })
+        userLoader = setTimeout(() => {
+          // loader itself
+          const userIds = Object.keys(state.loadingUsers)
+          Api.Users.GetMany(userIds)
+            .then(response => {
+              const users: User[] = response.data.data
+              users.forEach(user => {
+                commit('setUser', user)
+                const nameResolver = state.loadingUsers[user.username]
+                if (nameResolver) {
+                  nameResolver.resolver(user)
+                }
+                const idResolver = state.loadingUsers[user._id]
+                if (idResolver) {
+                  idResolver.resolver(user)
+                }
               })
-              .finally(() => {
-                userIds.forEach(userId => {
-                  commit('removeUserLoading', userId)
-                })
+            })
+            .finally(() => {
+              userIds.forEach(userId => {
+                commit('removeUserLoading', userId)
               })
-            userLoader = null
-          }, 20)
-        })
+            })
+          userLoader = null
+        }, 20)
       }
       // returning a resolver for user
       const p = new Promise(resolve => {

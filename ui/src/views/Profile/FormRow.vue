@@ -1,6 +1,8 @@
 <template>
   <div class="form-group row">
-    <label :for="id" class="col-sm-3 text-right col-form-label">{{label}}</label>
+    <label :for="id" class="col-sm-3 text-right col-form-label">{{
+      label
+    }}</label>
     <div class="col-sm-9">
       <slot v-if="hasChildren"></slot>
       <input

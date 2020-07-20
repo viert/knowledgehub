@@ -20,7 +20,7 @@
 import { Component, Prop } from 'vue-property-decorator'
 import Post from '@/components/Post.vue'
 import PostCommons from './PostCommons'
-import { Comment, User } from '@/store/types'
+import { Comment } from '@/store/types'
 import { mixins } from 'vue-class-component'
 
 @Component({ components: { Post } })
