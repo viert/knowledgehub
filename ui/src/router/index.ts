@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import QuestionsList from '@/views/Questions/QuestionsList.vue'
-import QuestionPage from '@/views/Questoins/QuestionPage.vue'
+import QuestionPage from '@/views/Questions/QuestionPage.vue'
+import ProfileView from '@/views/Profile/ProfileView.vue'
 import AskPage from '@/views/AskPage.vue'
 import SigninPage from '@/views/SignIn/SigninPage.vue'
 

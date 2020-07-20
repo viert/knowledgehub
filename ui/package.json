@@ -17,7 +17,6 @@
     "lodash": "^4.17.19",
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.4",
-    "showdown-htmlescape": "^0.1.9",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-fragment": "^1.5.1",
