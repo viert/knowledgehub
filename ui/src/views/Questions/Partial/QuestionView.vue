@@ -1,5 +1,5 @@
 <template>
-  <div class="question">
+  <div ref="root" class="question">
     <h2>{{ question.title }}</h2>
     <hr />
     <div class="question-post">

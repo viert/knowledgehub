@@ -26,7 +26,6 @@ export default class RequireAuth extends Vue {
 
   checkAuthState() {
     if (this.authState === AuthState.LoggedOut) {
-      this.$store.dispatch('users/setSigninOrigin', this.$route.fullPath)
       this.$router.replace('/signin')
       return false
     }

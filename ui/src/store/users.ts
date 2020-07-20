@@ -100,9 +100,6 @@ const usersStore: Module<UsersState, RootState> = {
     }
   },
   actions: {
-    setSigninOrigin({ commit }, origin) {
-      commit('setSigninOrigin', origin)
-    },
     loadSubscriptionUsers({ commit }, userIds) {
       if (userIds.length === 0) return
       Api.Users.GetMany(userIds).then((response: any) => {

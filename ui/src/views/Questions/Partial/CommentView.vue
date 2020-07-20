@@ -1,5 +1,5 @@
 <template>
-  <li class="comment">
+  <li ref="root" class="comment">
     <div class="comment-voter">
       <Voter
         :mini="true"
@@ -20,7 +20,7 @@
 import { Component, Prop } from 'vue-property-decorator'
 import Post from '@/components/Post.vue'
 import PostCommons from './PostCommons'
-import { Comment } from '@/store/types'
+import { Comment, User } from '@/store/types'
 import { mixins } from 'vue-class-component'
 
 @Component({ components: { Post } })
@@ -34,7 +34,7 @@ export default class CommentView extends mixins(PostCommons) {
     })
   }
 
-  author() {
+  get author() {
     return this.getUser(this.comment.author_id)
   }
 }

@@ -9,4 +9,9 @@ const questions = namespace('questions')
 export default class PostCommons extends Vue {
   @users.Getter('user') getUser!: (id: string) => User
   @questions.Getter('isMyQuestion') readonly isMyQuestion!: boolean
+
+  scrollIntoView() {
+    const rootElement = this.$refs.root as HTMLElement
+    rootElement.scrollIntoView({ block: 'center' })
+  }
 }

@@ -1,28 +1,15 @@
 <template>
   <div class="signin-page">
-    <div class="signin">
-      <h3>Sign in with...</h3>
-      <ProviderButton
-        v-for="provider in providers"
-        :key="provider.provider_name"
-        :provider="provider"
-      />
-    </div>
+    <SigninBanner message="Sign in with..." />
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { namespace } from 'vuex-class'
-import { ProviderInfo } from '../../store/types'
-import ProviderButton from './ProviderButton.vue'
+import SigninBanner from '@/components/SignIn/SigninBanner.vue'
 
-const users = namespace('users')
-
-@Component({ components: { ProviderButton } })
-export default class SigninPage extends Vue {
-  @users.State('providers') readonly providers!: ProviderInfo[]
-}
+@Component({ components: { SigninBanner } })
+export default class SigninPage extends Vue {}
 </script>
 
 <style lang="scss">
