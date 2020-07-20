@@ -4,7 +4,6 @@ export function countable(c: number, single: string, plural: string) {
 }
 
 export function duration(dt: Date) {
-  // TODO: singles and plurals
   const moment = new Date(dt).getTime()
   const now = Date.now()
 
