@@ -11,22 +11,17 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    value: {
-      type: Boolean,
-      required: true
-    },
-    readonly: {
-      type: Boolean,
-      required: true
-    }
-  },
-  methods: {
-    handleAccept() {
-      this.$emit('input', !this.value)
-    }
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
+
+@Component
+export default class Accept extends Vue {
+  @Prop({ type: Boolean, required: true }) value!: boolean
+  @Prop({ type: Boolean, required: true }) readonly!: boolean
+
+  @Emit('input')
+  handleAccept() {
+    return !this.value
   }
 }
 </script>

@@ -29,29 +29,25 @@
   </form>
 </template>
 
-<script>
-export default {
-  props: {
-    initialTitle: {
-      type: String,
-      default: ''
-    }
-  },
-  data() {
-    return {
-      link: '',
-      title: ''
-    }
-  },
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
+
+@Component
+export default class LinkOptions extends Vue {
+  @Prop({ type: String, default: '' }) readonly initialTitle!: string
+
+  private link = ''
+  private title = ''
+
   mounted() {
     this.title = this.initialTitle
-    this.$refs.linkInput.focus()
-  },
-  methods: {
-    handleSave() {
-      const { link, title } = this
-      this.$emit('add', { link, title })
-    }
+    const input = this.$refs.linkInput as HTMLInputElement
+    input.focus()
+  }
+
+  @Emit('add')
+  handleSave() {
+    return { link: this.link, title: this.title }
   }
 }
 </script>

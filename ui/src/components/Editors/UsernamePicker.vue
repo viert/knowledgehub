@@ -16,26 +16,26 @@
   </form>
 </template>
 
-<script>
-import UsernameSuggest from './UsernameSuggest'
-export default {
-  data() {
-    return {
-      username: ''
-    }
-  },
+<script lang="ts">
+import { Vue, Component, Emit } from 'vue-property-decorator'
+import UsernameSuggest from './UsernameSuggest.vue'
+
+@Component({
   components: {
     UsernameSuggest
-  },
+  }
+})
+export default class UsernamePicker extends Vue {
+  private username = ''
+
   mounted() {
-    this.$refs.usernameInput.focus()
-  },
-  methods: {
-    handleSave() {
-      this.$emit('add', this.username)
-    }
+    const input = this.$refs.usernameInput as HTMLInputElement
+    input.focus()
+  }
+
+  @Emit('add')
+  handleSave() {
+    return this.username
   }
 }
 </script>
-
-<style lang="scss"></style>

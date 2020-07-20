@@ -11,38 +11,26 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    value: {
-      type: Number,
-      required: true
-    },
-    single: {
-      type: String,
-      required: true
-    },
-    plural: {
-      type: String,
-      required: true
-    },
-    type: {
-      type: String,
-      default: ''
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+
+@Component
+export default class Counter extends Vue {
+  @Prop({ type: Number, required: true }) readonly value!: number
+  @Prop({ type: String, required: true }) readonly single!: string
+  @Prop({ type: String, required: true }) readonly plural!: string
+  @Prop({ type: String, default: '' }) readonly type!: string
+
+  get what() {
+    if (this.value % 10 === 1) {
+      return this.single
     }
-  },
-  computed: {
-    what() {
-      if (this.value % 10 === 1) {
-        return this.single
-      }
-      return this.plural
-    }
+    return this.plural
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .cnt {
   width: 60px;
   height: 62px;

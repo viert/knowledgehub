@@ -7,7 +7,7 @@
           placeholder="Set a title..."
           ref="title"
           class="form-control form-control-lg"
-          :class="{'is-invalid': !!titleError}"
+          :class="{ 'is-invalid': !!titleError }"
           type="text"
           v-model="title"
         />
@@ -36,74 +36,87 @@
   </div>
 </template>
 
-<script>
-import Api from '@/api'
-import MarkdownEditor from '@/components/Editors/MarkdownEditor'
-import TagEditor from '@/components/Editors/TagEditor'
-import Post from '@/components/Post'
+<script lang="ts">
+import { Component, Watch } from 'vue-property-decorator'
+import { mixins } from 'vue-class-component'
 import RequireAuth from '@/mixins/RequireAuth'
 
-export default {
-  data() {
-    return {
-      tags: [],
-      body: '',
-      title: '',
-      tagsError: null,
-      bodyError: null,
-      titleError: null
-    }
-  },
-  mixins: [RequireAuth],
+import MarkdownEditor from '@/components/Editors/MarkdownEditor.vue'
+import TagEditor from '@/components/Editors/TagEditor.vue'
+import Post from '@/components/Post.vue'
+import Api from '../api'
+
+@Component({
   components: {
     MarkdownEditor,
     TagEditor,
     Post
-  },
-  methods: {
-    addTag(tag) {
-      this.tags = [...this.tags, tag]
-      this.tagsError = null
-    },
-    removeTag(tag) {
-      this.tags = this.tags.filter(item => item !== tag)
-    },
-    handleSave() {
-      if (this.title.trim() === '') {
-        this.titleError = 'Title can not be empty'
-        this.$refs.title.focus()
-        return
-      }
-      if (this.body.trim() === '') {
-        this.bodyError = 'Body can not be empty'
-        this.$refs.editor.focus()
-        return
-      }
-      if (!this.tags.length) {
-        this.tagsError = 'Please define at least one tag'
-        this.$refs.tagEditor.focus()
-        return
-      }
-      // TODO disable controls, set loading flag
-      Api.Questions.Create(this.title, this.body, this.tags)
-        .then(response => {
-          const questionId = response.data.data._id
-          this.$router.replace(`/questions/${questionId}`)
-        })
-        .catch(() => {
-          // TODO enable controls, reset loading flag
-        })
+  }
+})
+export default class AskPage extends mixins(RequireAuth) {
+  private tags: string[] = []
+  private body = ''
+  private title = ''
+  private tagsError: string | null = null
+  private bodyError: string | null = null
+  private titleError: string | null = null
+
+  get titleInput() {
+    return this.$refs.title as HTMLInputElement
+  }
+
+  get markdownEditor() {
+    return this.$refs.editor as MarkdownEditor
+  }
+
+  get tagEditor() {
+    return this.$refs.tagEditor as TagEditor
+  }
+
+  addTag(tagName: string) {
+    this.tags = [...this.tags, tagName]
+    this.tagsError = null
+  }
+
+  removeTag(tagName: string) {
+    this.tags = this.tags.filter(item => item !== tagName)
+  }
+
+  handleSave() {
+    if (this.title.trim() === '') {
+      this.titleError = 'Title can not be empty'
+      this.titleInput.focus()
+      return
     }
-  },
-  watch: {
-    ready(value) {
-      if (value) {
-        this.$refs.title.focus()
-      }
-    },
-    body(nv) {
-      if (nv !== '') this.bodyError = null
+    if (this.body.trim() === '') {
+      this.bodyError = 'Body can not be empty'
+      this.markdownEditor.focus()
+      return
     }
+    if (!this.tags.length) {
+      this.tagsError = 'Please define at least one tag'
+      this.tagEditor.focus()
+      return
+    }
+    // TODO disable controls, set loading flag
+    Api.Questions.Create(this.title, this.body, this.tags)
+      .then(response => {
+        const questionId = response.data.data._id
+        this.$router.replace(`/questions/${questionId}`)
+      })
+      .catch(() => {
+        // TODO enable controls, reset loading flag
+      })
+  }
+
+  onReady() {
+    this.titleInput.focus()
+  }
+
+  @Watch('body')
+  onBodyChange(newValue: string) {
+    console.log('on body change')
+    if (newValue !== '') this.bodyError = null
   }
 }
 </script>

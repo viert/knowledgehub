@@ -41,32 +41,28 @@
   </form>
 </template>
 
-<script>
-export default {
-  props: {
-    initialTitle: {
-      type: String,
-      default: ''
-    }
-  },
-  data() {
-    return {
-      link: '',
-      title: '',
-      width: ''
-    }
-  },
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+
+@Component
+export default class PictureOptions extends Vue {
+  @Prop({ type: String, default: '' }) readonly initialTitle!: string
+
+  private link = ''
+  private title = ''
+  private width = ''
+
   mounted() {
     this.title = this.initialTitle
-    this.$refs.linkInput.focus()
-  },
-  methods: {
-    handleSave() {
-      const { link, title } = this
-      let width = parseInt(this.width)
-      if (isNaN(width)) width = null
-      this.$emit('add', { link, title, width })
-    }
+    const input = this.$refs.linkInput as HTMLInputElement
+    input.focus()
+  }
+
+  handleSave() {
+    const { link, title } = this
+    let width: number | null = parseInt(this.width)
+    if (isNaN(width)) width = null
+    this.$emit('add', { link, title, width })
   }
 }
 </script>

@@ -4,7 +4,13 @@
     :class="{ 'tag-editor--focused': focused, 'tag-editor--error': error }"
     @click="focus()"
   >
-    <tag v-for="tag in tags" :name="tag" :key="tag" :cross="true" @close="removeTag(tag)" />
+    <tag
+      v-for="tag in tags"
+      :name="tag"
+      :key="tag"
+      :cross="true"
+      @close="removeTag(tag)"
+    />
     <input
       ref="tagInput"
       type="text"
@@ -23,85 +29,80 @@
   </div>
 </template>
 
-<script>
-import Tag from '../Tag'
-export default {
-  props: {
-    tags: {
-      type: Array,
-      default: () => {
-        return []
-      }
-    },
-    error: {
-      type: Boolean,
-      default: false
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+
+@Component
+export default class TagEditor extends Vue {
+  @Prop({ type: Array, default: () => [] }) tags!: string[]
+  @Prop({ type: Boolean, default: false }) error!: boolean
+
+  private focused = false
+  private value = ''
+  private size = 5
+
+  get placeholder() {
+    if (!this.tags.length) {
+      return 'Add a tag...'
     }
-  },
-  data() {
-    return {
-      focused: false,
-      value: '',
-      size: 5
-    }
-  },
-  computed: {
-    placeholder() {
-      if (!this.tags.length) {
-        return 'Add a tag...'
-      }
-      return null
-    }
-  },
-  components: {
-    Tag
-  },
-  methods: {
-    focus() {
-      this.$refs.tagInput.focus()
-    },
-    onBlur(e) {
-      this.focused = false
+    return null
+  }
+
+  focus() {
+    const input = this.$refs.tagInput as HTMLInputElement
+    input.focus()
+  }
+
+  onBlur(e: Event) {
+    this.focused = false
+    this.addTag(e)
+  }
+
+  removeTag(tagName: string) {
+    this.$emit('remove', tagName)
+  }
+
+  addTag(e: Event) {
+    const input = e.target as HTMLInputElement
+    const tag = input.value.trim()
+    this.value = ''
+    this.size = 5
+    if (tag.length === 0) return
+    if (this.tags.find(i => i === tag)) return
+    this.$emit('add', tag)
+  }
+
+  tabHandler(e: KeyboardEvent) {
+    const input = e.target as HTMLInputElement
+    if (input.value.length > 0) {
+      e.preventDefault()
       this.addTag(e)
-    },
-    removeTag(tag) {
-      this.$emit('remove', tag)
-    },
-    addTag(e) {
-      const tag = e.target.value.trim()
-      this.value = ''
-      this.size = 5
-      if (tag.length === 0) return
-      if (this.tags.find(i => i === tag)) return
-      this.$emit('add', tag)
-    },
-    tabHandler(e) {
-      if (e.target.value.length > 0) {
-        e.preventDefault()
-        this.addTag(e)
-      }
-    },
-    backspaceHandler(e) {
-      if (e.target.value.length === 0) {
-        e.preventDefault()
-        const lastTag = this.tags[this.tags.length - 1]
-        this.removeTag(lastTag)
-      }
-    },
-    editorInput(e) {
-      const { value, size } = e.target
-      const targetSize = value.length + 5
-      let newSize = targetSize
-      if (targetSize > size) {
-        const inputWidth = e.target.clientWidth
-        const parentWidth = e.target.parentElement.clientWidth
-        if (inputWidth + 48 > parentWidth) {
-          newSize = size
-        }
-      }
-      this.value = value
-      this.size = newSize
     }
+  }
+
+  backspaceHandler(e: KeyboardEvent) {
+    const input = e.target as HTMLInputElement
+    if (input.value.length === 0) {
+      e.preventDefault()
+      const lastTag = this.tags[this.tags.length - 1]
+      this.removeTag(lastTag)
+    }
+  }
+
+  editorInput(e: Event) {
+    const input = e.target as HTMLInputElement
+    const { value, size } = input
+    const targetSize = value.length + 5
+    let newSize = targetSize
+    if (targetSize > size) {
+      const inputWidth = input.clientWidth
+      const parentWidth = input.parentElement!.clientWidth
+      if (inputWidth + 48 > parentWidth) {
+        newSize = size
+      }
+    }
+    this.value = value
+    this.size = newSize
   }
 }
 </script>

@@ -1,29 +1,15 @@
 <template>
   <div class="signin-page">
-    <div class="signin">
-      <h3>Sign in with...</h3>
-      <ProviderButton
-        v-for="provider in providers"
-        :key="provider.provider_name"
-        :provider="provider"
-      />
-    </div>
+    <SigninBanner message="Sign in with..." />
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import ProviderButton from './ProviderButton'
-export default {
-  components: {
-    ProviderButton
-  },
-  computed: {
-    ...mapState({
-      providers: state => state.users.providers
-    })
-  }
-}
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import SigninBanner from '@/components/SignIn/SigninBanner.vue'
+
+@Component({ components: { SigninBanner } })
+export default class SigninPage extends Vue {}
 </script>
 
 <style lang="scss">

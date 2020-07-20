@@ -5,16 +5,11 @@
   </button>
 </template>
 
-<script>
-export default {
-  props: {
-    loading: {
-      type: Boolean,
-      default: false
-    }
-  }
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+
+@Component
+export default class SpinnerButton extends Vue {
+  @Prop({ type: Boolean, default: false }) readonly loading!: boolean
 }
 </script>
-
-<style lang="scss">
-</style>

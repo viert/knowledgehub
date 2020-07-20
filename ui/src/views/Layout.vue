@@ -8,15 +8,18 @@
   </div>
 </template>
 
-<script>
-import PageHeader from './PageHeader'
-import PageFooter from './PageFooter'
-export default {
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import PageHeader from './PageHeader.vue'
+import PageFooter from './PageFooter.vue'
+
+@Component({
   components: {
-    PageHeader,
-    PageFooter
+    PageFooter,
+    PageHeader
   }
-}
+})
+export default class Layout extends Vue {}
 </script>
 
 <style lang="scss">

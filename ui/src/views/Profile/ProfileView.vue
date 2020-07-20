@@ -11,23 +11,50 @@
             <img :src="user.avatar_url" />
           </div>
           <form @submit.prevent="handleSave" class="user-settings_form">
-            <FormRow label="Your ID" v-model="user.ext_id" :disabled="saving" :readonly="true" />
-            <FormRow label="Username" v-model="user.username" :disabled="saving" />
-            <FormRow label="First Name" v-model="user.first_name" :disabled="saving" />
-            <FormRow label="Last Name" v-model="user.last_name" :disabled="saving" />
+            <FormRow
+              label="Your ID"
+              v-model="user.ext_id"
+              :disabled="saving"
+              :readonly="true"
+            />
+            <FormRow
+              label="Username"
+              v-model="user.username"
+              :disabled="saving"
+            />
+            <FormRow
+              label="First Name"
+              v-model="user.first_name"
+              :disabled="saving"
+            />
+            <FormRow
+              label="Last Name"
+              v-model="user.last_name"
+              :disabled="saving"
+            />
             <hr />
             <FormRow label="Email" v-model="user.email" :disabled="saving" />
-            <FormRow label="Telegram ID" v-model="user.telegram_id" :disabled="saving" />
+            <FormRow
+              label="Telegram ID"
+              v-model="user.telegram_id"
+              :disabled="saving"
+            />
             <FormRow label="ICQ ID" v-model="user.icq_id" :disabled="saving" />
             <FormRow label="Notifications">
               <ButtonSwitch v-model="notificationOptions" :disabled="saving" />
             </FormRow>
             <p>
-              To get Telegram and/or ICQ notifications, set your account ID here, then add %TODO_BOT_ACCOUNT% and run
+              To get Telegram and/or ICQ notifications, set your account ID
+              here, then add %TODO_BOT_ACCOUNT% and run
               <code>/start</code> command.
             </p>
             <div class="post-form-control">
-              <SpinnerButton :loading="saving" class="btn btn-primary">Save Settings</SpinnerButton>
+              <SpinnerButton
+                type="submit"
+                :loading="saving"
+                class="btn btn-primary"
+                >Save Settings</SpinnerButton
+              >
             </div>
           </form>
         </div>
@@ -36,67 +63,56 @@
   </div>
 </template>
 
-<script>
-import { mapGetters } from 'vuex'
-import FormRow from './FormRow'
+<script lang="ts">
+import { Component } from 'vue-property-decorator'
+import FormRow from './FormRow.vue'
 import RequireAuth from '@/mixins/RequireAuth'
+import { namespace } from 'vuex-class'
+import { mixins } from 'vue-class-component'
+import { User } from '@/store/types'
 
-export default {
-  mixins: [RequireAuth],
-  components: {
-    FormRow
-  },
-  data() {
-    return {
-      user: {},
-      notificationOptions: {
-        email: true,
-        telegram: false,
-        icq: false
-      },
-      loading: true,
-      saving: false
+const users = namespace('users')
+
+@Component({ components: { FormRow } })
+export default class ProfileView extends mixins(RequireAuth) {
+  private user: User | null = null
+  private notificationOptions = { email: true, telegram: false, icq: false }
+  private loading = false
+  private saving = false
+
+  @users.Getter('me') me!: User
+
+  handleSave() {
+    const settings = {
+      ...this.user,
+      notify_by_email: this.notificationOptions.email,
+      notify_by_icq: this.notificationOptions.icq,
+      notify_by_telegram: this.notificationOptions.telegram
     }
-  },
-  mounted() {},
-  methods: {
-    handleSave() {
-      const settings = {
-        ...this.user,
-        notify_by_email: this.notificationOptions.email,
-        notify_by_icq: this.notificationOptions.icq,
-        notify_by_telegram: this.notificationOptions.telegram
-      }
-      this.saving = true
-      this.$store
-        .dispatch('users/saveSettings', settings)
-        .then(() => {
-          this.fillUser()
-          this.$store.dispatch('messages/info', 'Settings saved successfully')
-        })
-        .finally(() => {
-          this.saving = false
-        })
-    },
-    fillUser() {
-      this.user = { ...this.me }
-      this.notificationOptions = {
-        email: this.me.notify_by_email,
-        telegram: this.me.notify_by_telegram,
-        icq: this.me.notify_by_icq
-      }
-      this.loading = false
+    this.saving = true
+    this.$store
+      .dispatch('users/saveSettings', settings)
+      .then(() => {
+        this.fillUser()
+        this.$store.dispatch('messages/info', 'Settings saved successfully')
+      })
+      .finally(() => {
+        this.saving = false
+      })
+  }
+
+  fillUser() {
+    this.user = { ...this.me }
+    this.notificationOptions = {
+      email: this.me.notify_by_email,
+      telegram: this.me.notify_by_telegram,
+      icq: this.me.notify_by_icq
     }
-  },
-  computed: {
-    ...mapGetters({
-      me: 'users/me'
-    })
-  },
-  watch: {
-    ready() {
-      this.fillUser()
-    }
+    this.loading = false
+  }
+
+  onReady() {
+    this.fillUser()
   }
 }
 </script>

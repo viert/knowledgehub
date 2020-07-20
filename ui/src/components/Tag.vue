@@ -8,30 +8,38 @@
   >
     <transition v-if="expandable" name="expand">
       <div v-if="showDetails" class="tag-expand">
-        <div class="tag-expand_name">{{ tag && tag.name || name }}</div>
+        <div class="tag-expand_name">{{ (tag && tag.name) || name }}</div>
         <div class="tag-expand_content">
           <div class="tag-expand_loading" v-if="tagLoading">
             <i class="fa fa-spinner fa-spin fa-2x"></i>
           </div>
           <fragment v-else>
             <div v-if="tag" class="tag-expand_counters">
-              <div class="tag-expand_counters-subs">{{ tag.subscribers_count }} subscribers</div>
-              <div class="tag-expand_counters-questions">{{ tag.questions_count }} questions</div>
+              <div class="tag-expand_counters-subs"
+                >{{ tag.subscribers_count }} subscribers</div
+              >
+              <div class="tag-expand_counters-questions"
+                >{{ tag.questions_count }} questions</div
+              >
             </div>
-            <p class="tag-expand_description">{{ tag && tag.description || defaultTagDescription }}</p>
+            <p class="tag-expand_description">{{
+              (tag && tag.description) || defaultTagDescription
+            }}</p>
             <div class="tag-expand_ctrl">
               <SpinnerButton
                 v-if="subscribed"
                 :loading="subscribeInProgress"
                 @click="handleUnsubscribe"
                 class="btn btn-sm btn-block btn-outline-danger"
-              >Unsubscribe</SpinnerButton>
+                >Unsubscribe</SpinnerButton
+              >
               <SpinnerButton
                 v-else
                 :loading="subscribeInProgress"
                 @click="handleSubscribe"
                 class="btn btn-sm btn-block btn-outline-primary"
-              >Subscribe</SpinnerButton>
+                >Subscribe</SpinnerButton
+              >
             </div>
           </fragment>
         </div>
@@ -44,84 +52,75 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-export default {
-  props: {
-    name: {
-      type: String,
-      required: true
-    },
-    cross: {
-      type: Boolean,
-      default: false
-    },
-    expandable: {
-      type: Boolean,
-      default: true
-    },
-    clickable: {
-      type: Boolean,
-      default: false
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { namespace } from 'vuex-class'
+const users = namespace('users')
+const tags = namespace('tags')
+
+@Component
+export default class Tag extends Vue {
+  @Prop({ type: String, required: true }) readonly name!: string
+  @Prop({ type: Boolean, default: false }) readonly cross!: boolean
+  @Prop({ type: Boolean, default: true }) readonly expandable!: boolean
+  @Prop({ type: Boolean, default: false }) readonly clickable!: boolean
+
+  private showDetails = false
+  private tagLoading = false
+  private subscribeInProgress = false
+
+  @users.State('tagSubscriptions') tagSubscriptions!: string[]
+  @tags.Getter('getTag') getTag!: (tagName: string) => Tag
+
+  public get defaultTagDescription() {
+    return `Questions related to ${this.name}`
+  }
+
+  public get subscribed() {
+    return this.tagSubscriptions.includes(this.name)
+  }
+
+  public get tag() {
+    const tag = this.getTag(this.name)
+    if (!tag) {
+      this.loadTag()
     }
-  },
-  data() {
-    return {
-      showDetails: false,
-      tagLoading: false,
-      subscribeInProgress: false
-    }
-  },
-  computed: {
-    ...mapState({
-      tagSubscriptions: state => state.users.tagSubscriptions
-    }),
-    defaultTagDescription() {
-      return `Questions related to ${this.name}`
-    },
-    subscribed() {
-      return this.tagSubscriptions.includes(this.name)
-    },
-    tag() {
-      const tag = this.$store.getters['tags/getTag'](this.name)
-      if (!tag) {
-        this.loadTag()
-      }
-      return tag
-    }
-  },
-  methods: {
-    handleSubscribe() {
-      this.subscribeInProgress = true
-      this.$store.dispatch('users/subscribeToTag', this.name).finally(() => {
-        this.subscribeInProgress = false
-      })
-    },
-    handleUnsubscribe() {
-      this.subscribeInProgress = true
-      this.$store
-        .dispatch('users/unsubscribeFromTag', this.name)
-        .finally(() => {
-          this.subscribeInProgress = false
-        })
-    },
-    loadTag() {
-      this.tagLoading = true
-      this.$store.dispatch('tags/lazyLoadTag', this.name).finally(() => {
-        this.tagLoading = false
-      })
-    },
-    crossClick(e) {
-      this.$emit('close', e)
-    },
-    tagClick(e) {
-      this.$emit('click', e)
-    }
+    return tag
+  }
+
+  loadTag() {
+    // TODO catch 404 to avoid refetching
+    this.tagLoading = true
+    this.$store.dispatch('tags/lazyLoadTag', this.name).finally(() => {
+      this.tagLoading = false
+    })
+  }
+
+  handleSubscribe() {
+    this.subscribeInProgress = true
+    this.$store.dispatch('users/subscribeToTag', this.name).finally(() => {
+      this.subscribeInProgress = false
+    })
+  }
+
+  handleUnsubscribe() {
+    this.subscribeInProgress = true
+    this.$store.dispatch('users/unsubscribeFromTag', this.name).finally(() => {
+      this.subscribeInProgress = false
+    })
+  }
+
+  crossClick() {
+    this.$emit('close')
+  }
+
+  tagClick(e: Event) {
+    this.$emit('click', e)
   }
 }
 </script>
 
-<style lang='scss'>
+<style lang="scss">
 .tag {
   font-size: 80%;
   position: relative;
@@ -185,15 +184,15 @@ export default {
       }
     }
   }
+}
 
-  .expand-enter-active,
-  .expand-leave-active {
-    transition: opacity 0.3s;
-  }
+.expand-enter-active,
+.expand-leave-active {
+  transition: opacity 0.3s;
+}
 
-  .expand-enter,
-  .expand-leave-to {
-    opacity: 0;
-  }
+.expand-enter,
+.expand-leave-to {
+  opacity: 0;
 }
 </style>
