@@ -11,14 +11,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    text: {
-      type: String,
-      default: 'loading'
-    }
-  }
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+
+@Component
+export default class Progress extends Vue {
+  @Prop({ type: String, default: 'loading' }) readonly text!: string
 }
 </script>
 

@@ -16,20 +16,17 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-export default {
-  name: 'alert-box',
-  methods: {
-    close(msgId) {
-      this.$store.dispatch('messages/removeMessage', msgId)
-    }
-  },
-  computed: {
-    ...mapState({
-      messages: state => state.messages.messages
-    })
-  }
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { namespace } from 'vuex-class'
+import { Message } from '../store/types'
+
+const messages = namespace('messages')
+
+@Component
+export default class AlertBox extends Vue {
+  @messages.Action('removeMessage') close!: (msgId: string) => void
+  @messages.State('messages') messages!: Message[]
 }
 </script>
 

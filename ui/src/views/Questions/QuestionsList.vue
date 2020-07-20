@@ -43,71 +43,79 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import QuestionsListItem from './QuestionsListItem'
-import Pagination from '@/components/Pagination'
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator'
+import { namespace } from 'vuex-class'
+import { Question } from '../../store/types'
+import QuestionsListItem from './QuestionsListItem.vue'
 
-export default {
-  data() {
-    return {
-      dataLoading: false
-    }
-  },
+import Pagination from '@/components/Pagination.vue'
+
+const questions = namespace('questions')
+
+@Component({
   components: {
     QuestionsListItem,
     Pagination
-  },
-  computed: {
-    ...mapState({
-      questions: state => state.questions.questionsList,
-      currentPage: state => state.questions.page,
-      totalPages: state => state.questions.totalPages
-    }),
-    currentSort() {
-      return this.$route.query.sort ? this.$route.query.sort : 'rating'
-    },
-    page() {
-      let page = 1
-      if (this.$route.query.page) {
+  }
+})
+export default class QuestionsList extends Vue {
+  private dataLoading = false
+
+  @questions.State('questionsList') readonly questions!: Question[]
+  @questions.State('page') readonly currentPage!: number
+  @questions.State('totalPages') readonly totalPages!: number
+
+  get currentSort() {
+    return this.$route.query.sort ? this.$route.query.sort : 'rating'
+  }
+
+  get page() {
+    let page = 1
+    if (this.$route.query.page) {
+      if (
+        this.$route.query.page &&
+        typeof this.$route.query.page === 'string'
+      ) {
         page = parseInt(this.$route.query.page)
         if (isNaN(page)) {
           page = 1
         }
       }
-      return page
     }
-  },
-  methods: {
-    pageChanged(page) {
-      const { query } = this.$route
-      this.$router.push({ query: { ...query, page: page } })
-    },
-    reload() {
-      document.body.scrollTop = 0
-      document.documentElement.scrollTop = 0
-      this.dataLoading = true
-      const sort = this.currentSort
-      const page = this.page
-      this.$store
-        .dispatch('questions/loadQuestions', { sort, page })
-        .catch(err => {
-          if (err && err.maxPage) {
-            this.pageChanged(err.maxPage)
-          }
-        })
-        .finally(() => {
-          this.dataLoading = false
-        })
-    }
-  },
+    return page
+  }
+
+  pageChanged(page: number) {
+    const { query } = this.$route
+    this.$router.push({ query: { ...query, page: page.toString() } })
+  }
+
+  reload() {
+    document.body.scrollTop = 0
+    document.documentElement.scrollTop = 0
+    this.dataLoading = true
+    const sort = this.currentSort
+    const page = this.page
+    this.$store
+      .dispatch('questions/loadQuestions', { sort, page })
+      .catch(err => {
+        if (err && err.maxPage) {
+          this.pageChanged(err.maxPage)
+        }
+      })
+      .finally(() => {
+        this.dataLoading = false
+      })
+  }
+
   mounted() {
     this.reload()
-  },
-  watch: {
-    '$route.query'() {
-      this.reload()
-    }
+  }
+
+  @Watch('$route.query')
+  onQueryChange() {
+    this.reload()
   }
 }
 </script>

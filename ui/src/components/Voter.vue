@@ -1,5 +1,5 @@
 <template>
-  <div class="voter" :class="{'voter--mini': mini}">
+  <div class="voter" :class="{ 'voter--mini': mini }">
     <a
       class="voter-link"
       href
@@ -8,7 +8,7 @@
     >
       <i class="fa fa-chevron-up"></i>
     </a>
-    <div v-if="!mini || points>0" class="voter-points">{{ points }}</div>
+    <div v-if="!mini || points > 0" class="voter-points">{{ points }}</div>
     <a
       v-if="!mini"
       class="voter-link"
@@ -21,36 +21,28 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    points: {
-      type: Number,
-      default: 0
-    },
-    value: {
-      type: Number,
-      default: 0
-    },
-    mini: {
-      type: Boolean,
-      default: false
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+
+@Component
+export default class Voter extends Vue {
+  @Prop({ type: Number, default: 0 }) readonly points!: number
+  @Prop({ type: Number, default: 0 }) readonly value!: number
+  @Prop({ type: Boolean, default: false }) readonly mini!: number
+
+  voteUp() {
+    if (this.value <= 0) {
+      this.$emit('input', 1)
+    } else {
+      this.$emit('input', 0)
     }
-  },
-  methods: {
-    voteUp() {
-      if (this.value <= 0) {
-        this.$emit('input', 1)
-      } else {
-        this.$emit('input', 0)
-      }
-    },
-    voteDown() {
-      if (this.value >= 0) {
-        this.$emit('input', -1)
-      } else {
-        this.$emit('input', 0)
-      }
+  }
+
+  voteDown() {
+    if (this.value >= 0) {
+      this.$emit('input', -1)
+    } else {
+      this.$emit('input', 0)
     }
   }
 }

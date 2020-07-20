@@ -8,26 +8,16 @@
   </div>
 </template>
 
-<script>
-import UserPic from '@/components/UserPic'
-export default {
-  components: {
-    UserPic
-  },
-  props: {
-    askedAt: {
-      type: String,
-      required: true
-    },
-    action: {
-      type: String,
-      default: ''
-    },
-    author: {
-      type: Object,
-      required: true
-    }
-  }
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+import UserPic from '@/components/UserPic.vue'
+import { User } from '@/store/types'
+
+@Component({ components: { UserPic } })
+export default class AuthorCard extends Vue {
+  @Prop({ type: String, required: true }) readonly askedAt!: string
+  @Prop({ type: String, default: '' }) readonly action!: string
+  @Prop({ type: Object, required: true }) readonly author!: User
 }
 </script>
 

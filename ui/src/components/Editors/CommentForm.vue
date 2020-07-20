@@ -10,42 +10,43 @@
       class="form-control"
     ></textarea>
     <div class="post-form-control">
-      <SpinnerButton type="submit" :loading="posting" class="btn btn-primary btn-150">Add Comment</SpinnerButton>
+      <SpinnerButton
+        type="submit"
+        :loading="posting"
+        class="btn btn-primary btn-150"
+        >Add Comment</SpinnerButton
+      >
     </div>
   </form>
 </template>
 
-<script>
-export default {
-  props: {
-    posting: {
-      type: Boolean,
-      default: false
-    },
-    value: {
-      type: String,
-      default: ''
-    },
-    autofocus: {
-      type: Boolean,
-      default: true
-    }
-  },
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+
+@Component
+export default class CommentForm extends Vue {
+  @Prop({ type: Boolean, default: false }) posting!: boolean
+  @Prop({ type: Boolean, default: true }) autofocus!: boolean
+  @Prop({ type: String, default: '' }) value!: string
+
   mounted() {
     if (this.autofocus) {
-      this.$refs.input.focus()
+      const input = this.$refs.input as HTMLInputElement
+      input.focus()
     }
-  },
-  methods: {
-    handleInput(e) {
-      this.$emit('input', e.target.value)
-    },
-    handleEnter(e) {
-      const onMac = window.navigator.platform.startsWith('Mac')
-      const needSubmit = (onMac && e.metaKey) || (!onMac && e.ctrlKey)
-      if (needSubmit) {
-        this.$emit('submit')
-      }
+  }
+
+  handleInput(e: InputEvent) {
+    const input = e.target as HTMLInputElement
+    this.$emit('input', input.value)
+  }
+
+  handleEnter(e: KeyboardEvent) {
+    // TODO reuse isCtrlEnter from MarkdownEditor
+    const onMac = window.navigator.platform.startsWith('Mac')
+    const needSubmit = (onMac && e.metaKey) || (!onMac && e.ctrlKey)
+    if (needSubmit) {
+      this.$emit('submit')
     }
   }
 }

@@ -32,75 +32,77 @@
   </nav>
 </template>
 
-<script>
-export default {
-  name: 'pagination',
-  props: {
-    total: {
-      type: Number,
-      required: true
-    },
-    current: {
-      type: Number,
-      required: true
-    },
-    spread: {
-      type: Number,
-      default: 3
-    }
-  },
-  methods: {
-    pageClick(page) {
-      if (page.disabled) return
-      var newPage
-      switch (page.page) {
-        case 'prev':
-          newPage = this.current - 1
-          break
-        case 'next':
-          newPage = this.current + 1
-          break
-        default:
-          newPage = page.page
-      }
-      this.$emit('page', newPage)
-    }
-  },
-  computed: {
-    needPagination() {
-      if (this.total > 1) return true
-      if (this.total === 1 && this.current !== this.total) return true
-      return false
-    },
-    pages() {
-      const { current, total, spread } = this
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
 
+interface PageDescriptor {
+  id: number | 'prev' | 'next' // page number or prev/next
+  page: number | string // page label
+  disabled: boolean
+}
+
+@Component
+export default class Pagination extends Vue {
+  @Prop({ type: Number, required: true }) readonly total!: number
+  @Prop({ type: Number, required: true }) readonly current!: number
+  @Prop({ type: Number, default: 3 }) readonly spread!: number
+
+  pageClick(page: PageDescriptor) {
+    if (page.disabled) return
+    let newPage: number
+    switch (page.page) {
+      case 'prev':
+        newPage = this.current - 1
+        break
+      case 'next':
+        newPage = this.current + 1
+        break
+      default:
+        newPage = page.page as number
+    }
+    this.$emit('page', newPage)
+  }
+
+  get needPagination() {
+    // more than 1 page -> need pagination
+    if (this.total > 1) return true
+
+    // just one page, but accidentally (i.e. by url) an invalid page was chosen,
+    // we need to show pagination to make user able to switch to a valid page
+    if (this.total === 1 && this.current !== this.total) return true
+
+    // otherwise no pagination is needed
+    return false
+  }
+
+  get pages() {
+    // pages list generator
+    const { current, total, spread } = this
+
+    const result: PageDescriptor[] = [
+      { id: 'prev', page: 'prev', disabled: current === 1 },
       // always show the first page
-      const result = [
-        { id: 'prev', page: 'prev', disabled: current === 1 },
-        { id: 1, page: 1, disabled: current === 1 }
-      ]
+      { id: 1, page: 1, disabled: current === 1 }
+    ]
 
-      let i = 2
-      if (current - spread > 2) {
-        result.push({ id: 2, page: '...', disabled: true })
-        i = current - spread
-      }
-
-      while (i <= current + spread && i <= total) {
-        result.push({ id: i, page: i, disabled: current === i })
-        i++
-      }
-
-      if (i < total) {
-        result.push({ id: i, page: '...', disabled: true })
-        // show the last page
-        result.push({ id: total, page: total, disabled: current === total })
-      }
-
-      result.push({ id: 'next', page: 'next', disabled: current === total })
-      return result
+    let i = 2
+    if (current - spread > 2) {
+      result.push({ id: 2, page: '...', disabled: true })
+      i = current - spread
     }
+
+    while (i <= current + spread && i <= total) {
+      result.push({ id: i, page: i, disabled: current === i })
+      i++
+    }
+
+    if (i < total) {
+      result.push({ id: i, page: '...', disabled: true })
+      // show the last page
+      result.push({ id: total, page: total, disabled: current === total })
+    }
+    result.push({ id: 'next', page: 'next', disabled: current === total })
+    return result
   }
 }
 </script>

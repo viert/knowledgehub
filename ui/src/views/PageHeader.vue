@@ -11,10 +11,12 @@
         <input type="text" class="form-control searchbox" />
       </div>
       <div class="panel-ask">
-        <router-link to="/ask" class="btn btn-primary btn-ask">Ask Question</router-link>
+        <router-link to="/ask" class="btn btn-primary btn-ask"
+          >Ask Question</router-link
+        >
       </div>
       <div v-if="me" class="panel-account">
-        <router-link to="/profile">@{{me.username}}</router-link>
+        <router-link to="/profile">@{{ me.username }}</router-link>
         <a class="logout" href @click.prevent="logout">
           <i class="fas fa-sign-out-alt"></i>
         </a>
@@ -26,30 +28,25 @@
   </div>
 </template>
 
-<script>
-import { mapGetters, mapState, mapActions } from 'vuex'
-import { AuthStates } from '@/constants'
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { namespace } from 'vuex-class'
+import { User } from '../store/types'
+import { AuthState } from '../constants'
+const users = namespace('users')
 
-export default {
-  computed: {
-    ...mapGetters({
-      me: 'users/me'
-    }),
-    ...mapState({
-      authState: 'users/authState'
-    }),
-    authInfoAcquired() {
-      return this.authState !== AuthStates.Unknown
-    },
-    avatarURL() {
-      if (this.me.avatar) {
-        return this.me.avatar
-      }
-      return '/images/default_user.png'
-    }
-  },
-  methods: {
-    ...mapActions({ logout: 'users/logout' })
+@Component
+export default class PageHeader extends Vue {
+  @users.Getter('me') readonly me!: User
+  @users.State('authState') readonly authState!: AuthState
+  @users.Action('logout') logout!: () => void
+
+  get authInfoAcquired() {
+    return this.authState !== AuthState.Unknown
+  }
+
+  get avatarURL() {
+    return this.me.avatar_url ? this.me.avatar_url : '/images/default_user.png'
   }
 }
 </script>
@@ -69,6 +66,7 @@ $avatar-size: 40px;
   align-items: center;
   background-color: white;
   border-bottom: 1px solid #dfd7ca;
+
   .logo {
     display: flex;
     height: 26px;

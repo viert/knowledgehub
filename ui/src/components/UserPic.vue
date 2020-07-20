@@ -4,18 +4,14 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    url: {
-      type: String,
-      default: ''
-    }
-  },
-  computed: {
-    src() {
-      return this.url === '' ? '/images/user.jpeg' : this.url
-    }
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+
+@Component
+export default class UserPic extends Vue {
+  @Prop({ type: String, default: '' }) readonly url!: string
+  get src() {
+    return this.url === '' ? '/images/user.jpeg' : this.url
   }
 }
 </script>

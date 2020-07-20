@@ -11,7 +11,9 @@
         <div class="question-list_list-item_tags">
           <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
         </div>
-        <div class="question-list_list-item_date">active {{ question.last_activity_at | duration }}</div>
+        <div class="question-list_list-item_date"
+          >active {{ question.last_activity_at | duration }}</div
+        >
       </div>
     </div>
     <div class="question-list_list-item_counters">
@@ -27,33 +29,37 @@
   </li>
 </template>
 
-<script>
-import UserPic from '@/components/UserPic'
-import Counter from '@/components/Counter'
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+import UserPic from '@/components/UserPic.vue'
+import Counter from '@/components/Counter.vue'
+import { Question, User } from '../../store/types'
+import { namespace } from 'vuex-class'
 
-export default {
+const users = namespace('users')
+
+@Component({
   components: {
     UserPic,
     Counter
-  },
-  props: {
-    question: {
-      type: Object,
-      required: true
-    }
-  },
-  computed: {
-    questionLink() {
-      return `/questions/${this.question._id}`
-    },
-    answerCounterType() {
-      if (this.question.answers_count === 0) return ''
-      if (this.question.has_accepted_answer) return 'maxgreen'
-      return 'green'
-    },
-    author() {
-      return this.$store.getters['users/user'](this.question.author_id)
-    }
+  }
+})
+export default class QuestionsListItem extends Vue {
+  @Prop({ type: Object, required: true }) readonly question!: Question
+  @users.Getter('user') private getUser!: (id: string) => User
+
+  get questionLink() {
+    return `/questions/${this.question._id}`
+  }
+
+  get answerCounterType() {
+    if (this.question.answers_count === 0) return ''
+    if (this.question.has_accepted_answer) return 'maxgreen'
+    return 'green'
+  }
+
+  get author() {
+    return this.getUser(this.question.author_id)
   }
 }
 </script>
