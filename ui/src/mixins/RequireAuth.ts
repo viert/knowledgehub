@@ -6,19 +6,21 @@ const users = namespace('users')
 
 @Component
 export default class RequireAuth extends Vue {
-  protected ready = false
-
   @users.State('authState') authState!: AuthState
 
   get loggedIn() {
     return this.authState === AuthState.LoggedIn
   }
 
+  onReady() {
+    // To be overriden
+  }
+
   mounted() {
     this.checkAuthState()
     if (this.loggedIn) {
       // everything should be rendered on mounted already
-      this.ready = true
+      this.onReady()
     }
   }
 
@@ -51,7 +53,7 @@ export default class RequireAuth extends Vue {
     // the next tick everything is going to be rendered
     if (newValue) {
       this.$nextTick(() => {
-        this.ready = true
+        this.onReady()
       })
     }
   }

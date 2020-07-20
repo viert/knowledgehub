@@ -12,12 +12,7 @@
           v-model="title"
         />
         <div v-if="titleError" class="error-msg">{{ titleError }}</div>
-        <MarkdownEditor
-          ref="editor"
-          :autofocus="false"
-          :error="!!bodyError"
-          v-model="body"
-        ></MarkdownEditor>
+        <MarkdownEditor ref="editor" :autofocus="false" :error="!!bodyError" v-model="body"></MarkdownEditor>
         <div v-if="bodyError" class="error-msg">{{ bodyError }}</div>
         <TagEditor
           ref="tagEditor"
@@ -34,9 +29,7 @@
           </div>
         </div>
         <div class="post-form-control">
-          <button @click="handleSave" class="btn btn-primary"
-            >Post Question</button
-          >
+          <button @click="handleSave" class="btn btn-primary">Post Question</button>
         </div>
       </div>
     </main>
@@ -116,11 +109,8 @@ export default class AskPage extends mixins(RequireAuth) {
       })
   }
 
-  @Watch('ready')
-  onReadyChange(newValue: boolean) {
-    if (newValue) {
-      this.titleInput.focus()
-    }
+  onReady() {
+    this.titleInput.focus()
   }
 
   @Watch('body')
