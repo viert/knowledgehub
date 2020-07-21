@@ -1,10 +1,13 @@
 import os
+from elasticsearch import Elasticsearch, TransportError, ImproperlyConfigured
 
 from lazy_object_proxy import Proxy
 from glasskit.base import Base
 from glasskit import ctx
 
 from ask.errors import ConfigurationError
+from ask.search import MongoJSONSerializer
+
 from ask.controllers.main import gen_main_ctrl
 from ask.controllers.api.v1.account import account_ctrl
 from ask.controllers.api.v1.questions import questions_ctrl
@@ -50,10 +53,26 @@ class App(Base):
         FacebookProvider().register()
         YandexProvider().register()
 
+    def setup_search(self):
+        ctx.es = None
+        ctx.log.info("Setting up Elasticsearch")
+
+        search_cfg = ctx.cfg.get("search")
+        if search_cfg is None:
+            ctx.log.info("no search section found in config, elasticsearch will be disabled")
+            return None
+        nodes = search_cfg.get("nodes", [])
+        options = search_cfg.get("options", {})
+        try:
+            ctx.es = Elasticsearch(nodes, serializer=MongoJSONSerializer(), **options)
+        except (TransportError, ImproperlyConfigured) as e:
+            ctx.log.error("error initializing elasticsearch driver: %s", e)
+
     def after_setup(self):
         if "base_uri" not in ctx.cfg:
             raise ConfigurationError("base_uri is missing from configuration")
         self.setup_oauth()
+        self.setup_search()
 
 
 def force_init_app():
