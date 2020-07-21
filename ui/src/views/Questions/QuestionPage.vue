@@ -26,9 +26,10 @@
           <hr />
           <AnswerForm
             v-if="me"
+            ref="editor"
             v-model="answerBody"
             :error="answerBodyError"
-            :disabled="isSaving"
+            :isSaving="isSaving"
             @submit="handlePostAnswer"
           />
           <SigninBanner v-else message="Sign in to post answers" />
@@ -76,6 +77,13 @@ export default class QuestionPage extends Vue {
   @questions.State('comments') readonly comments!: Comment[]
   @users.Getter('me') readonly me!: User
 
+  mounted() {
+    this.reload()
+    if (!this.me) {
+      this.$store.commit('users/setSigninOrigin', this.$route.fullPath)
+    }
+  }
+
   get answersCount() {
     return countable(this.answers.length, 'answer', 'answers')
   }
@@ -90,7 +98,6 @@ export default class QuestionPage extends Vue {
       this.editor.focus()
       return
     }
-    // TODO disable controls, set loading flag
     this.isSaving = true
     this.$store
       .dispatch('questions/createAnswer', this.answerBody)
@@ -122,13 +129,6 @@ export default class QuestionPage extends Vue {
       .finally(() => {
         this.loading = false
       })
-  }
-
-  mounted() {
-    this.reload()
-    if (!this.me) {
-      this.$store.commit('users/setSigninOrigin', this.$route.fullPath)
-    }
   }
 
   @Watch('$route.params.questionId')
