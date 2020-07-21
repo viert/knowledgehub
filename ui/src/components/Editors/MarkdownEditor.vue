@@ -130,6 +130,7 @@
         @keyup="handleSelectionChange"
         @mouseup="handleSelectionChange"
         @input="handleInput"
+        :disabled="disabled"
       />
     </div>
     <slot></slot>
@@ -167,6 +168,7 @@ export default class MarkdownEditor extends Vue {
   @Prop({ type: Number, default: 300 }) height!: number
   @Prop({ type: Boolean, default: true }) autofocus!: boolean
   @Prop({ type: Boolean, default: false }) error!: boolean
+  @Prop({ type: Boolean, default: false }) disabled!: boolean
 
   private linkOptionsOpen = false
   private pictureOptionsOpen = false

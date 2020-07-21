@@ -26,8 +26,10 @@
           <hr />
           <AnswerForm
             v-if="me"
+            ref="editor"
             v-model="answerBody"
             :error="answerBodyError"
+            :isSaving="isSaving"
             @submit="handlePostAnswer"
           />
           <SigninBanner v-else message="Sign in to post answers" />
@@ -44,7 +46,6 @@ import { Vue, Component, Watch } from 'vue-property-decorator'
 import QuestionView from './Partial/QuestionView.vue'
 import AnswerView from './Partial/AnswerView.vue'
 
-import MarkdownEditor from '@/components/Editors/MarkdownEditor.vue'
 import AnswerForm from '@/components/Editors/AnswerForm.vue'
 import SigninBanner from '@/components/SignIn/SigninBanner.vue'
 
@@ -59,7 +60,6 @@ const users = namespace('users')
   components: {
     QuestionView,
     AnswerView,
-    MarkdownEditor,
     AnswerForm,
     SigninBanner
   }
@@ -68,18 +68,26 @@ export default class QuestionPage extends Vue {
   private loading = true
   private answerBody = ''
   private answerBodyError = ''
+  private isSaving = false
 
   @questions.State('question') readonly question!: Question
   @questions.State('answers') readonly answers!: Answer[]
   @questions.State('comments') readonly comments!: Comment[]
   @users.Getter('me') readonly me!: User
 
+  mounted() {
+    this.reload()
+    if (!this.me) {
+      this.$store.commit('users/setSigninOrigin', this.$route.fullPath)
+    }
+  }
+
   get answersCount() {
     return countable(this.answers.length, 'answer', 'answers')
   }
 
   get editor() {
-    return this.$refs.editor as MarkdownEditor
+    return this.$refs.editor as AnswerForm
   }
 
   handlePostAnswer() {
@@ -88,7 +96,7 @@ export default class QuestionPage extends Vue {
       this.editor.focus()
       return
     }
-    // TODO disable controls, set loading flag
+    this.isSaving = true
     this.$store
       .dispatch('questions/createAnswer', this.answerBody)
       .then(answerId => {
@@ -101,7 +109,7 @@ export default class QuestionPage extends Vue {
         console.log(err)
       })
       .finally(() => {
-        // TODO reset loading flag, enable controls
+        this.isSaving = false
       })
   }
 
@@ -119,13 +127,6 @@ export default class QuestionPage extends Vue {
       .finally(() => {
         this.loading = false
       })
-  }
-
-  mounted() {
-    this.reload()
-    if (!this.me) {
-      this.$store.commit('users/setSigninOrigin', this.$route.fullPath)
-    }
   }
 
   @Watch('$route.params.questionId')
