@@ -17,6 +17,7 @@
           :autofocus="false"
           :error="!!bodyError"
           v-model="body"
+          :disabled="isSaving"
         ></MarkdownEditor>
         <div v-if="bodyError" class="error-msg">{{ bodyError }}</div>
         <TagEditor
@@ -34,8 +35,12 @@
           </div>
         </div>
         <div class="post-form-control">
-          <button @click="handleSave" class="btn btn-primary"
-            >Post Question</button
+          <SpinnerButton
+            @click="handleSave"
+            class="btn btn-primary btn-150"
+            type="submit"
+            :loading="isSaving"
+            >Post Question</SpinnerButton
           >
         </div>
       </div>
@@ -67,6 +72,7 @@ export default class AskPage extends mixins(RequireAuth) {
   private tagsError: string | null = null
   private bodyError: string | null = null
   private titleError: string | null = null
+  private isSaving: boolean | false = false
 
   get titleInput() {
     return this.$refs.title as HTMLInputElement
@@ -105,14 +111,16 @@ export default class AskPage extends mixins(RequireAuth) {
       this.tagEditor.focus()
       return
     }
-    // TODO disable controls, set loading flag
+
+    this.isSaving = true
+
     Api.Questions.Create(this.title, this.body, this.tags)
       .then(response => {
         const questionId = response.data.data._id
         this.$router.replace(`/questions/${questionId}`)
       })
       .finally(() => {
-        // TODO enable controls, reset loading flag
+        this.isSaving = false
       })
   }
 

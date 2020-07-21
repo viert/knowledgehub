@@ -5,7 +5,7 @@
       ref="editor"
       :autofocus="false"
       :error="!!error"
-      :disabled="disabled"
+      :disabled="isSaving"
       :value="value"
       @input="$emit('input', $event)"
     />
@@ -19,9 +19,9 @@
     <div class="post-form-control">
       <SpinnerButton
         @click="$emit('submit')"
-        class="btn btn-primary"
+        class="btn btn-primary btn-150"
         type="submit"
-        :loading="disabled"
+        :loading="isSaving"
         >Post Answer</SpinnerButton
       >
     </div>
@@ -42,7 +42,15 @@ export default class AnswerForm extends Vue {
   @Prop({ type: String, default: '' }) readonly value!: string
   @Prop({ type: String, default: '' }) readonly error!: string
   @questions.State('question') readonly question!: Question
-  @Prop({ type: Boolean, default: false }) disabled!: boolean
+  @Prop({ type: Boolean, default: false }) isSaving!: boolean
+
+  get editor(): MarkdownEditor {
+    return this.$refs.editor as MarkdownEditor
+  }
+
+  focus() {
+    this.editor.focus()
+  }
 }
 </script>
 
