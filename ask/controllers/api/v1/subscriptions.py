@@ -26,9 +26,9 @@ def tag_subscription():
 @subs_ctrl.route("/users", methods=["GET"])
 def users_subscription():
     user: User = get_user_from_app_context()
-    ts = user.user_subscription
+    us = user.user_subscription
     users = []
-    for user in ts.subscribed_to:
+    for user in us.subscribed_to:
         users.append(user.to_dict(fields=USER_FIELDS))
     return json_response({"data": users})
 

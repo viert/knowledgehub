@@ -13,11 +13,13 @@ from glasskit.errors import NotFound
 from ask.errors import (InvalidUser, InvalidParent, InvalidQuestion,
                         InvalidTags, HasReferences, AlreadyDeleted, NotDeleted)
 from ask.tasks import SyncTagsTask
+from ask.unmark import unmark
 
 
 class BasePost(StorableSubmodel):
 
     COLLECTION = "posts"
+    INDEXER_FIELDS = []
 
     author_id: ObjectIdField(required=True, rejected=True, index=True)
     created_at: DatetimeField(required=True, rejected=True, default=now, index=-1)
@@ -27,6 +29,10 @@ class BasePost(StorableSubmodel):
     deleted_by_id: ObjectIdField(rejected=True, default=None)
     deleted: BoolField(required=True, rejected=True, default=False)
     points: IntField(required=True, rejected=True, default=0, index=-1)
+
+    @property
+    def type(self) -> str:
+        return self.submodel
 
     @property
     def author(self) -> Union['User', None]:
@@ -145,8 +151,21 @@ class BasePost(StorableSubmodel):
     def generate_events(self):
         pass
 
+    def get_indexer_document(self) -> Union[Dict[str, Any], None]:
+        if self.deleted:
+            return None
+        data = self.to_dict(self.INDEXER_FIELDS)
+        data["created_at"] = int(self.created_at.timestamp())
+        data["body"] = unmark(self.body)
+        return data
 
 class Question(BasePost):
+
+    INDEXER_FIELDS = (
+        "title",
+        "body",
+        "tags",
+    )
 
     title: StringField(required=True, min_length=5, max_length=120)
     body: StringField(required=True, min_length=10, max_length=65536)
@@ -373,6 +392,11 @@ class Answer(BasePost):
 
     SUBMODEL = "answer"
 
+    INDEXER_FIELDS = (
+        "body",
+        "tags",
+    )
+
     body: StringField(required=True, min_length=10, max_length=65536)
     accepted: BoolField(required=True, default=False, rejected=True)
     accepted_at: DatetimeField(default=None, rejected=True)
@@ -411,6 +435,11 @@ class Answer(BasePost):
 class Comment(BasePost):
 
     SUBMODEL = "comment"
+
+    INDEXER_FIELDS = (
+        "body",
+        "tags",
+    )
 
     body: StringField(required=True, min_length=2, max_length=1024)
     parent_id: ObjectIdField(required=True, rejected=True)

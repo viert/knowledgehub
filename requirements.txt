@@ -1,2 +1,4 @@
 glasskit>=3.9.29
 line_profiler
+elasticsearch
+markdown
