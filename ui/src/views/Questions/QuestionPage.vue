@@ -46,7 +46,6 @@ import { Vue, Component, Watch } from 'vue-property-decorator'
 import QuestionView from './Partial/QuestionView.vue'
 import AnswerView from './Partial/AnswerView.vue'
 
-import MarkdownEditor from '@/components/Editors/MarkdownEditor.vue'
 import AnswerForm from '@/components/Editors/AnswerForm.vue'
 import SigninBanner from '@/components/SignIn/SigninBanner.vue'
 
@@ -61,7 +60,6 @@ const users = namespace('users')
   components: {
     QuestionView,
     AnswerView,
-    MarkdownEditor,
     AnswerForm,
     SigninBanner
   }
@@ -89,7 +87,7 @@ export default class QuestionPage extends Vue {
   }
 
   get editor() {
-    return this.$refs.editor as MarkdownEditor
+    return this.$refs.editor as AnswerForm
   }
 
   handlePostAnswer() {
