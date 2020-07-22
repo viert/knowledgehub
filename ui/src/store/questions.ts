@@ -18,8 +18,10 @@ const questionsStore: Module<QuestionsState, RootState> = {
     question: null,
     answers: [],
     comments: [],
+    searchResults: [],
     page: 1,
-    totalPages: 1
+    totalPages: 1,
+    count: 0
   },
   getters: {
     isMyQuestion(state, _, rootState) {
@@ -27,7 +29,7 @@ const questionsStore: Module<QuestionsState, RootState> = {
     }
   },
   mutations: {
-    storeQuestionsList(state, questions: Array<Question>) {
+    storeQuestionsList(state, questions: Question[]) {
       state.questionsList = questions
     },
     setPage(state, page: number) {
@@ -36,11 +38,17 @@ const questionsStore: Module<QuestionsState, RootState> = {
     setTotalPages(state, totalPages: number) {
       state.totalPages = totalPages
     },
+    setCount(state, count: number) {
+      state.count = count
+    },
     storeQuestion(state, question: Question) {
       state.question = question
     },
-    storeAnswers(state, answers: Array<Answer>) {
+    storeAnswers(state, answers: Answer[]) {
       state.answers = answers
+    },
+    storeSearchResults(state, searchResults: Array<Answer | Question>) {
+      state.searchResults = searchResults
     },
     addAnswer(state, answer: Answer) {
       answer = {
@@ -56,7 +64,7 @@ const questionsStore: Module<QuestionsState, RootState> = {
       }
       state.comments = [...state.comments, comment]
     },
-    storeComments(state, comments: Array<Comment>) {
+    storeComments(state, comments: Comment[]) {
       state.comments = comments
     },
     replaceComment(state, comment: Comment) {
@@ -71,6 +79,25 @@ const questionsStore: Module<QuestionsState, RootState> = {
     }
   },
   actions: {
+    async searchQuestions(
+      { commit },
+      payload: { page: number; query: string }
+    ) {
+      const { page, query } = payload
+      return Api.Search.Search(query, page).then(response => {
+        const { results, authors } = response.data
+        if (results.total_pages > 0 && results.page > results.total_pages) {
+          // fixpage
+          throw new MaxPage(results.total_pages)
+        }
+
+        commit('storeSearchResults', results.data)
+        commit('setPage', results.page)
+        commit('setCount', results.count)
+        commit('setTotalPages', results.total_pages)
+        commit('users/applyUsers', authors.data, { root: true })
+      })
+    },
     async loadQuestions(
       { commit },
       payload: { page: number; sort: string; limit: number }

@@ -19,7 +19,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
 import Post from '@/components/Post.vue'
-import PostCommons from './PostCommons'
+import PostCommons from '@/mixins/PostCommons'
 import { Comment } from '@/store/types'
 import { mixins } from 'vue-class-component'
 

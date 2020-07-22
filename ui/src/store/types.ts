@@ -23,6 +23,7 @@ export interface Question {
   author_id: string
   answers_count: number
   has_accepted_answer: boolean
+  type?: 'question'
 }
 
 export interface Answer {
@@ -32,6 +33,7 @@ export interface Answer {
   accepted: boolean
   author_id: string
   flash?: boolean
+  type?: 'answer'
 }
 
 export interface Comment {
@@ -40,6 +42,7 @@ export interface Comment {
   parent_id: string
   author_id: string
   flash?: boolean
+  type?: 'comment'
 }
 
 export interface Tag {
@@ -115,11 +118,13 @@ export interface UsersState {
 
 export interface QuestionsState {
   questionsList: Question[]
+  searchResults: Array<Question | Answer>
   question: Question | null
   answers: Answer[]
   comments: Comment[]
   page: number
   totalPages: number
+  count: number
 }
 
 export interface DataState {
