@@ -1,7 +1,6 @@
 import { Module } from 'vuex'
 import { RootState, QuestionsState, Question, Answer, Comment } from './types'
 import Api from '@/api'
-import Questions from '@/api/questions'
 
 class MaxPage extends Error {
   maxPage: number
