@@ -1,4 +1,4 @@
-glasskit>=3.9.29
+glasskit>=3.9.31
 line_profiler
 elasticsearch
 markdown

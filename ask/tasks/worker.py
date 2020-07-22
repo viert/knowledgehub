@@ -28,10 +28,15 @@ class Worker(BaseWorker):
     def rt_post_indexer(task: PostIndexerTask):
         if task.delete:
             ctx.es.delete(index="posts", id=task.post_id)
+            ctx.log.info("post %s has been deleted from index", task.post_id)
         else:
             post: BasePost = BasePost.get(task.post_id)
             if post is None:
                 ctx.log.error("error indexing post %s: post not found", task.post_id)
                 return
             doc = post.get_indexer_document()
-            ctx.es.index(index="posts", id=task.post_id, body=doc)
+            resp = ctx.es.index(index="posts", id=task.post_id, body=doc)
+            if resp["result"] == "created":
+                ctx.log.info("post %s has been indexed", task.post_id)
+            elif resp["result"] == "updated":
+                ctx.log.info("post %s index has been updated", task.post_id)

@@ -29,6 +29,7 @@ class BasePost(StorableSubmodel):
     deleted_by_id: ObjectIdField(rejected=True, default=None)
     deleted: BoolField(required=True, rejected=True, default=False)
     points: IntField(required=True, rejected=True, default=0, index=-1)
+    _score = None
 
     @property
     def type(self) -> str:
@@ -425,6 +426,10 @@ class Answer(BasePost):
         return Question.find_one({"_id": self.parent_id})
 
     @property
+    def question_title(self) -> str:
+        return self.question.title
+
+    @property
     def comments(self) -> ObjectsCursor:
         return Comment.find({"parent_id": self._id}).sort("created_at", ASCENDING)
 
@@ -447,12 +452,6 @@ class Answer(BasePost):
 class Comment(BasePost):
 
     SUBMODEL = "comment"
-
-    INDEXER_FIELDS = (
-        "body",
-        "tags",
-        "type",
-    )
 
     body: StringField(required=True, min_length=2, max_length=1024)
     parent_id: ObjectIdField(required=True, rejected=True)
@@ -481,6 +480,14 @@ class Comment(BasePost):
         q = self.question
         q.update_last_activity()
         q.save(skip_callback=True)
+
+    def reindex(self):
+        # Comments are not indexed
+        pass
+
+    def get_indexer_document(self) -> Union[Dict[str, Any], None]:
+        # Comments are not indexed
+        return None
 
 
 BasePost.register_submodel(Question.SUBMODEL, Question)

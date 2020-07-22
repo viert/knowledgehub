@@ -14,6 +14,7 @@ from ask.controllers.api.v1.questions import questions_ctrl
 from ask.controllers.api.v1.users import users_ctrl
 from ask.controllers.api.v1.subscriptions import subs_ctrl
 from ask.controllers.api.v1.tags import tags_ctrl
+from ask.controllers.api.v1.search import search_ctrl
 
 
 def get_version():
@@ -39,6 +40,7 @@ class App(Base):
             {"prefix": "/api/v1/tags", "ctrl": tags_ctrl, "name": "tags"},
             {"prefix": "/api/v1/questions", "ctrl": questions_ctrl, "name": "questions"},
             {"prefix": "/api/v1/subscriptions", "ctrl": subs_ctrl, "name": "subscriptions"},
+            {"prefix": "/api/v1/search", "ctrl": search_ctrl, "name": "search"},
         ]
 
         for ep in endpoints:
