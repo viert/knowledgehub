@@ -1,5 +1,5 @@
 <template>
-  <div class="page-layout">
+  <div class="page-layout search">
     <main>
       <div class="search-page">
         <Progress v-if="isLoading" text="Searching..." />
@@ -30,7 +30,14 @@
         </div>
       </div>
     </main>
-    <aside></aside>
+    <aside>
+      <div class="aside-section">
+        <h4>Related Tags</h4>
+        <div class="tag-list">
+          <Tag v-for="tag in relatedTags" :key="tag" :name="tag" />
+        </div>
+      </div>
+    </aside>
   </div>
 </template>
 
@@ -62,6 +69,7 @@ export default class SearchResultsPage extends mixins(Paginated) {
     Answer | Question
   >
   @questions.State('count') readonly count!: number
+  @questions.Getter('searchPageRelatedTags') readonly relatedTags!: string[]
 
   mounted() {
     this.$store.commit('questions/storeSearchResults', [])
@@ -103,6 +111,10 @@ export default class SearchResultsPage extends mixins(Paginated) {
 <style lang="scss">
 .search-page {
   padding: 20px;
+}
+
+.page-layout.search .tag-list .tag {
+  margin-bottom: 8px;
 }
 
 ul.search-results-list {

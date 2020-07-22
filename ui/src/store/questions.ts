@@ -1,6 +1,7 @@
 import { Module } from 'vuex'
 import { RootState, QuestionsState, Question, Answer, Comment } from './types'
 import Api from '@/api'
+import Questions from '@/api/questions'
 
 class MaxPage extends Error {
   maxPage: number
@@ -26,6 +27,18 @@ const questionsStore: Module<QuestionsState, RootState> = {
   getters: {
     isMyQuestion(state, _, rootState) {
       return state.question?.author_id === rootState.users.user?._id
+    },
+    searchPageRelatedTags(state) {
+      const tags = state.searchResults.reduce((acc, item) => {
+        if (item.type === 'question') {
+          const question = item as Question
+          question.tags.forEach(tag => {
+            acc.add(tag)
+          })
+        }
+        return acc
+      }, new Set<string>())
+      return Array.from(tags)
     }
   },
   mutations: {
