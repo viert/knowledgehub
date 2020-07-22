@@ -7,13 +7,19 @@
       </router-link>
     </div>
     <div class="panel">
-      <div class="panel-search">
-        <input type="text" class="form-control searchbox" />
-      </div>
+      <form @submit.prevent="handleSearch" class="panel-search">
+        <input
+          ref="search"
+          type="text"
+          v-model="searchQuery"
+          class="form-control searchbox"
+        />
+      </form>
       <div class="panel-ask">
-        <router-link to="/ask" class="btn btn-primary btn-ask"
-          >Ask Question</router-link
-        >
+        <!--prettyhtml-ignore-->
+        <router-link to="/ask" class="btn btn-primary btn-ask">
+          Ask Question
+        </router-link>
       </div>
       <div v-if="me" class="panel-account">
         <router-link to="/profile">@{{ me.username }}</router-link>
@@ -41,12 +47,35 @@ export default class PageHeader extends Vue {
   @users.State('authState') readonly authState!: AuthState
   @users.Action('logout') logout!: () => void
 
+  private searchQuery = ''
+
   get authInfoAcquired() {
     return this.authState !== AuthState.Unknown
   }
 
   get avatarURL() {
     return this.me.avatar_url ? this.me.avatar_url : '/images/default_user.png'
+  }
+
+  get q() {
+    const { query } = this.$route
+    if (typeof query.q === 'string') return query.q
+    return ''
+  }
+
+  mounted() {
+    if (this.$route.name === 'SearchResults') {
+      this.searchQuery = this.q
+      this.$nextTick(() => {
+        const search = this.$refs.search as HTMLInputElement
+        search.focus()
+      })
+    }
+  }
+
+  handleSearch() {
+    if (this.searchQuery === '' || this.searchQuery === this.q) return
+    this.$router.push(`/search?q=${this.searchQuery}`)
   }
 }
 </script>
@@ -96,13 +125,15 @@ $avatar-size: 40px;
 
       &:before {
         display: block;
+        position: absolute;
+        left: 12px;
         font-family: 'Font Awesome 5 Free';
         font-weight: bold;
         content: '\f002';
       }
 
       input.searchbox {
-        margin-left: 12px;
+        padding-left: 36px;
       }
     }
 

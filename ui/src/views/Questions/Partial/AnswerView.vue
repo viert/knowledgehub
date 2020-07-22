@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
-import PostCommons from './PostCommons'
+import PostCommons from '@/mixins/PostCommons'
 import Post from '@/components/Post.vue'
 import Accept from '@/components/Accept.vue'
 import CommentsList from './CommentsList.vue'

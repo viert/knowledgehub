@@ -5,6 +5,7 @@ import QuestionPage from '@/views/Questions/QuestionPage.vue'
 import ProfileView from '@/views/Profile/ProfileView.vue'
 import AskPage from '@/views/AskPage.vue'
 import SigninPage from '@/views/SignIn/SigninPage.vue'
+import SearchResultsPage from '@/views/Search/SearchResultsPage.vue'
 import store from '@/store'
 
 Vue.use(VueRouter)
@@ -19,6 +20,11 @@ const routes: Array<RouteConfig> = [
     path: '/signin',
     name: 'SignIn',
     component: SigninPage
+  },
+  {
+    path: '/search',
+    name: 'SearchResults',
+    component: SearchResultsPage
   },
   {
     path: '/questions/:questionId',
