@@ -25,6 +25,7 @@ SEARCH_FIELDS = (
     "answers_count",
     "points",
     "author_id",
+    "has_accepted_answer",
 )
 
 
