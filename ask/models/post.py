@@ -12,7 +12,7 @@ from glasskit.errors import NotFound
 
 from ask.errors import (InvalidUser, InvalidParent, InvalidQuestion,
                         InvalidTags, HasReferences, AlreadyDeleted, NotDeleted)
-from ask.tasks import SyncTagsTask
+from ask.tasks import SyncTagsTask, PostIndexerTask
 from ask.unmark import unmark
 
 
@@ -113,9 +113,16 @@ class BasePost(StorableSubmodel):
         if self.deleted_by_id is not None and self.deleted_by is None:
             raise InvalidUser("deleted_by_id is invalid or user not found")
 
+    def reindex(self):
+        PostIndexerTask.create(self._id, self.deleted).publish()
+
     def _after_save(self, is_new):
         if is_new:
             self.generate_events()
+        self.reindex()
+
+    def _after_delete(self):
+        PostIndexerTask.create(self._id, True).publish()
 
     def api_dict(self, fields=None, include_restricted=False) -> Dict[str, Any]:
         d = self.to_dict(fields, include_restricted)
@@ -159,12 +166,14 @@ class BasePost(StorableSubmodel):
         data["body"] = unmark(self.body)
         return data
 
+
 class Question(BasePost):
 
     INDEXER_FIELDS = (
         "title",
         "body",
         "tags",
+        "type",
     )
 
     title: StringField(required=True, min_length=5, max_length=120)
@@ -214,6 +223,7 @@ class Question(BasePost):
         Tag.sync(self.tags)
 
     def _before_save(self) -> None:
+        super()._before_save()
         new_tags = set(self.tags)
         if len(self.tags) != len(new_tags):
             raise InvalidTags("tags must be unique")
@@ -237,6 +247,7 @@ class Question(BasePost):
         self.save(skip_callback=True)
 
     def _after_save(self, is_new) -> None:
+        super()._after_save(is_new)
         # create task only after assuring the new data is saved to db
         if self._tags_changed:
             task = SyncTagsTask.create(self._tags_changed)
@@ -250,6 +261,7 @@ class Question(BasePost):
         However this method will make sure that the question has no
         answers and/or comments attached to it
         """
+        super()._before_delete()
         if self.comments.count() > 0:
             raise HasReferences("question have comments attached")
         if self.answers.count() > 0:
@@ -262,8 +274,7 @@ class Question(BasePost):
 
     def _after_delete(self) -> None:
         # tags should be recalculated
-        task = SyncTagsTask.create(self.tags)
-        task.publish()
+        SyncTagsTask.create(self.tags).publish()
 
     def update_last_activity(self) -> None:
         self.last_activity_at = now()
@@ -395,6 +406,7 @@ class Answer(BasePost):
     INDEXER_FIELDS = (
         "body",
         "tags",
+        "type",
     )
 
     body: StringField(required=True, min_length=10, max_length=65536)
@@ -439,6 +451,7 @@ class Comment(BasePost):
     INDEXER_FIELDS = (
         "body",
         "tags",
+        "type",
     )
 
     body: StringField(required=True, min_length=2, max_length=1024)
