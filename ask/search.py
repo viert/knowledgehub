@@ -1,8 +1,13 @@
+import re
+from typing import Dict, Any, List, Tuple
 from glasskit import ctx
 from glasskit.uorm.db import ObjectsCursor, ObjectId
 from glasskit.uorm.models.base_model import BaseModel
 from elasticsearch.serializer import JSONSerializer
 from ask.models.post import BasePost
+from ask.models.tag import TAG_NAME_EXPRESSION
+
+TAG_SEARCH_EXPR = re.compile(r"\[(" + TAG_NAME_EXPRESSION + r")\]")
 
 
 class SearchCursor:
@@ -75,26 +80,35 @@ class SearchCursor:
         return SearchCursor.Iterator(self._response["hits"]["hits"])
 
 
-def search_posts_generic(query_string):
-    query = {
+def search_posts_generic(query_string, tags=None):
+    query: Dict[str, Any] = {
         "query": {
-            "multi_match": {
-                "fields": ["body", "title"],
-                "query": query_string
+            "bool": {
+                "should": {
+                    "multi_match": {
+                        "fields": ["body", "title"],
+                        "query": query_string
+                    }
+                }
             }
         }
     }
 
+    if tags:
+        query["query"]["bool"]["filter"] = [{"term": {"tags": tag}} for tag in tags]
+
     return SearchCursor("posts", query)
-    docs = []
-    for doc in result["hits"]["hits"]:
-        post = BasePost.find_one({"_id": ObjectId(doc["_id"])})
-        if not post:
-            continue
-        post = post.to_dict()
-        post["_score"] = doc["_score"]
-        docs.append(post)
-    return docs
+
+
+def parse_query(query_string) -> Tuple[str, List[str]]:
+    tags = TAG_SEARCH_EXPR.findall(query_string)
+    query_string = TAG_SEARCH_EXPR.sub("", query_string).strip()
+    return query_string, tags
+
+
+def search_posts(query_string):
+    query_string, tags = parse_query(query_string)
+    return search_posts_generic(query_string, tags)
 
 
 class MongoJSONSerializer(JSONSerializer):

@@ -1,8 +1,13 @@
+import re
 from glasskit.uorm.models.storable_model import StorableModel
 from glasskit.uorm.models.fields import StringField, IntField
 from glasskit.uorm.utils import save_required
 from glasskit import ctx
-from ask.errors import HasReferences
+from ask.errors import HasReferences, InvalidTags
+
+
+TAG_NAME_EXPRESSION = r"[a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?"
+TAG_NAME_RE = re.compile("^" + TAG_NAME_EXPRESSION + "$")
 
 
 class Tag(StorableModel):
@@ -38,6 +43,8 @@ class Tag(StorableModel):
             self.save(skip_callback=True)
 
     def _before_save(self):
+        if not TAG_NAME_RE.match(self.name):
+            raise InvalidTags(f"tag name {self.name} is invalid")
         if self.description is None:
             self.description = f"Questions related to {self.name}"
         self.questions_count = self.questions().count()

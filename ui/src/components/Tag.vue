@@ -26,8 +26,15 @@
               (tag && tag.description) || defaultTagDescription
             }}</p>
             <div class="tag-expand_ctrl">
+              <router-link
+                v-if="!me"
+                to="/signin"
+                class="btn btn-sm btn-block btn-outline-secondary"
+              >
+                Sign in to subscribe
+              </router-link>
               <SpinnerButton
-                v-if="subscribed"
+                v-else-if="subscribed"
                 :loading="subscribeInProgress"
                 @click="handleUnsubscribe"
                 class="btn btn-sm btn-block btn-outline-danger"
@@ -55,6 +62,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
+import { User } from '../store/types'
 const users = namespace('users')
 const tags = namespace('tags')
 
@@ -69,6 +77,7 @@ export default class Tag extends Vue {
   private tagLoading = false
   private subscribeInProgress = false
 
+  @users.State('user') me!: User
   @users.State('tagSubscriptions') tagSubscriptions!: string[]
   @tags.Getter('getTag') getTag!: (tagName: string) => Tag
 
