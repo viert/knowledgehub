@@ -13,7 +13,7 @@ from glasskit.errors import NotFound
 from ask.errors import (InvalidUser, InvalidParent, InvalidQuestion,
                         InvalidTags, HasReferences, AlreadyDeleted, NotDeleted)
 from ask.tasks import SyncTagsTask, PostIndexerTask, NewPostTask
-from ask.unmark import unmark
+from ask.unmark import unmark, extract_usernames
 
 
 class BasePost(StorableSubmodel):
@@ -21,6 +21,7 @@ class BasePost(StorableSubmodel):
     COLLECTION = "posts"
     INDEXER_FIELDS = []
 
+    body: StringField()
     author_id: ObjectIdField(required=True, rejected=True, index=True)
     created_at: DatetimeField(required=True, rejected=True, default=now, index=-1)
     edited_at: DatetimeField(rejected=True, default=None)
@@ -163,7 +164,20 @@ class BasePost(StorableSubmodel):
         return post
 
     def generate_new_post_events(self):
-        pass
+        self.generate_mention_events()
+
+    def generate_mention_events(self):
+        for username in extract_usernames(self.body):
+            user = User.get(username)
+            if not user:
+                continue
+            e = MentionEvent({
+                "user_id": user._id,
+                "post_id": self._id,
+                "post_type": self.type,
+                "author_id": self.author_id,
+            })
+            e.save()
 
     def get_indexer_document(self) -> Union[Dict[str, Any], None]:
         if self.deleted:
@@ -230,10 +244,16 @@ class Question(BasePost):
         Tag.sync(self.tags)
 
     def _before_save(self) -> None:
+        from .tag import TAG_NAME_RE
+
         super()._before_save()
         new_tags = set(self.tags)
         if len(self.tags) != len(new_tags):
             raise InvalidTags("tags must be unique")
+
+        for tag in new_tags:
+            if not TAG_NAME_RE.match(tag):
+                raise InvalidTags(f"tag name {tag} is invalid")
 
         if self.is_new:
             self._tags_changed = new_tags
@@ -407,6 +427,7 @@ class Question(BasePost):
         return results
 
     def generate_new_post_events(self):
+        super(Question, self).generate_new_post_events()
         for ts in TagSubscription.find_by_tags(self.tags):
             user_id = ts.user_id
 
@@ -471,6 +492,7 @@ class Answer(BasePost):
         q.update_answers_count()
 
     def generate_new_post_events(self):
+        super(Answer, self).generate_new_post_events()
         question = self.question
         if self.author_id == question.author_id:
             # self-answers don't create events
@@ -538,6 +560,7 @@ class Comment(BasePost):
         return None
 
     def generate_new_post_events(self):
+        super(Comment, self).generate_new_post_events()
         post = self.parent
         if self.author_id == post.author_id:
             # self-comments don't create events
@@ -562,4 +585,4 @@ from .vote import Vote
 from .tag import Tag
 from .tag_subscription import TagSubscription
 from .event import (TagNewQuestionEvent, QuestionNewAnswerEvent,
-                    PostNewCommentEvent, AnswerAcceptedEvent)
+                    PostNewCommentEvent, AnswerAcceptedEvent, MentionEvent)
