@@ -38,6 +38,8 @@ QUESTION_FIELDS = (
     "my_vote",
     "created_at",
     "edited_at",
+    "deleted_at",
+    "deleted",
     "views_count",
     "tags",
     "answers_count",
@@ -55,6 +57,8 @@ ANSWER_FIELDS = (
     "my_vote",
     "created_at",
     "edited_at",
+    "deleted_at",
+    "deleted",
     "accepted",
 )
 
@@ -67,6 +71,8 @@ COMMENT_FIELDS = (
     "my_vote",
     "created_at",
     "edited_at",
+    "deleted_at",
+    "deleted",
 )
 
 SORT_MAP = {

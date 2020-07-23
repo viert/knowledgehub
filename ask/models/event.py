@@ -1,8 +1,8 @@
-from typing import Union
+from typing import Union, Optional
 from glasskit.utils import now
 from glasskit.uorm.db import ObjectsCursor
 from glasskit.uorm.models.submodel import StorableSubmodel
-from glasskit.uorm.models.fields import StringField, ObjectIdField, BoolField, DictField, DatetimeField
+from glasskit.uorm.models.fields import ListField, StringField, ObjectIdField, BoolField, DictField, DatetimeField
 
 
 class Event(StorableSubmodel):
@@ -35,11 +35,11 @@ class Event(StorableSubmodel):
 
 class TagNewQuestionEvent(Event):
 
-    tag: StringField(required=True, rejected=True)
+    tags: ListField(required=True, rejected=True, min_length=1)
     question_id: ObjectIdField(required=True, rejected=True)
 
     @property
-    def question(self) -> 'Question':
+    def question(self) -> Optional['Question']:
         return Question.find_one({"_id": self.question_id})
 
 
@@ -65,6 +65,7 @@ class QuestionNewAnswerEvent(Event):
 class PostNewCommentEvent(Event):
 
     post_id: ObjectIdField(required=True, rejected=True)
+    post_type: StringField(required=True, rejected=True)
     comment_id: ObjectIdField(required=True, rejected=True)
     author_id: ObjectIdField(required=True, rejected=True)
 
@@ -84,6 +85,7 @@ class PostNewCommentEvent(Event):
 class MentionEvent(Event):
 
     post_id: ObjectIdField(required=True, rejected=True)
+    post_type: StringField(required=True, rejected=True)
     author_id: ObjectIdField(required=True, rejected=True)
 
     @property
@@ -98,6 +100,7 @@ class MentionEvent(Event):
 class AnswerAcceptedEvent(Event):
 
     answer_id: ObjectIdField(required=True, rejected=True)
+    accepted_by_id: ObjectIdField(required=True, rejected=True)
 
     @property
     def answer(self) -> 'Answer':
