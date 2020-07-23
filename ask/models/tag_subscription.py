@@ -1,3 +1,5 @@
+from typing import List
+from glasskit.uorm.db import ObjectsCursor
 from glasskit.uorm.models.storable_model import StorableModel
 from glasskit.uorm.models.fields import ObjectIdField, ListField
 from glasskit.errors import InputDataError
@@ -14,6 +16,10 @@ class TagSubscription(StorableModel):
 
     def setup_initial_state(self):
         return {"tags": self.tags[:]}
+
+    @classmethod
+    def find_by_tags(cls, tags: List[str]) -> ObjectsCursor:
+        return cls.find({"$or": [{"tags": tag} for tag in tags]})
 
     @property
     def user(self) -> 'User':

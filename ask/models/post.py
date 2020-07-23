@@ -12,7 +12,7 @@ from glasskit.errors import NotFound
 
 from ask.errors import (InvalidUser, InvalidParent, InvalidQuestion,
                         InvalidTags, HasReferences, AlreadyDeleted, NotDeleted)
-from ask.tasks import SyncTagsTask, PostIndexerTask
+from ask.tasks import SyncTagsTask, PostIndexerTask, NewPostTask
 from ask.unmark import unmark
 
 
@@ -50,6 +50,12 @@ class BasePost(StorableSubmodel):
         if self.deleted_by_id is None:
             return None
         return User.find_one({"_id": self.deleted_by_id})
+
+    def is_mine(self):
+        if not has_request_context():
+            return True
+        user = get_user_from_app_context()
+        return user._id == self.author_id
 
     @property
     def my_vote(self) -> int:
@@ -119,7 +125,7 @@ class BasePost(StorableSubmodel):
 
     def _after_save(self, is_new):
         if is_new:
-            self.generate_events()
+            NewPostTask.create(self._id).publish()
         self.reindex()
 
     def _after_delete(self):
@@ -127,7 +133,7 @@ class BasePost(StorableSubmodel):
 
     def api_dict(self, fields=None, include_restricted=False) -> Dict[str, Any]:
         d = self.to_dict(fields, include_restricted)
-        if self.deleted:
+        if self.deleted and not self.is_mine():
             d["body"] = None
         if "submodel" in d:
             del d["submodel"]
@@ -156,7 +162,7 @@ class BasePost(StorableSubmodel):
                 raise raise_if_none
         return post
 
-    def generate_events(self):
+    def generate_new_post_events(self):
         pass
 
     def get_indexer_document(self) -> Union[Dict[str, Any], None]:
@@ -295,6 +301,7 @@ class Question(BasePost):
             answer.accepted = True
             answer.accepted_at = now()
             answer.save(skip_callback=True)
+            answer.generate_accepted_event()
             self.has_accepted_answer = True
         else:
             self.has_accepted_answer = False
@@ -399,6 +406,21 @@ class Question(BasePost):
 
         return results
 
+    def generate_new_post_events(self):
+        for ts in TagSubscription.find_by_tags(self.tags):
+            user_id = ts.user_id
+
+            subscribed_tags = set(ts.tags)
+            post_tags = set(self.tags)
+            result_tags = subscribed_tags.intersection(post_tags)
+
+            e = TagNewQuestionEvent({
+                "user_id": user_id,
+                "tags": list(result_tags),
+                "question_id": self._id
+            })
+            e.save()
+
 
 class Answer(BasePost):
 
@@ -448,6 +470,32 @@ class Answer(BasePost):
         q.update_last_activity()
         q.update_answers_count()
 
+    def generate_new_post_events(self):
+        question = self.question
+        if self.author_id == question.author_id:
+            # self-answers don't create events
+            return
+
+        e = QuestionNewAnswerEvent({
+            "user_id": question.author_id,  # event receiver
+            "question_id": question._id,
+            "answer_id": self._id,
+            "author_id": self.author_id,
+        })
+        e.save()
+
+    def generate_accepted_event(self):
+        question = self.question
+        if question.author_id == self.author_id:
+            # self-answers accepting doesn't create events
+            return
+
+        e = AnswerAcceptedEvent({
+            "user_id": self.author_id,
+            "accepted_by_id": question.author_id,
+        })
+        e.save()
+
 
 class Comment(BasePost):
 
@@ -489,6 +537,21 @@ class Comment(BasePost):
         # Comments are not indexed
         return None
 
+    def generate_new_post_events(self):
+        post = self.parent
+        if self.author_id == post.author_id:
+            # self-comments don't create events
+            return
+
+        e = PostNewCommentEvent({
+            "user_id": post.author_id,  # event receiver
+            "post_id": post._id,
+            "post_type": post.type,
+            "comment_id": self._id,
+            "author_id": self.author_id,
+        })
+        e.save()
+
 
 BasePost.register_submodel(Question.SUBMODEL, Question)
 BasePost.register_submodel(Comment.SUBMODEL, Comment)
@@ -497,3 +560,6 @@ BasePost.register_submodel(Answer.SUBMODEL, Answer)
 from .user import User
 from .vote import Vote
 from .tag import Tag
+from .tag_subscription import TagSubscription
+from .event import (TagNewQuestionEvent, QuestionNewAnswerEvent,
+                    PostNewCommentEvent, AnswerAcceptedEvent)
