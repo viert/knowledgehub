@@ -16,7 +16,7 @@ class AuthController(Controller):
     def _get_user_from_session() -> Union[User, None]:
         user_id = session.get("user_id")
         if user_id:
-            user = User.cache_get(user_id)
+            user = User.get(user_id)
             return user
         return None
 
@@ -34,4 +34,5 @@ class AuthController(Controller):
             username = os.getenv("DEV_USER")
             if username is not None:
                 return User.get(username)
-        return self._get_user_from_x_api_auth_token() or self._get_user_from_session()
+        user = self._get_user_from_x_api_auth_token() or self._get_user_from_session()
+        return user

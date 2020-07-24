@@ -35,6 +35,8 @@ class Event(StorableSubmodel):
 
 class TagNewQuestionEvent(Event):
 
+    SUBMODEL = "tag_new_question_event"
+
     tags: ListField(required=True, rejected=True, min_length=1)
     question_id: ObjectIdField(required=True, rejected=True)
 
@@ -44,6 +46,8 @@ class TagNewQuestionEvent(Event):
 
 
 class QuestionNewAnswerEvent(Event):
+
+    SUBMODEL = "question_new_answer_event"
 
     question_id: ObjectIdField(required=True, rejected=True)
     answer_id: ObjectIdField(required=True, rejected=True)
@@ -63,6 +67,8 @@ class QuestionNewAnswerEvent(Event):
 
 
 class PostNewCommentEvent(Event):
+
+    SUBMODEL = "post_new_comment_event"
 
     post_id: ObjectIdField(required=True, rejected=True)
     post_type: StringField(required=True, rejected=True)
@@ -84,6 +90,8 @@ class PostNewCommentEvent(Event):
 
 class MentionEvent(Event):
 
+    SUBMODEL = "mention_event"
+
     post_id: ObjectIdField(required=True, rejected=True)
     post_type: StringField(required=True, rejected=True)
     author_id: ObjectIdField(required=True, rejected=True)
@@ -98,6 +106,8 @@ class MentionEvent(Event):
 
 
 class AnswerAcceptedEvent(Event):
+
+    SUBMODEL = "answer_accepted_event"
 
     answer_id: ObjectIdField(required=True, rejected=True)
     accepted_by_id: ObjectIdField(required=True, rejected=True)

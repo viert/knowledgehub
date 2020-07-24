@@ -50,5 +50,6 @@ class Worker(BaseWorker):
         post: Optional[BasePost] = BasePost.get(task.post_id)
         if not post:
             ctx.log.error("error processing new post %s: post not found", task.post_id)
+            return
 
         post.generate_new_post_events()

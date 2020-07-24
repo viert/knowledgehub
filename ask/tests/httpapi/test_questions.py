@@ -6,6 +6,7 @@ class TestQuestions(HTTPAPITestCase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.clear_task_queue()
         Question.destroy_all()
 
     def create_questions(self):
@@ -19,6 +20,7 @@ class TestQuestions(HTTPAPITestCase):
         q3 = Question({"title": "question3", "body": "Scaramouch, scaramouch will you do the fandango?",
                        "author_id": self.user2._id, "tags": ["queen"]})
         q3.save()
+        self.run_tasks()
 
         return q1, q2, q3
 
@@ -64,7 +66,7 @@ class TestQuestions(HTTPAPITestCase):
         self.assertEqual(resp.status_code, 403)
 
         resp = self.patch(f"/api/v1/questions/{q1._id}", json=payload, user=self.moderator)
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200, resp.data)
 
         q1.reload()
         self.assertEqual(q1.body, payload["body"])
@@ -108,7 +110,7 @@ class TestQuestions(HTTPAPITestCase):
         self.assertEqual(resp.status_code, 403)
 
         resp = self.post(f"/api/v1/questions/{q1._id}/restore", user=self.moderator)
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200, resp.data)
 
         q1.reload()
         self.assertFalse(q1.deleted)
@@ -198,7 +200,7 @@ class TestQuestions(HTTPAPITestCase):
         self.assertEqual(resp.status_code, 403)
 
         resp = self.patch(f"/api/v1/questions/{q1._id}/answers/{a._id}", user=self.moderator, json=attrs)
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200, resp.data)
 
         a.reload()
         self.assertEqual(a.body, attrs["body"])
@@ -216,7 +218,7 @@ class TestQuestions(HTTPAPITestCase):
         self.assertEqual(resp.status_code, 403)
 
         resp = self.delete(f"/api/v1/questions/{q1._id}/answers/{a._id}", user=self.moderator)
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200, resp.data)
 
         a.reload()
         self.assertTrue(a.deleted)
@@ -239,7 +241,7 @@ class TestQuestions(HTTPAPITestCase):
         self.assertEqual(resp.status_code, 403)
 
         resp = self.post(f"/api/v1/questions/{q1._id}/answers/{a1._id}/accept", user=self.user1)
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200, resp.data)
 
         a1.reload()
         a2.reload()
