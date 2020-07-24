@@ -161,6 +161,7 @@ def delete(question_id):
 @questions_ctrl.route("/<question_id>/restore", methods=["POST"])
 @auth_required
 def restore(question_id):
+    user = get_user_from_app_context()
     q = Question.get(question_id, "question not found")
     restore_post(q)
     return json_response({"data": q.api_dict(QUESTION_FIELDS)})

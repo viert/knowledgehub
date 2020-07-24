@@ -11,25 +11,36 @@ class HTTPAPITestCase(MongoMockTest):
 
     @classmethod
     def setUpClass(cls) -> None:
+        force_init_app()
         super().setUpClass()
         User.ensure_indexes()
-        force_init_app()
         cls.app = app
 
-        cls.user1 = User({"username": "user1", "ext_id": "user1"})
-        cls.user1.save()
-        cls.user1.create_auth_token()
-        cls.user2 = User({"username": "user2", "ext_id": "user2"})
-        cls.user2.save()
-        cls.user2.create_auth_token()
-        cls.moderator = User({"username": "mod", "ext_id": "mod", "moderator": True})
-        cls.moderator.save()
-        cls.moderator.create_auth_token()
+    def setUp(self) -> None:
+        User.destroy_all()
+        self.user1 = User({"username": "user1", "ext_id": "user1"})
+        self.user1.save()
+        self.user1.create_auth_token()
+        self.user2 = User({"username": "user2", "ext_id": "user2"})
+        self.user2.save()
+        self.user2.create_auth_token()
+        self.moderator = User({"username": "mod", "ext_id": "mod", "moderator": True})
+        self.moderator.save()
+        self.moderator.create_auth_token()
+
 
     @staticmethod
     def run_tasks():
         for task in ctx.queue.tasks:
             wrk.run_task(task)
+
+    @staticmethod
+    def clear_task_queue():
+        for task in ctx.queue.tasks:
+            try:
+                wrk.run_task(task)
+            except:
+                pass
 
     @property
     def client(self):

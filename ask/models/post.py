@@ -80,6 +80,7 @@ class BasePost(StorableSubmodel):
     @property
     def delete_allowed(self) -> bool:
         user: User = get_user_from_app_context()
+        # print(user, user.moderator)
         return self.author_id == user._id or user.moderator
 
     @property
@@ -514,6 +515,7 @@ class Answer(BasePost):
 
         e = AnswerAcceptedEvent({
             "user_id": self.author_id,
+            "answer_id": self._id,
             "accepted_by_id": question.author_id,
         })
         e.save()
