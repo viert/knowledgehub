@@ -1,6 +1,5 @@
 import requests
-from flask import json
-from glasskit import ctx
+from glasskit import ctx, json
 from .provider import BaseProvider
 from ask.errors import OAuthError
 
