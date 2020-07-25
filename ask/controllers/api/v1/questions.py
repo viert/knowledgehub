@@ -1,5 +1,6 @@
 from pymongo import DESCENDING
 from flask import request
+from typing import Optional
 
 from glasskit.api import (json_response, paginated, default_transform,
                           json_body_required, get_boolean_request_param)
@@ -136,7 +137,7 @@ def index():
 
 @questions_ctrl.route("/<question_id>", methods=["GET"])
 def show(question_id):
-    q: Question = Question.get(question_id, "question not found")
+    q: Optional[Question] = Question.get(question_id, "question not found")
     q.inc_views()
     return json_response({"data": q.everything()})
 
@@ -145,7 +146,7 @@ def show(question_id):
 @json_body_required
 @auth_required
 def update(question_id):
-    q = Question.get(question_id, "question not found")
+    q: Optional[Question] = Question.get(question_id, "question not found")
     update_post(q)
     return json_response({"data": q.api_dict(QUESTION_FIELDS)})
 
@@ -153,7 +154,7 @@ def update(question_id):
 @questions_ctrl.route("/<question_id>", methods=["DELETE"])
 @auth_required
 def delete(question_id):
-    q = Question.get(question_id, "question not found")
+    q: Optional[Question] = Question.get(question_id, "question not found")
     delete_post(q)
     return json_response({"data": q.api_dict(QUESTION_FIELDS)})
 
@@ -161,8 +162,7 @@ def delete(question_id):
 @questions_ctrl.route("/<question_id>/restore", methods=["POST"])
 @auth_required
 def restore(question_id):
-    user = get_user_from_app_context()
-    q = Question.get(question_id, "question not found")
+    q: Optional[Question] = Question.get(question_id, "question not found")
     restore_post(q)
     return json_response({"data": q.api_dict(QUESTION_FIELDS)})
 
@@ -171,7 +171,7 @@ def restore(question_id):
 @json_body_required
 @auth_required
 def vote_question(question_id):
-    q: Question = Question.get(question_id, "question not found")
+    q: Optional[Question] = Question.get(question_id, "question not found")
     u: User = get_user_from_app_context()
     if q.author_id == u._id:
         raise Forbidden("you can't vote for your own question")
@@ -202,7 +202,7 @@ def create():
 @json_body_required
 @auth_required
 def create_answer(question_id):
-    q = Question.get(question_id, "question not found")
+    q: Optional[Question] = Question.get(question_id, "question not found")
     user: User = get_user_from_app_context()
     attrs = request.json
 
@@ -219,7 +219,7 @@ def create_answer(question_id):
 @json_body_required
 @auth_required
 def update_answer(question_id, answer_id):
-    a = Answer.get(answer_id, "answer not found")
+    a: Optional[Answer] = Answer.get(answer_id, "answer not found")
     if a.parent_id != resolve_id(question_id):
         raise NotFound("answer not found")
     update_post(a)
@@ -229,7 +229,7 @@ def update_answer(question_id, answer_id):
 @questions_ctrl.route("/<question_id>/answers/<answer_id>", methods=["DELETE"])
 @auth_required
 def delete_answer(question_id, answer_id):
-    a = Answer.get(answer_id, "answer not found")
+    a: Optional[Answer] = Answer.get(answer_id, "answer not found")
     if a.parent_id != resolve_id(question_id):
         raise NotFound("answer not found")
     delete_post(a)
@@ -239,7 +239,7 @@ def delete_answer(question_id, answer_id):
 @questions_ctrl.route("/<question_id>/answers/<answer_id>/restore", methods=["POST"])
 @auth_required
 def restore_answer(question_id, answer_id):
-    a = Answer.get(answer_id, "answer not found")
+    a: Optional[Answer] = Answer.get(answer_id, "answer not found")
     if a.parent_id != resolve_id(question_id):
         raise NotFound("answer not found")
     restore_post(a)
@@ -250,7 +250,7 @@ def restore_answer(question_id, answer_id):
 @json_body_required
 @auth_required
 def vote_answer(question_id, answer_id):
-    a = Answer.get(answer_id, "answer not found")
+    a: Optional[Answer] = Answer.get(answer_id, "answer not found")
     if a.parent_id != resolve_id(question_id):
         raise NotFound("answer not found")
     u: User = get_user_from_app_context()
@@ -271,8 +271,8 @@ def vote_answer(question_id, answer_id):
 @auth_required
 def accept_answer(question_id, answer_id):
     u: User = get_user_from_app_context()
-    q: Question = Question.get(question_id, "answer not found")
-    a: Answer = Answer.get(answer_id, "answer not found")
+    q: Optional[Question] = Question.get(question_id, "answer not found")
+    a: Optional[Answer] = Answer.get(answer_id, "answer not found")
     if a.parent_id != q._id:
         raise NotFound("answer not found")
     if q.author_id != u._id:
@@ -285,8 +285,8 @@ def accept_answer(question_id, answer_id):
 @auth_required
 def revoke_answer(question_id, answer_id):
     u: User = get_user_from_app_context()
-    q: Question = Question.get(question_id, "answer not found")
-    a: Answer = Answer.get(answer_id, "answer not found")
+    q: Optional[Question] = Question.get(question_id, "answer not found")
+    a: Optional[Answer] = Answer.get(answer_id, "answer not found")
     if a.parent_id != q._id:
         raise NotFound("answer not found")
     if q.author_id != u._id:
@@ -318,7 +318,7 @@ def create_comment(question_id):
 @json_body_required
 @auth_required
 def update_comment(question_id, comment_id):
-    c = Comment.get(comment_id, "comment not found")
+    c: Optional[Comment] = Comment.get(comment_id, "comment not found")
     if c.parent_id != resolve_id(question_id):
         raise NotFound("comment not found")
     update_post(c)
@@ -328,7 +328,7 @@ def update_comment(question_id, comment_id):
 @questions_ctrl.route("/<question_id>/comments/<comment_id>", methods=["DELETE"])
 @auth_required
 def delete_comment(question_id, comment_id):
-    c = Comment.get(comment_id, "comment not found")
+    c: Optional[Comment] = Comment.get(comment_id, "comment not found")
     if c.parent_id != resolve_id(question_id):
         raise NotFound("comment not found")
     delete_post(c)
@@ -338,7 +338,7 @@ def delete_comment(question_id, comment_id):
 @questions_ctrl.route("/<question_id>/comments/<comment_id>/restore", methods=["POST"])
 @auth_required
 def restore_comment(question_id, comment_id):
-    c = Comment.get(comment_id, "comment not found")
+    c: Optional[Comment] = Comment.get(comment_id, "comment not found")
     if c.parent_id != resolve_id(question_id):
         raise NotFound("comment not found")
     restore_post(c)
@@ -349,7 +349,7 @@ def restore_comment(question_id, comment_id):
 @json_body_required
 @auth_required
 def vote_comment(question_id, comment_id):
-    c = Comment.get(comment_id, "comment not found")
+    c: Optional[Comment] = Comment.get(comment_id, "comment not found")
     if c.parent_id != resolve_id(question_id):
         raise NotFound("comment not found")
     u: User = get_user_from_app_context()
@@ -370,7 +370,7 @@ def vote_comment(question_id, comment_id):
 @json_body_required
 @auth_required
 def create_answer_comment(question_id, answer_id):
-    a = Answer.get(answer_id, "answer not found")
+    a: Optional[Answer] = Answer.get(answer_id, "answer not found")
     if a.parent_id != resolve_id(question_id):
         raise NotFound("answer not found")
     user: User = get_user_from_app_context()
@@ -388,9 +388,9 @@ def create_answer_comment(question_id, answer_id):
 @json_body_required
 @auth_required
 def update_answer_comment(question_id, answer_id, comment_id):
-    c = Comment.get(comment_id, "comment not found")
-    a = Answer.get(answer_id, "comment not found")
-    q = Question.get(question_id, "comment not found")
+    c: Optional[Comment] = Comment.get(comment_id, "comment not found")
+    a: Optional[Answer] = Answer.get(answer_id, "comment not found")
+    q: Optional[Question] = Question.get(question_id, "comment not found")
     if a.parent_id != q._id or c.parent_id != a._id:
         raise NotFound("comment not found")
     update_post(c)
@@ -400,9 +400,9 @@ def update_answer_comment(question_id, answer_id, comment_id):
 @questions_ctrl.route("/<question_id>/answers/<answer_id>/comments/<comment_id>", methods=["DELETE"])
 @auth_required
 def delete_answer_comment(question_id, answer_id, comment_id):
-    c = Comment.get(comment_id, "comment not found")
-    a = Answer.get(answer_id, "comment not found")
-    q = Question.get(question_id, "comment not found")
+    c: Optional[Comment] = Comment.get(comment_id, "comment not found")
+    a: Optional[Answer] = Answer.get(answer_id, "comment not found")
+    q: Optional[Question] = Question.get(question_id, "comment not found")
     if a.parent_id != q._id or c.parent_id != a._id:
         raise NotFound("comment not found")
     delete_post(c)
@@ -412,9 +412,9 @@ def delete_answer_comment(question_id, answer_id, comment_id):
 @questions_ctrl.route("/<question_id>/answers/<answer_id>/comments/<comment_id>/restore", methods=["POST"])
 @auth_required
 def restore_answer_comment(question_id, answer_id, comment_id):
-    c = Comment.get(comment_id, "comment not found")
-    a = Answer.get(answer_id, "comment not found")
-    q = Question.get(question_id, "comment not found")
+    c: Optional[Comment] = Comment.get(comment_id, "comment not found")
+    a: Optional[Answer] = Answer.get(answer_id, "comment not found")
+    q: Optional[Question] = Question.get(question_id, "comment not found")
     if a.parent_id != q._id or c.parent_id != a._id:
         raise NotFound("comment not found")
     restore_post(c)
@@ -425,9 +425,9 @@ def restore_answer_comment(question_id, answer_id, comment_id):
 @json_body_required
 @auth_required
 def vote_answer_comment(question_id, answer_id, comment_id):
-    c = Comment.get(comment_id, "comment not found")
-    a = Answer.get(answer_id, "comment not found")
-    q = Question.get(question_id, "comment not found")
+    c: Optional[Comment] = Comment.get(comment_id, "comment not found")
+    a: Optional[Answer] = Answer.get(answer_id, "comment not found")
+    q: Optional[Question] = Question.get(question_id, "comment not found")
     if a.parent_id != q._id or c.parent_id != a._id:
         raise NotFound("comment not found")
     u: User = get_user_from_app_context()

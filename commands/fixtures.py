@@ -4,6 +4,7 @@ import random
 from glasskit import ctx
 from glasskit.commands import Command
 from glasskit.queue import DummyQueue
+from ask import force_init_app
 from ask.tasks.worker import Worker
 from ask.models import User, Comment, Question, Answer
 
@@ -40,14 +41,16 @@ class Fixtures(Command):
     def create_users(self):
         ctx.log.info("creating fixture users")
         self.users = []
+
         data = requests.get(f"https://randomuser.me/api/?results={USERS_COUNT}").json()
         i = 1
         for user_data in data["results"]:
             username = f"fx_test_user_{i}"
             user = User.get(username)
             if not user:
-                user = User(
+                user = User.create(
                     username=username,
+                    ext_id=username,
                     first_name=user_data["name"]["first"],
                     last_name=user_data["name"]["last"],
                     avatar_url=user_data["picture"]["thumbnail"],
@@ -63,7 +66,7 @@ class Fixtures(Command):
         return text.replace('\\n', '\n')
 
     def random_tags(self):
-        count = random.randrange(MAX_TAGS)
+        count = 1 + random.randrange(MAX_TAGS)
         data = requests.get(f"https://random-word-api.herokuapp.com/word?number={count}").json()
         return data
 
@@ -74,25 +77,27 @@ class Fixtures(Command):
             title = requests.get("https://fish-text.ru/get?type=title").json()["text"]
             text = self.random_paragraph()
             tags = self.random_tags()
-            q = Question(body=text, title=title, tags=tags, author_id=self.random_user()._id)
+            q = Question.create(body=text, title=title, tags=tags, author_id=self.random_user()._id)
             q.save()
             for ic in range(random.randrange(MAX_COMMENTS)):
                 text = requests.get("https://fish-text.ru/get?type=sentence").json()["text"]
-                c = q.create_comment(author_id=self.random_user()._id, body=text)
+                c = q.create_comment(dict(author_id=self.random_user()._id, body=text))
                 c.save()
             for ac in range(random.randrange(MAX_ANSWERS)):
                 text = self.random_paragraph()
-                a = q.create_answer(author_id=self.random_user()._id, body=text)
+                a = q.create_answer(dict(author_id=self.random_user()._id, body=text))
                 a.save()
                 for ic in range(random.randrange(MAX_COMMENTS)):
                     text = requests.get("https://fish-text.ru/get?type=sentence").json()["text"]
-                    c = a.create_comment(author_id=self.random_user()._id, body=text)
+                    c = a.create_comment(dict(author_id=self.random_user()._id, body=text))
                     c.save()
         for task in ctx.queue.tasks:
             wrk.run_task(task)
 
     def run(self):
-        del ctx.queue
+        force_init_app()
+        if hasattr(ctx, "queue"):
+            del ctx.queue
         ctx.queue = DummyQueue({})
         if self.args.drop:
             self.drop()
