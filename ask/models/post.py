@@ -1,4 +1,4 @@
-from typing import Union, Dict, Any
+from typing import Union, Dict, Any, Optional
 from pymongo import ASCENDING, DESCENDING
 from flask import has_request_context
 
@@ -149,13 +149,14 @@ class BasePost(StorableSubmodel):
 
     @classmethod
     def get(cls, expression, raise_if_none=None):
-        post = super().get(expression, raise_if_none)
+        post: Optional[BasePost] = super().get(expression, raise_if_none)
         if post and post.deleted:
-            user: User = get_user_from_app_context()
-            # if user logged in and he is moderator or post.author
-            # he can view deleted post
-            if not user or (user._id != post.author_id and not user.moderator):
-                post = None
+            if has_request_context():
+                user: User = get_user_from_app_context()
+                # if user logged in and he is moderator or post.author
+                # he can view deleted post
+                if not user or (user._id != post.author_id and not user.moderator):
+                    post = None
 
         if post is None and raise_if_none:
             if isinstance(raise_if_none, str):
