@@ -224,10 +224,17 @@ const questionsStore: Module<QuestionsState, RootState> = {
           commit('replaceAnswer', response.data.data)
         })
     },
-    async deletePost({ state, commit }, questionId) {
+    async deleteQuestion({ state, commit }, questionId) {
       if (!state.question) return
 
       return Api.Questions.Delete(state.question._id).then(response => {
+        commit('storeQuestion', response.data.data)
+      })
+    },
+    async restoreQuestion({ state, commit }, questionId) {
+      if (!state.question) return
+
+      return Api.Questions.Restore(state.question._id).then(response => {
         commit('storeQuestion', response.data.data)
       })
     }

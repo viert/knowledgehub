@@ -10,12 +10,23 @@
           :value="question.my_vote"
         />
       </div>
-      <div class="question-body">
+      <div
+        :class="{
+          'question-body': true,
+          'question-body__deleted': question.deleted
+        }"
+      >
         <Post :body="question.body" />
         <div class="question-meta">
-          <div class="question-tags">
-            <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
+          <div class="question-meta__wrapper">
+            <div class="question-tags">
+              <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
+            </div>
+            <div class="question-actions">
+              <PostActions />
+            </div>
           </div>
+
           <div class="question-author">
             <AuthorCard
               action="Asked"
@@ -24,6 +35,7 @@
             />
           </div>
         </div>
+
         <CommentsList :parentId="question._id" :comments="selfComments" />
       </div>
     </div>
@@ -37,9 +49,10 @@ import { mixins } from 'vue-class-component'
 import Post from '@/components/Post.vue'
 import CommentsList from './CommentsList.vue'
 import AuthorCard from './AuthorCard.vue'
+import PostActions from '@/components/PostActions.vue'
 import { Question, Comment } from '@/store/types'
 
-@Component({ components: { Post, CommentsList, AuthorCard } })
+@Component({ components: { Post, CommentsList, AuthorCard, PostActions } })
 export default class QuestionView extends mixins(PostCommons) {
   @Prop({ type: Object, required: true }) question!: Question
   @Prop({ type: Array, default: () => [] }) readonly comments!: Comment[]
@@ -77,9 +90,21 @@ export default class QuestionView extends mixins(PostCommons) {
     flex-grow: 1;
   }
 
+  &-body__deleted {
+    opacity: 0.5;
+  }
+
   &-meta {
     display: flex;
     justify-content: flex-end;
+  }
+
+  &-actions {
+    margin: 10px 0;
+  }
+
+  &-meta__wrapper {
+    flex-grow: 1;
   }
 
   &-tags {

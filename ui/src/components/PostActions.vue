@@ -3,8 +3,11 @@
     <a @click.prevent href="#">
       edit
     </a>
-    <a @click.prevent="handleDelete" href="#">
+    <a v-if="!question.deleted" @click.prevent="handleDelete" href="#">
       delete
+    </a>
+    <a v-else @click.prevent="handleRestore" href="#">
+      restore
     </a>
   </div>
 </template>
@@ -24,8 +27,11 @@ export default class PostActions extends Vue {
   @questions.State('comments') readonly comments!: Comment[]
 
   handleDelete() {
-    console.log('question ', this.question)
-    this.$store.dispatch('questions/deletePost')
+    this.$store.dispatch('questions/deleteQuestion')
+  }
+
+  handleRestore() {
+    this.$store.dispatch('questions/restoreQuestion')
   }
 }
 </script>

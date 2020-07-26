@@ -23,6 +23,10 @@ const Questions = {
   Delete(questionId: string) {
     const url = `${API_PREFIX}/${questionId}`
     return wrap(Axios.delete(url))
+  },
+  Restore(questionId: string) {
+    const url = `${API_PREFIX}/${questionId}/restore`
+    return wrap(Axios.post(url))
   }
 }
 
