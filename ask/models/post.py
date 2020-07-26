@@ -201,7 +201,7 @@ class Question(BasePost):
 
     title: StringField(required=True, min_length=5, max_length=120)
     body: StringField(required=True, min_length=10, max_length=65536)
-    tags: ListField(required=True, min_length=1, default=list)
+    tags: ListField(required=True, min_length=1, max_length=10, default=list)
     views_count: IntField(required=True, default=0, rejected=True, index=True)
     answers_count: IntField(required=True, default=0, rejected=True, index=True)
     has_accepted_answer: BoolField(required=True, default=False, rejected=True, index=True)
