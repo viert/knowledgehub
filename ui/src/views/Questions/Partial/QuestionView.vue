@@ -23,7 +23,7 @@
               <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
             </div>
             <div class="question-actions">
-              <PostActions />
+              <PostActions view="question" />
             </div>
           </div>
 

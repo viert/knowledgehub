@@ -16,6 +16,10 @@
       <div class="answer-body">
         <Post :body="answer.body" />
         <div class="answer-meta">
+          <div>
+            <PostActions view="answer" />
+          </div>
+
           <div class="answer-author">
             <AuthorCard
               action="Answered"
@@ -41,8 +45,11 @@ import CommentsList from './CommentsList.vue'
 import AuthorCard from './AuthorCard.vue'
 import { Answer, Comment } from '@/store/types'
 import { mixins } from 'vue-class-component'
+import PostActions from '@/components/PostActions.vue'
 
-@Component({ components: { Post, CommentsList, AuthorCard, Accept } })
+@Component({
+  components: { Post, CommentsList, AuthorCard, Accept, PostActions }
+})
 export default class AnswerView extends mixins(PostCommons) {
   @Prop({ type: Object, required: true }) readonly answer!: Answer
   @Prop({ type: Array, default: () => [] }) readonly comments!: Comment[]
