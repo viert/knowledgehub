@@ -19,6 +19,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
+
 @Component
 export default class ButtonSwitch extends Vue {
   @Prop({ type: Object, required: true }) readonly value!: {

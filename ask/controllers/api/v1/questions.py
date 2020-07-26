@@ -47,6 +47,8 @@ QUESTION_FIELDS = (
     "has_accepted_answer",
     "last_activity_at",
     "closed",
+    "deleted",
+    "deleted_at"
 )
 
 ANSWER_FIELDS = (

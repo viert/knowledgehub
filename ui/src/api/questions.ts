@@ -19,6 +19,10 @@ const Questions = {
   },
   Vote(questionId: string, value: 1 | 0 | -1) {
     return wrap(Axios.post(`${API_PREFIX}/${questionId}/vote`, { value }))
+  },
+  Delete(questionId: string) {
+    const url = `${API_PREFIX}/${questionId}`
+    return wrap(Axios.delete(url))
   }
 }
 

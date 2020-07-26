@@ -17,7 +17,9 @@
     <a v-else-if="me" @click.prevent="formOpened = true" href="#">
       add a comment
     </a>
+
     <router-link to="/signin" v-else>sign in to add a comment</router-link>
+    <PostActions />
   </div>
 </template>
 
@@ -27,10 +29,11 @@ import CommentView from './CommentView.vue'
 import CommentForm from '@/components/Editors/CommentForm.vue'
 import { Comment, User } from '@/store/types'
 import { namespace } from 'vuex-class'
+import PostActions from '@/components/PostActions.vue'
 
 const users = namespace('users')
 
-@Component({ components: { CommentView, CommentForm } })
+@Component({ components: { PostActions, CommentView, CommentForm } })
 export default class CommentsList extends Vue {
   @Prop({ type: Array, default: () => [] }) readonly comments!: Comment[]
   @Prop({ type: String, required: true }) readonly parentId!: string
