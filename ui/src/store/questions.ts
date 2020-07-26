@@ -224,7 +224,7 @@ const questionsStore: Module<QuestionsState, RootState> = {
           commit('replaceAnswer', response.data.data)
         })
     },
-    async deleteQuestion({ state, commit }, questionId) {
+    async deleteQuestion({ state, commit }) {
       if (!state.question) return
 
       return Api.Questions.Delete(state.question._id).then(response => {
@@ -237,6 +237,24 @@ const questionsStore: Module<QuestionsState, RootState> = {
       return Api.Questions.Restore(state.question._id).then(response => {
         commit('storeQuestion', response.data.data)
       })
+    },
+    async deleteAnswer({ state, commit }, answerId) {
+      if (!state.question) return
+
+      return Api.Answers(state.question._id)
+        .Delete(answerId)
+        .then(response => {
+          commit('replaceAnswer', response.data.data)
+        })
+    },
+    async restoreAnswer({ state, commit }, answerId) {
+      if (!state.question) return
+
+      return Api.Answers(state.question._id)
+        .Restore(answerId)
+        .then(response => {
+          commit('replaceAnswer', response.data.data)
+        })
     }
   }
 }

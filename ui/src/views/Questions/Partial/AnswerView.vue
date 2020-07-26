@@ -13,11 +13,16 @@
           @input="handleAccept"
         />
       </div>
-      <div class="answer-body">
+
+      <div :class="{ 'answer-body': true, deleted: answer.deleted }">
         <Post :body="answer.body" />
         <div class="answer-meta">
           <div>
-            <PostActions view="answer" />
+            <PostActions
+              view="answer"
+              :parentId="answer._id"
+              :answer="answer"
+            />
           </div>
 
           <div class="answer-author">
@@ -83,5 +88,8 @@ export default class AnswerView extends mixins(PostCommons) {
 .answer {
   border-top: 1px solid #cccccc;
   padding-top: 20px;
+}
+.deleted {
+  opacity: 0.4;
 }
 </style>
