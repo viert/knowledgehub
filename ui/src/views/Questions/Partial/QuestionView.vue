@@ -22,7 +22,7 @@
             <div class="question-tags">
               <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
             </div>
-            <div class="question-actions">
+            <div class="question-actions" v-if="me">
               <PostActions view="question" />
             </div>
           </div>
@@ -50,10 +50,14 @@ import Post from '@/components/Post.vue'
 import CommentsList from './CommentsList.vue'
 import AuthorCard from './AuthorCard.vue'
 import PostActions from '@/components/PostActions.vue'
-import { Question, Comment } from '@/store/types'
+import { Question, Comment, User } from '@/store/types'
+import { namespace } from 'vuex-class'
+
+const users = namespace('users')
 
 @Component({ components: { Post, CommentsList, AuthorCard, PostActions } })
 export default class QuestionView extends mixins(PostCommons) {
+  @users.Getter('me') readonly me!: User
   @Prop({ type: Object, required: true }) question!: Question
   @Prop({ type: Array, default: () => [] }) readonly comments!: Comment[]
 

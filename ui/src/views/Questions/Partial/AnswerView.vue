@@ -17,8 +17,9 @@
       <div :class="{ 'answer-body': true, deleted: answer.deleted }">
         <Post :body="answer.body" />
         <div class="answer-meta">
-          <div>
+          <div class="answer-actions">
             <PostActions
+              v-if="me"
               view="answer"
               :parentId="answer._id"
               :answer="answer"
@@ -48,14 +49,17 @@ import Post from '@/components/Post.vue'
 import Accept from '@/components/Accept.vue'
 import CommentsList from './CommentsList.vue'
 import AuthorCard from './AuthorCard.vue'
-import { Answer, Comment } from '@/store/types'
+import { Answer, Comment, User } from '@/store/types'
 import { mixins } from 'vue-class-component'
 import PostActions from '@/components/PostActions.vue'
+import { namespace } from 'vuex-class'
+const users = namespace('users')
 
 @Component({
   components: { Post, CommentsList, AuthorCard, Accept, PostActions }
 })
 export default class AnswerView extends mixins(PostCommons) {
+  @users.Getter('me') readonly me!: User
   @Prop({ type: Object, required: true }) readonly answer!: Answer
   @Prop({ type: Array, default: () => [] }) readonly comments!: Comment[]
 
@@ -91,5 +95,8 @@ export default class AnswerView extends mixins(PostCommons) {
 }
 .deleted {
   opacity: 0.4;
+}
+.answer-actions {
+  flex-grow: 1;
 }
 </style>
