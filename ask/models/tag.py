@@ -6,7 +6,7 @@ from glasskit import ctx
 from ask.errors import HasReferences, InvalidTags
 
 
-TAG_NAME_EXPRESSION = r"[a-zа-яА-ЯA-Z0-9](?:[a-zа-яА-ЯA-Z0-9\-]*[a-zа-яА-ЯA-Z0-9])?"
+TAG_NAME_EXPRESSION = r"[^\W_](?:(?:[^\W_]|-)*[^\W_])?"
 TAG_NAME_RE = re.compile("^" + TAG_NAME_EXPRESSION + "$")
 
 
