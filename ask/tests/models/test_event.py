@@ -2,7 +2,7 @@ from glasskit import ctx
 from glasskit.tests.mongo_mock_test import MongoMockTest
 from ask.models import User, Question
 from ask.models.post import BasePost
-from ask.models.event import TagNewQuestionEvent, Event
+from ask.models.event import TagNewQuestionEvent, Event, QuestionNewAnswerEvent, PostNewCommentEvent
 from ask.tasks.worker import Worker
 
 wrk = Worker()
@@ -102,3 +102,49 @@ class TestEvent(MongoMockTest):
 
         events = user.get_new_events()
         self.assertEqual(events.count(), 1)
+
+        event: QuestionNewAnswerEvent = events[0]
+        self.assertEqual(event.question_id, p._id)
+        self.assertEqual(event.answer_id, a._id)
+        self.assertEqual(event.author_id, other_user._id)
+
+    def test_post_comment_event(self):
+        user = User({"username": "test", "ext_id": "test"})
+        user.save()
+        other_user = User({"username": "other", "ext_id": "other"})
+        other_user.save()
+
+        p = Question({
+            "title": "test title",
+            "body": "test body, needs to be long",
+            "tags": ["test-tag", "test-tag2"],
+            "author_id": user._id
+        })
+        p.save()
+        self.run_tasks()
+        Event.destroy_all()
+
+        c = p.create_comment({
+            "body": "this is a self-comment, should not generate events",
+            "author_id": user._id
+        })
+        c.save()
+        self.run_tasks()
+
+        events = user.get_new_events()
+        self.assertEqual(events.count(), 0)
+
+        c = p.create_comment({
+            "body": "this is a real comment, should generate an event",
+            "author_id": other_user._id
+        })
+        c.save()
+        self.run_tasks()
+
+        events = user.get_new_events()
+        self.assertEqual(events.count(), 1)
+
+        event: PostNewCommentEvent = events[0]
+        self.assertEqual(event.post_id, p._id)
+        self.assertEqual(event.comment_id, c._id)
+        self.assertEqual(event.author_id, other_user._id)
