@@ -12,7 +12,6 @@ def get_conf(provider_name):
     gcfg = oacfg.get("_global")
 
     if provider_name not in oacfg:
-        ctx.log.error("no provider \"%s\" found", provider_name)
         return None
 
     provider_cfg = {

@@ -52,8 +52,13 @@ class App(Base):
         from ask.idconnect.config import get_conf
         from ask.idconnect.facebook import FacebookProvider
         from ask.idconnect.yandex import YandexProvider
-        FacebookProvider().register()
-        YandexProvider().register()
+        from ask.idconnect.github import GithubProvider
+
+        for provider in (FacebookProvider, YandexProvider, GithubProvider):
+            if get_conf(provider.PROVIDER_NAME):
+                provider().register()
+            else:
+                ctx.log.info("Skipping OAuth2 provider %s, no configuration found", provider.PROVIDER_NAME)
 
     def setup_search(self):
         ctx.es = None

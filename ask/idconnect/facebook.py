@@ -40,4 +40,3 @@ class FacebookProvider(BaseProvider):
             "first_name": attrs["first_name"],
             "last_name": attrs["last_name"],
         }
-

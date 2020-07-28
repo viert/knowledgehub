@@ -6,6 +6,7 @@ class BaseProvider:
 
     PROVIDER_NAME = None
     PROVIDER_MAP = {}
+    state = None
 
     def __init__(self):
         if self.PROVIDER_NAME is None:
