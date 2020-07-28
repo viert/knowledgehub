@@ -433,16 +433,19 @@ class Question(BasePost):
         for ts in TagSubscription.find_by_tags(self.tags):
             user_id = ts.user_id
 
-            subscribed_tags = set(ts.tags)
-            post_tags = set(self.tags)
-            result_tags = subscribed_tags.intersection(post_tags)
+            if user_id != self.author_id:
+                # self-posts don't generate events
 
-            e = TagNewQuestionEvent({
-                "user_id": user_id,
-                "tags": list(result_tags),
-                "question_id": self._id
-            })
-            e.save()
+                subscribed_tags = set(ts.tags)
+                post_tags = set(self.tags)
+                result_tags = subscribed_tags.intersection(post_tags)
+
+                e = TagNewQuestionEvent({
+                    "user_id": user_id,
+                    "tags": list(result_tags),
+                    "question_id": self._id
+                })
+                e.save()
 
 
 class Answer(BasePost):
@@ -489,6 +492,7 @@ class Answer(BasePost):
             self.accepted_at = None
 
     def _after_save(self, is_new) -> None:
+        super(Answer, self)._after_save(is_new)
         q = self.question
         q.update_last_activity()
         q.update_answers_count()
@@ -496,17 +500,16 @@ class Answer(BasePost):
     def generate_new_post_events(self):
         super(Answer, self).generate_new_post_events()
         question = self.question
-        if self.author_id == question.author_id:
+        if self.author_id != question.author_id:
             # self-answers don't create events
-            return
 
-        e = QuestionNewAnswerEvent({
-            "user_id": question.author_id,  # event receiver
-            "question_id": question._id,
-            "answer_id": self._id,
-            "author_id": self.author_id,
-        })
-        e.save()
+            e = QuestionNewAnswerEvent({
+                "user_id": question.author_id,  # event receiver
+                "question_id": question._id,
+                "answer_id": self._id,
+                "author_id": self.author_id,
+            })
+            e.save()
 
     def generate_accepted_event(self):
         question = self.question

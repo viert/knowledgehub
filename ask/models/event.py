@@ -7,6 +7,8 @@ from glasskit.uorm.models.fields import ListField, StringField, ObjectIdField, B
 
 class Event(StorableSubmodel):
 
+    COLLECTION = "events"
+
     user_id: ObjectIdField(required=True, rejected=True, index=True)
     dismissed: BoolField(required=True, default=False)
     sent: DictField(required=True, rejected=True, default=dict)
@@ -115,6 +117,13 @@ class AnswerAcceptedEvent(Event):
     @property
     def answer(self) -> 'Answer':
         return Answer.find_one({"_id": self.answer_id})
+
+
+Event.register_submodel(TagNewQuestionEvent.SUBMODEL, TagNewQuestionEvent)
+Event.register_submodel(QuestionNewAnswerEvent.SUBMODEL, QuestionNewAnswerEvent)
+Event.register_submodel(PostNewCommentEvent.SUBMODEL, PostNewCommentEvent)
+Event.register_submodel(MentionEvent.SUBMODEL, MentionEvent)
+Event.register_submodel(AnswerAcceptedEvent.SUBMODEL, AnswerAcceptedEvent)
 
 
 from .user import User

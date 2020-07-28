@@ -30,6 +30,10 @@ class Worker(BaseWorker):
 
     @staticmethod
     def rt_post_indexer(task: PostIndexerTask):
+        if not hasattr(ctx, "es"):
+            ctx.log.error("elasticsearch is not configured, indexing skipped")
+            return
+
         if task.delete:
             ctx.es.delete(index="posts", id=task.post_id)
             ctx.log.info("post %s has been deleted from index", task.post_id)
