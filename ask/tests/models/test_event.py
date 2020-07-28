@@ -2,7 +2,8 @@ from glasskit import ctx
 from glasskit.tests.mongo_mock_test import MongoMockTest
 from ask.models import User, Question
 from ask.models.post import BasePost
-from ask.models.event import TagNewQuestionEvent, Event, QuestionNewAnswerEvent, PostNewCommentEvent
+from ask.models.event import (TagNewQuestionEvent, Event, QuestionNewAnswerEvent,
+                              PostNewCommentEvent, MentionEvent)
 from ask.tasks.worker import Worker
 
 wrk = Worker()
@@ -148,3 +149,38 @@ class TestEvent(MongoMockTest):
         self.assertEqual(event.post_id, p._id)
         self.assertEqual(event.comment_id, c._id)
         self.assertEqual(event.author_id, other_user._id)
+
+    def test_mention_event(self):
+        user = User({"username": "test", "ext_id": "test"})
+        user.save()
+        other_user = User({"username": "other", "ext_id": "other"})
+        other_user.save()
+
+        p = Question({
+            "title": "test title",
+            "body": "test body, @test is mentioned",
+            "tags": ["test-tag"],
+            "author_id": user._id
+        })
+        p.save()
+        self.run_tasks()
+        events = user.get_new_events()
+        self.assertEqual(events.count(), 0)
+
+        a = p.create_answer({
+            "author_id": other_user._id,
+            "body": "this @test mention should create an event"
+        })
+        a.save()
+        self.run_tasks()
+
+        events = user.get_new_events()
+        self.assertEqual(events.count(), 2)  # new comment event and mention event
+
+        found_mention_event = False
+        for event in events:
+            if isinstance(event, MentionEvent):
+                found_mention_event = True
+                self.assertEqual(event.author_id, other_user._id)
+                self.assertEqual(event.post_id, a._id)
+        self.assertTrue(found_mention_event)

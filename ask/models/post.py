@@ -173,13 +173,15 @@ class BasePost(StorableSubmodel):
             user = User.get(username)
             if not user:
                 continue
-            e = MentionEvent({
-                "user_id": user._id,
-                "post_id": self._id,
-                "post_type": self.type,
-                "author_id": self.author_id,
-            })
-            e.save()
+            if user._id != self.author_id:
+                # self-mention doesn't create an event
+                e = MentionEvent({
+                    "user_id": user._id,
+                    "post_id": self._id,
+                    "post_type": self.type,
+                    "author_id": self.author_id,
+                })
+                e.save()
 
     def get_indexer_document(self) -> Union[Dict[str, Any], None]:
         if self.deleted:
