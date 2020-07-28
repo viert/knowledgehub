@@ -23,7 +23,7 @@ class AuthController(Controller):
     @staticmethod
     def _get_user_from_x_api_auth_token() -> Union[User, None]:
         if "X-Api-Auth-Token" in request.headers:
-            token = Token.cache_get(request.headers["X-Api-Auth-Token"])
+            token = Token.get(request.headers["X-Api-Auth-Token"])
             if token is not None and not token.expired:
                 token.prolongate()
                 return token.user

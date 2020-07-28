@@ -40,7 +40,7 @@ class Token(StorableModel):
     @property
     def user(self):
         from .user import User
-        return User.cache_get(self.user_id)
+        return User.get(self.user_id)
 
     @property
     def expired(self):
