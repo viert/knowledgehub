@@ -47,7 +47,7 @@
       <AnswerEdit
         v-else
         ref="editor"
-        :value="body"
+        :value="this.answer.body"
         @save="handleSaveEdits"
         @cancel="handleCancelEdits"
         :isSaving="isSaving"
@@ -91,7 +91,6 @@ export default class AnswerView extends mixins(PostCommons) {
   private isEditView: boolean | false = false
   private isSaving: boolean | false = false
   private bodyError: string | null = null
-  private body: string | '' = this.answer.body
 
   handleVote(value: 1 | 0 | -1) {
     this.$store.dispatch('questions/voteAnswer', {
@@ -117,11 +116,9 @@ export default class AnswerView extends mixins(PostCommons) {
   }
 
   handleOpenEditor(answerId: number) {
-
-    console.log('this.body ', this.body)
     this.isEditView = true
 
-    if (this.bodyError ) {
+    if (this.bodyError) {
       this.bodyError = null
     }
   }
@@ -131,8 +128,7 @@ export default class AnswerView extends mixins(PostCommons) {
       this.bodyError = 'Body can not be empty'
       this.answerEditor.focus()
       return
-    };
-
+    }
 
     this.isSaving = true
     const payload = {
