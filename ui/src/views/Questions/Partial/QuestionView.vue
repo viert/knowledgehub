@@ -10,11 +10,21 @@
           :value="question.my_vote"
         />
       </div>
-      <div class="question-body">
+      <div
+        :class="{
+          'question-body': true,
+          'question-body__deleted': question.deleted
+        }"
+      >
         <Post :body="question.body" />
         <div class="question-meta">
-          <div class="question-tags">
-            <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
+          <div class="question-meta__wrapper">
+            <div class="question-tags">
+              <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
+            </div>
+            <div class="question-actions" v-if="isMyQuestion">
+              <PostActions view="question" />
+            </div>
           </div>
           <div class="question-author">
             <AuthorCard
@@ -35,12 +45,16 @@ import { Component, Prop } from 'vue-property-decorator'
 import PostCommons from '@/mixins/PostCommons'
 import { mixins } from 'vue-class-component'
 import Post from '@/components/Post.vue'
+import PostActions from '@/components/PostActions.vue'
 import CommentsList from './CommentsList.vue'
 import AuthorCard from './AuthorCard.vue'
-import { Question, Comment } from '@/store/types'
+import { Question, Comment, User } from '@/store/types'
+import { namespace } from 'vuex-class'
+const users = namespace('users')
 
-@Component({ components: { Post, CommentsList, AuthorCard } })
+@Component({ components: { Post, CommentsList, AuthorCard, PostActions } })
 export default class QuestionView extends mixins(PostCommons) {
+  @users.Getter('me') readonly me!: User
   @Prop({ type: Object, required: true }) question!: Question
   @Prop({ type: Array, default: () => [] }) readonly comments!: Comment[]
 
@@ -77,9 +91,17 @@ export default class QuestionView extends mixins(PostCommons) {
     flex-grow: 1;
   }
 
+  &-body__deleted {
+    opacity: 0.5;
+  }
+
   &-meta {
     display: flex;
     justify-content: flex-end;
+  }
+
+  &-meta__wrapper {
+    flex-grow: 1;
   }
 
   &-tags {
