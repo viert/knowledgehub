@@ -6,7 +6,7 @@
     <a v-if="!isDeleted" @click.prevent="handleDelete" href="#">
       delete
     </a>
-    <a v-else @click.prevent="handleRestore" href="#">
+    <a v-else @click.prevent="handleRestore" href="#" >
       restore
     </a>
   </div>
@@ -21,53 +21,18 @@ const questions = namespace('questions')
 
 @Component
 export default class PostActions extends Vue {
-  @Prop({ type: String, required: true }) readonly view!: string
   @users.Getter('me') readonly me!: User
   @questions.State('question') readonly question!: Question
   @Prop({ type: Object, required: false }) readonly answer!: Answer
   @Prop({ type: String, required: false }) readonly parentId!: string
+  @Prop({ type: Boolean, required: true }) readonly isDeleted!: boolean
 
   handleDelete() {
-    switch (this.view) {
-      case 'question':
-        this.$store.dispatch('questions/deleteQuestion')
-        break
-      case 'answer':
-        this.$store.dispatch('questions/deleteAnswer', this.parentId)
-        break
-      default:
-        console.error(
-          'Err: default case, no action in handleDelete of PostActions'
-        )
-    }
-  }
-
-  get isDeleted() {
-    let isDeleted = false
-    switch (this.view) {
-      case 'question':
-        isDeleted = this.question.deleted
-        break
-      case 'answer':
-        isDeleted = this.answer.deleted
-        break
-    }
-    return isDeleted
+    this.$emit('delete', this.parentId)
   }
 
   handleRestore() {
-    switch (this.view) {
-      case 'question':
-        this.$store.dispatch('questions/restoreQuestion')
-        break
-      case 'answer':
-        this.$store.dispatch('questions/restoreAnswer', this.parentId)
-        break
-      default:
-        console.error(
-          'Err: default case, no action in handleDelete of PostActions'
-        )
-    }
+    this.$emit('restore', this.parentId)
   }
 }
 </script>

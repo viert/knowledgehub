@@ -23,7 +23,11 @@
               <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
             </div>
             <div class="question-actions" v-if="isMyQuestion">
-              <PostActions view="question" />
+              <PostActions
+                v-on:delete="handleDelete"
+                v-on:restore="handleRestore"
+                :isDeleted="isDeleted"
+              />
             </div>
           </div>
           <div class="question-author">
@@ -64,6 +68,18 @@ export default class QuestionView extends mixins(PostCommons) {
 
   get selfComments() {
     return this.comments.filter(c => c.parent_id === this.question._id)
+  }
+
+  handleDelete() {
+    this.$store.dispatch('questions/deleteQuestion')
+  }
+
+  handleRestore() {
+    this.$store.dispatch('questions/restoreQuestion')
+  }
+
+  get isDeleted() {
+    return this.question.deleted
   }
 
   get author() {

@@ -22,6 +22,9 @@
               view="answer"
               :parentId="answer._id"
               :answer="answer"
+              v-on:delete="handleDelete"
+              v-on:restore="handleRestore"
+              :isDeleted="isDeleted"
             />
           </div>
           <div class="answer-author">
@@ -76,8 +79,20 @@ export default class AnswerView extends mixins(PostCommons) {
     }
   }
 
+  handleDelete(answerId: number) {
+    this.$store.dispatch('questions/deleteAnswer', answerId)
+  }
+
+  handleRestore(answerId: number) {
+    this.$store.dispatch('questions/restoreAnswer', answerId)
+  }
+
   get selfComments() {
     return this.comments.filter(c => c.parent_id === this.answer._id)
+  }
+
+  get isDeleted() {
+    return this.answer.deleted
   }
 
   get author() {

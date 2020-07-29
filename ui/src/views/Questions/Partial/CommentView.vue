@@ -12,7 +12,9 @@
       <Post :body="comment.body" :strict="true" :inline="true" />&mdash;
       <User :username="author.username" />
       {{ comment.created_at | duration }}
+
     </div>
+    <div>edit, delete</div>
   </li>
 </template>
 
