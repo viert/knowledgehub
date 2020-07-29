@@ -34,11 +34,9 @@ export default class AnswerEdit extends mixins(PostCommons) {
   @Prop({ type: Boolean, required: true }) readonly isSaving!: boolean
   @Prop({ type: String, required: false }) readonly error!: string
 
-
   private body = this.value
 
   handleSave() {
-    console.log('this value ', this.body)
     this.$emit('save', this.body)
   }
 
