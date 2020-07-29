@@ -13,6 +13,10 @@ const Questions = {
     const url = `${API_PREFIX}/${questionId}`
     return wrap(Axios.get(url))
   },
+  Edit(questionId: string, payload: object) {
+    const url = `${API_PREFIX}/${questionId}`
+    return wrap(Axios.patch(url, payload))
+  },
   Create(title: string, body: string, tags: Array<string>) {
     const payload = { title, body, tags }
     return wrap(Axios.post(`${API_PREFIX}/`, payload))

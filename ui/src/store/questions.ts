@@ -268,6 +268,13 @@ const questionsStore: Module<QuestionsState, RootState> = {
       return Api.Answers(state.question._id)
         .Edit(payload.body, payload.answerId)
         .then(response => commit('replaceAnswer', response.data.data))
+    },
+    async editQuestion({ state, commit }, payload) {
+      if (!state.question) return
+
+      return Api.Questions.Edit(state.question._id, payload).then(response => {
+        commit('storeQuestion', response.data.data)
+      })
     }
   }
 }
