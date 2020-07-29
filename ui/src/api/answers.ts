@@ -7,6 +7,9 @@ const Answers = (questionId: string) => {
     Create(body: string) {
       return wrap(Axios.post(`${prefix}/`, { body }))
     },
+    Edit(body: string, answerId: number) {
+      return wrap(Axios.patch(`${prefix}/${answerId}`, { body }))
+    },
     Vote(answerId: string, value: 1 | 0 | -1) {
       return wrap(Axios.post(`${prefix}/${answerId}/vote`, { value }))
     },

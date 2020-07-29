@@ -1,12 +1,12 @@
 <template>
   <div class="post-actions">
-    <a @click.prevent href="#">
+    <a @click.prevent="handleEdit" href="#">
       edit
     </a>
     <a v-if="!isDeleted" @click.prevent="handleDelete" href="#">
       delete
     </a>
-    <a v-else @click.prevent="handleRestore" href="#" >
+    <a v-else @click.prevent="handleRestore" href="#">
       restore
     </a>
   </div>
@@ -33,6 +33,10 @@ export default class PostActions extends Vue {
 
   handleRestore() {
     this.$emit('restore', this.parentId)
+  }
+
+  handleEdit() {
+    this.$emit('edit', this.parentId)
   }
 }
 </script>
