@@ -11,7 +11,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { AppInfo } from '../store/types'
+import { AppInfo } from '@/store/types'
 
 const data = namespace('data')
 

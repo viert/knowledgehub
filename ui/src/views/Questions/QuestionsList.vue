@@ -46,7 +46,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { Question } from '../../store/types'
+import { Question } from '@/store/types'
 import QuestionsListItem from './QuestionsListItem.vue'
 
 import Pagination from '@/components/Pagination.vue'

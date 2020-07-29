@@ -8,7 +8,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { ProviderInfo } from '../../store/types'
+import { ProviderInfo } from '@/store/types'
 
 const users = namespace('users')
 

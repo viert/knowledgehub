@@ -12,7 +12,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { ProviderInfo } from '../../store/types'
+import { ProviderInfo } from '@/store/types'
 import ProviderButton from '@/components/SignIn/ProviderButton.vue'
 
 const users = namespace('users')

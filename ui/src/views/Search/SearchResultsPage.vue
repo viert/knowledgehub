@@ -49,7 +49,7 @@ import Progress from '@/components/Progress.vue'
 import SearchResultsQuestion from './SearchResultsQuestion.vue'
 import SearchResultsAnswer from './SearchResultsAnswer.vue'
 import { namespace } from 'vuex-class'
-import { Answer, Question } from '../../store/types'
+import { Answer, Question } from '@/store/types'
 import { mixins } from 'vue-class-component'
 
 const questions = namespace('questions')

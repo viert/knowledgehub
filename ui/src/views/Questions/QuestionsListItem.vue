@@ -33,7 +33,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import UserPic from '@/components/UserPic.vue'
 import Counter from '@/components/Counter.vue'
-import { Question, User } from '../../store/types'
+import { Question, User } from '@/store/types'
 import { namespace } from 'vuex-class'
 
 const users = namespace('users')
