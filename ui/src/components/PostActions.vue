@@ -13,17 +13,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
-import { namespace } from 'vuex-class'
-import { Answer, Comment, Question, User } from '@/store/types'
-const users = namespace('users')
-const questions = namespace('questions')
+import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component
 export default class PostActions extends Vue {
-  @users.Getter('me') readonly me!: User
-  @questions.State('question') readonly question!: Question
-  @Prop({ type: Object, required: false }) readonly answer!: Answer
   @Prop({ type: String, required: false }) readonly parentId!: string
   @Prop({ type: Boolean, required: true }) readonly isDeleted!: boolean
 

@@ -5,7 +5,6 @@
       type="text"
       v-model="title"
     />
-    <!--    <hr />-->
     <MarkdownEditor
       ref="editor"
       :autofocus="false"
@@ -56,10 +55,6 @@ export default class QuestionEdit extends Vue {
   private error: string | null = null
   private tagsError: string | null = null
 
-  mounted() {
-    console.log(this.body)
-  }
-
   get questionEditor() {
     return this.$refs.editor as QuestionEdit
   }
@@ -76,7 +71,7 @@ export default class QuestionEdit extends Vue {
     }
 
     if (!this.tags.length) {
-      this.tagsError = 'Please define at least one tag'
+      this.tagsError = 'Please add at least one tag'
       this.tagEditor.focus()
       return
     }

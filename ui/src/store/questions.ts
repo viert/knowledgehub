@@ -275,6 +275,39 @@ const questionsStore: Module<QuestionsState, RootState> = {
       return Api.Questions.Edit(state.question._id, payload).then(response => {
         commit('storeQuestion', response.data.data)
       })
+    },
+    async deleteComment({ state, commit }, commentId) {
+      if (!state.question) return
+
+      return Api.Comments(state.question._id)
+        .Delete(commentId)
+        .then(response => {
+          commit('replaceComment', response.data.data)
+        })
+    },
+    async restoreComment({ state, commit }, commentId) {
+      if (!state.question) return
+
+      return Api.Comments(state.question._id)
+        .Restore(commentId)
+        .then(response => {
+          commit('replaceComment', response.data.data)
+        })
+    },
+    async editComment(
+      { state, commit },
+      payload: {
+        commentId: string
+        body: string
+      }
+    ) {
+      if (!state.question) return
+
+      return Api.Comments(state.question._id)
+        .Edit(payload.commentId, payload.body)
+        .then(response => {
+          commit('replaceComment', response.data.data)
+        })
     }
   }
 }
