@@ -48,15 +48,17 @@ import { Component, Prop } from 'vue-property-decorator'
 import Post from '@/components/Post.vue'
 import PostActions from '@/components/PostActions.vue'
 import PostCommons from '@/mixins/PostCommons'
-import { Comment, User } from '@/store/types'
+import { Comment, Question, User } from '@/store/types'
 import { mixins } from 'vue-class-component'
 import PostEditorActions from '@/components/PostEditorActions.vue'
 import { namespace } from 'vuex-class'
 const users = namespace('users')
+const questions = namespace('questions')
 
 @Component({ components: { PostEditorActions, Post, PostActions } })
 export default class CommentView extends mixins(PostCommons) {
   @users.Getter('me') readonly me!: User
+  @questions.State('question') readonly question!: Question
   @Prop({ type: Object, required: true }) readonly comment!: Comment
   private isSaving = false
   private isEditing = false
@@ -89,6 +91,31 @@ export default class CommentView extends mixins(PostCommons) {
   get isMyComment() {
     return Boolean(this.me && this.me._id === this.comment.author_id)
   }
+
+  saveHandler() {
+    const isCommentToQuestion = this.question._id === this.comment.parent_id
+
+    const payload: {
+      commentId: string
+      body: string
+      answerId?: string
+    } = {
+      commentId: this.comment._id,
+      body: this.body
+    }
+
+    if (!isCommentToQuestion) {
+      payload.answerId = this.comment.parent_id
+    }
+
+    if (isCommentToQuestion) {
+      return this.$store.dispatch('questions/editCommentToQuestion', payload)
+    }
+
+    return this.$store.dispatch('questions/editCommentToAnswer', payload)
+  }
+
+  
   handleSave() {
     if (this.body.trim() === '') {
       this.error = "Comment can't be empty"
@@ -98,15 +125,13 @@ export default class CommentView extends mixins(PostCommons) {
 
     this.isSaving = true
 
-    this.$store
-      .dispatch('questions/editComment', {
-        commentId: this.comment._id,
-        body: this.body,
-        parentId: this.comment.parent_id // answerId, if exists
-      })
-      .finally(() => {
+    this.saveHandler()
+      .then(() => {
         this.isSaving = false
         this.isEditing = false
+      })
+      .catch(() => {
+        this.isSaving = false
       })
   }
 

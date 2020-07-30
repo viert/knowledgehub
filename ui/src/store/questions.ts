@@ -294,17 +294,33 @@ const questionsStore: Module<QuestionsState, RootState> = {
           commit('replaceComment', response.data.data)
         })
     },
-    async editComment(
+    async editCommentToQuestion(
       { state, commit },
       payload: {
         commentId: string
         body: string
-        parentId: string
       }
     ) {
       if (!state.question) return
 
-      return Api.Comments(state.question._id, payload.parentId)
+      return Api.Comments(state.question._id)
+        .Edit(payload.commentId, payload.body)
+        .then(response => {
+          commit('replaceComment', response.data.data)
+        })
+    },
+
+    async editCommentToAnswer(
+      { state, commit },
+      payload: {
+        commentId: string
+        body: string
+        answerId: string
+      }
+    ) {
+      if (!state.question) return
+
+      return Api.Comments(state.question._id, payload.answerId)
         .Edit(payload.commentId, payload.body)
         .then(response => {
           commit('replaceComment', response.data.data)
