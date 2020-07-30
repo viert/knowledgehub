@@ -13,7 +13,14 @@ const Questions = {
     const url = `${API_PREFIX}/${questionId}`
     return wrap(Axios.get(url))
   },
-  Edit(questionId: string, payload: object) {
+  Edit(
+    questionId: string,
+    payload: {
+      title: string
+      body: string
+      tags: string[]
+    }
+  ) {
     const url = `${API_PREFIX}/${questionId}`
     return wrap(Axios.patch(url, payload))
   },
