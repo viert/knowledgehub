@@ -2,7 +2,6 @@ import { wrap } from './utils'
 import Axios from 'axios'
 
 const Comments = (questionId: string, answerId: string | null = null) => {
-  console.log('answerId in comment ', answerId)
   let prefix = `/api/v1/questions/${questionId}`
   if (answerId) {
     prefix += `/answers/${answerId}`
