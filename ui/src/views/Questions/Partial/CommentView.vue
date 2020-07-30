@@ -101,7 +101,8 @@ export default class CommentView extends mixins(PostCommons) {
     this.$store
       .dispatch('questions/editComment', {
         commentId: this.comment._id,
-        body: this.body
+        body: this.body,
+        parentId: this.comment.parent_id // answerId, if exists
       })
       .finally(() => {
         this.isSaving = false

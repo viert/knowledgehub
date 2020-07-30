@@ -7,7 +7,7 @@
       class="btn btn-primary btn-150 "
       type="submit"
       :loading="isSaving"
-      >Save {{ name || '' }}</SpinnerButton
+      >Save {{ name }}</SpinnerButton
     >
   </div>
 </template>

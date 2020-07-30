@@ -299,11 +299,12 @@ const questionsStore: Module<QuestionsState, RootState> = {
       payload: {
         commentId: string
         body: string
+        parentId: string
       }
     ) {
       if (!state.question) return
 
-      return Api.Comments(state.question._id)
+      return Api.Comments(state.question._id, payload.parentId)
         .Edit(payload.commentId, payload.body)
         .then(response => {
           commit('replaceComment', response.data.data)
