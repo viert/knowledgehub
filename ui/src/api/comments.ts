@@ -14,6 +14,15 @@ const Comments = (questionId: string, answerId: string | null = null) => {
     },
     Vote(commentId: string, value: 1 | 0) {
       return wrap(Axios.post(`${prefix}/${commentId}/vote`, { value }))
+    },
+    Delete(commentId: string) {
+      return wrap(Axios.delete(`${prefix}/${commentId}`))
+    },
+    Restore(commentId: string) {
+      return wrap(Axios.post(`${prefix}/${commentId}/restore`))
+    },
+    Edit(commentId: string, body: string) {
+      return wrap(Axios.patch(`${prefix}/${commentId}`, { body }))
     }
   }
 }

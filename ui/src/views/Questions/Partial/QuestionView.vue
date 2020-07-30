@@ -1,46 +1,58 @@
 <template>
   <div ref="root" class="question">
-    <h2>{{ question.title }}</h2>
-    <hr />
-    <div class="question-post">
-      <div class="question-vote">
-        <Voter
-          @input="handleVote"
-          :points="question.points"
-          :value="question.my_vote"
-        />
-      </div>
-      <div
-        :class="{
-          'question-body': true,
-          'question-body__deleted': question.deleted
-        }"
-      >
-        <Post :body="question.body" />
-        <div class="question-meta">
-          <div class="question-meta__wrapper">
-            <div class="question-tags">
-              <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
+    <fragment v-if="!isEditing">
+      <h2>{{ question.title }}</h2>
+      <hr />
+
+      <div class="question-post">
+        <div class="question-vote">
+          <Voter
+            @input="handleVote"
+            :points="question.points"
+            :value="question.my_vote"
+          />
+        </div>
+        <div
+          :class="{
+            'question-body': true,
+            'question-body__deleted': question.deleted
+          }"
+        >
+          <Post :body="question.body" />
+          <div class="question-meta">
+            <div class="question-meta__wrapper">
+              <div class="question-tags">
+                <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
+              </div>
+              <div class="question-actions" v-if="isMyQuestion">
+                <PostActions
+                  @edit="openEditor"
+                  @delete="handleDelete"
+                  @restore="handleRestore"
+                  :isDeleted="isDeleted"
+                />
+              </div>
             </div>
-            <div class="question-actions" v-if="isMyQuestion">
-              <PostActions
-                v-on:delete="handleDelete"
-                v-on:restore="handleRestore"
-                :isDeleted="isDeleted"
+            <div class="question-author">
+              <AuthorCard
+                action="Asked"
+                :author="author"
+                :askedAt="question.created_at"
               />
             </div>
           </div>
-          <div class="question-author">
-            <AuthorCard
-              action="Asked"
-              :author="author"
-              :askedAt="question.created_at"
-            />
-          </div>
+
+          <CommentsList :parentId="question._id" :comments="selfComments" />
         </div>
-        <CommentsList :parentId="question._id" :comments="selfComments" />
       </div>
-    </div>
+    </fragment>
+    <fragment v-else
+      ><QuestionEdit
+        :question="question"
+        :isSaving="isSaving"
+        @save="onSave"
+        @cancel="onCancel"
+    /></fragment>
   </div>
 </template>
 
@@ -52,15 +64,20 @@ import Post from '@/components/Post.vue'
 import PostActions from '@/components/PostActions.vue'
 import CommentsList from './CommentsList.vue'
 import AuthorCard from './AuthorCard.vue'
+import QuestionEdit from '@/views/Questions/Partial/QuestionEdit.vue'
 import { Question, Comment, User } from '@/store/types'
 import { namespace } from 'vuex-class'
 const users = namespace('users')
 
-@Component({ components: { Post, CommentsList, AuthorCard, PostActions } })
+@Component({
+  components: { Post, CommentsList, AuthorCard, PostActions, QuestionEdit }
+})
 export default class QuestionView extends mixins(PostCommons) {
   @users.Getter('me') readonly me!: User
   @Prop({ type: Object, required: true }) question!: Question
   @Prop({ type: Array, default: () => [] }) readonly comments!: Comment[]
+  private isEditing = false
+  private isSaving = false
 
   handleVote(value: 1 | 0 | -1) {
     this.$store.dispatch('questions/voteQuestion', value)
@@ -78,12 +95,28 @@ export default class QuestionView extends mixins(PostCommons) {
     this.$store.dispatch('questions/restoreQuestion')
   }
 
+  openEditor() {
+    this.isEditing = true
+  }
+
   get isDeleted() {
     return this.question.deleted
   }
 
   get author() {
     return this.getUser(this.question.author_id)
+  }
+
+  onSave(data: object) {
+    this.isSaving = true
+    this.$store.dispatch('questions/editQuestion', data).finally(() => {
+      this.isSaving = false
+      this.isEditing = false
+    })
+  }
+
+  onCancel() {
+    this.isEditing = false
   }
 }
 </script>
@@ -122,6 +155,10 @@ export default class QuestionView extends mixins(PostCommons) {
 
   &-tags {
     flex-grow: 1;
+  }
+
+  .question-actions {
+    margin: 10px 0;
   }
 }
 </style>

@@ -1,41 +1,105 @@
 <template>
-  <div class="page-layout">
+  <div class="question-edit">
+    <input
+      class="form-control form-control-sm title"
+      type="text"
+      v-model="title"
+    />
+    <MarkdownEditor
+      ref="editor"
+      :autofocus="false"
+      :error="!!error"
+      :disabled="false"
+      v-model="body"
+    />
+    <div v-if="error" class="error-msg">{{ error }}</div>
+
+    <TagEditor
+      ref="tagEditor"
+      :tags="tags"
+      :error="!!tagsError"
+      @add="addTag"
+      @remove="removeTag"
+    />
+    <div v-if="tagsError" class="error-msg">{{ tagsError }}</div>
+    <PostEditorActions
+      @save="handleSave"
+      @cancel="handleCancel"
+      :isSaving="isSaving"
+      name="question"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator'
-
-import QuestionView from './Partial/QuestionView.vue'
-import AnswerView from './Partial/AnswerView.vue'
-
-import AnswerForm from '@/components/Editors/AnswerForm.vue'
-
-import { namespace } from 'vuex-class'
-import { countable } from '@/filters'
+import { Vue, Component, Prop } from 'vue-property-decorator'
+import MarkdownEditor from '@/components/Editors/MarkdownEditor.vue'
+import TagEditor from '@/components/Editors/TagEditor.vue'
 import { Question, Answer, Comment, User } from '@/store/types'
-
-const questions = namespace('questions')
-const users = namespace('users')
+import PostEditorActions from '@/components/PostEditorActions.vue'
 
 @Component({
   components: {
-    QuestionView,
-    AnswerView,
-    AnswerForm,
+    MarkdownEditor,
+    PostEditorActions,
+    TagEditor
   }
 })
 export default class QuestionEdit extends Vue {
-  private loading = true
-  private answerBody = ''
-  private answerBodyError = ''
-  private isSaving = false
+  @Prop({ type: Object, required: true }) question!: Question
+  @Prop({ type: Boolean, required: true }) readonly isSaving!: boolean
 
-  @questions.State('question') readonly question!: Question
-  @questions.State('answers') readonly answers!: Answer[]
-  @questions.State('comments') readonly comments!: Comment[]
-  @users.Getter('me') readonly me!: User
+  private body = this.question.body
+  private title = this.question.title
+  private tags = this.question.tags
+  private error: string | null = null
+  private tagsError: string | null = null
+
+  get questionEditor() {
+    return this.$refs.editor as QuestionEdit
+  }
+
+  get tagEditor() {
+    return this.$refs.tagEditor as TagEditor
+  }
+
+  handleSave() {
+    if (this.body.trim() === '') {
+      this.error = 'Body can not be empty'
+      this.questionEditor.focus()
+      return
+    }
+
+    if (!this.tags.length) {
+      this.tagsError = 'Please add at least one tag'
+      this.tagEditor.focus()
+      return
+    }
+
+    this.$emit('save', {
+      body: this.body,
+      title: this.title,
+      tags: this.tags
+    })
+  }
+
+  handleCancel() {
+    this.$emit('cancel')
+  }
+
+  addTag(tagName: string) {
+    this.tags = [...this.tags, tagName]
+    this.tagsError = null
+  }
+
+  removeTag(tagName: string) {
+    this.tags = this.tags.filter(item => item !== tagName)
+  }
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.title {
+  margin: 10px 0;
+}
+</style>

@@ -7,7 +7,7 @@
       class="btn btn-primary btn-150 "
       type="submit"
       :loading="isSaving"
-      >Save answer</SpinnerButton
+      >Save {{ name }}</SpinnerButton
     >
   </div>
 </template>
@@ -21,9 +21,7 @@ import Accept from '@/components/Accept.vue'
 import CommentsList from '../views/Questions/Partial/CommentsList.vue'
 import AuthorCard from '../views/Questions/Partial/AuthorCard.vue'
 import MarkdownEditor from '@/components/Editors/MarkdownEditor.vue'
-import { Answer, Comment, User } from '@/store/types'
 import { mixins } from 'vue-class-component'
-import { namespace } from 'vuex-class'
 
 @Component({
   components: {
@@ -37,6 +35,8 @@ import { namespace } from 'vuex-class'
 })
 export default class PostEditorActions extends mixins(PostCommons) {
   @Prop({ type: Boolean, required: true }) readonly isSaving!: boolean
+  @Prop({ type: String, required: true }) readonly name!: boolean
+
   save() {
     this.$emit('save')
   }

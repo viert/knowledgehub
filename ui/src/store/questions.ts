@@ -268,6 +268,63 @@ const questionsStore: Module<QuestionsState, RootState> = {
       return Api.Answers(state.question._id)
         .Edit(payload.body, payload.answerId)
         .then(response => commit('replaceAnswer', response.data.data))
+    },
+    async editQuestion({ state, commit }, payload) {
+      if (!state.question) return
+
+      return Api.Questions.Edit(state.question._id, payload).then(response => {
+        commit('storeQuestion', response.data.data)
+      })
+    },
+    async deleteComment({ state, commit }, commentId) {
+      if (!state.question) return
+
+      return Api.Comments(state.question._id)
+        .Delete(commentId)
+        .then(response => {
+          commit('replaceComment', response.data.data)
+        })
+    },
+    async restoreComment({ state, commit }, commentId) {
+      if (!state.question) return
+
+      return Api.Comments(state.question._id)
+        .Restore(commentId)
+        .then(response => {
+          commit('replaceComment', response.data.data)
+        })
+    },
+    async editCommentToQuestion(
+      { state, commit },
+      payload: {
+        commentId: string
+        body: string
+      }
+    ) {
+      if (!state.question) return
+
+      return Api.Comments(state.question._id)
+        .Edit(payload.commentId, payload.body)
+        .then(response => {
+          commit('replaceComment', response.data.data)
+        })
+    },
+
+    async editCommentToAnswer(
+      { state, commit },
+      payload: {
+        commentId: string
+        body: string
+        answerId: string
+      }
+    ) {
+      if (!state.question) return
+
+      return Api.Comments(state.question._id, payload.answerId)
+        .Edit(payload.commentId, payload.body)
+        .then(response => {
+          commit('replaceComment', response.data.data)
+        })
     }
   }
 }
