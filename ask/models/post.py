@@ -405,7 +405,7 @@ class Question(BasePost):
             elif doc["submodel"] == "answer":
                 if doc["deleted"]:
                     # skip deleted answers unless user is the author or a moderator
-                    if not user.moderator and user._id != doc["author_id"]:
+                    if user or (not user.moderator and user._id != doc["author_id"]):
                         continue
                 results["answers"].append(doc)
             author_ids.add(doc["author_id"])

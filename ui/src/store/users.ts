@@ -28,7 +28,8 @@ function extractUserData(data: { [key: string]: any }): User {
     icq_id: data.icq_id,
     notify_by_email: data.notify_by_email,
     notify_by_telegram: data.notify_by_telegram,
-    notify_by_icq: data.notify_by_icq
+    notify_by_icq: data.notify_by_icq,
+    moderator: data.moderator
   }
 }
 

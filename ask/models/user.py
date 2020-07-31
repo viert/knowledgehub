@@ -13,7 +13,7 @@ class User(StorableModel):
     avatar_url: StringField(default="")
     created_at: DatetimeField(required=True, rejected=True, default=now)
     updated_at: DatetimeField(required=True, rejected=True, default=now)
-    moderator: BoolField(required=True, restricted=True, default=False, rejected=True)
+    moderator: BoolField(required=True, default=False, rejected=True)
     email: StringField(default="", restricted=True)
     telegram_id: IntField(default=None, restricted=True)
     icq_id: StringField(default=None, restricted=True)

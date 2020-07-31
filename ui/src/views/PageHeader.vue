@@ -22,7 +22,11 @@
         </router-link>
       </div>
       <div v-if="me" class="panel-account">
-        <router-link to="/profile">@{{ me.username }}</router-link>
+        <User
+          :username="me.username"
+          overrideLink="/profile"
+          :moderator="me.moderator"
+        />
         <a class="logout" href @click.prevent="logout">
           <i class="fas fa-sign-out-alt"></i>
         </a>

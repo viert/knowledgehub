@@ -1,7 +1,8 @@
 <template>
   <div class="event-body">
     You got a new <router-link :to="commentLink">comment</router-link> by
-    <User :username="event.author_username" /> {{ event.created_at | duration }}
+    <User :username="event.author_username" :load="true" />
+    {{ event.created_at | duration }}
   </div>
 </template>
 

@@ -22,6 +22,7 @@ export interface User {
   notify_by_email: boolean
   notify_by_telegram: boolean
   notify_by_icq: boolean
+  moderator: boolean
 }
 
 export interface Question {

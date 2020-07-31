@@ -11,6 +11,7 @@ USER_FIELDS = (
     "first_name",
     "last_name",
     "username",
+    "moderator",
     "ext_id",
 )
 

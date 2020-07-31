@@ -23,6 +23,7 @@ ACCOUNT_FIELDS = (
 )
 
 ACCOUNT_RESTRICTED_FIELDS = (
+    "moderator",
     "email",
     "telegram_id",
     "icq_id",
