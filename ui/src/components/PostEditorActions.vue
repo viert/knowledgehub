@@ -1,14 +1,15 @@
 <template>
-  <div class="answer-edit-actions">
+  <div class="post-edit-actions">
     <button class="btn btn-secondary cancel" @click="cancel">Cancel</button>
 
     <SpinnerButton
       @click="save"
-      class="btn btn-primary btn-150 "
+      class="btn btn-primary btn-150"
       type="submit"
       :loading="isSaving"
-      >Save {{ name }}</SpinnerButton
     >
+      Save {{ name }}
+    </SpinnerButton>
   </div>
 </template>
 
@@ -48,13 +49,17 @@ export default class PostEditorActions extends mixins(PostCommons) {
 </script>
 
 <style lang="scss">
-.answer-edit-actions {
+.post-edit-actions {
   margin: 10px 0;
   display: flex;
   justify-content: flex-end;
-}
 
-.cancel {
-  margin-right: 10px;
+  .btn {
+    font-size: 1em;
+  }
+
+  .cancel {
+    margin-right: 10px;
+  }
 }
 </style>

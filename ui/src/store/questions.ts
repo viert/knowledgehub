@@ -231,7 +231,7 @@ const questionsStore: Module<QuestionsState, RootState> = {
         commit('storeQuestion', response.data.data)
       })
     },
-    async restoreQuestion({ state, commit }, questionId) {
+    async restoreQuestion({ state, commit }) {
       if (!state.question) return
 
       return Api.Questions.Restore(state.question._id).then(response => {

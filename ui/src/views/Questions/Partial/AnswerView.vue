@@ -115,7 +115,7 @@ export default class AnswerView extends mixins(PostCommons) {
     this.$store.dispatch('questions/restoreAnswer', answerId)
   }
 
-  handleOpenEditor(answerId: number) {
+  handleOpenEditor() {
     this.isEditView = true
 
     if (this.bodyError) {
@@ -123,7 +123,7 @@ export default class AnswerView extends mixins(PostCommons) {
     }
   }
 
-  handleSaveEdits(body: object) {
+  handleSaveEdits(body: string) {
     if (body.trim() === '') {
       this.bodyError = 'Body can not be empty'
       this.answerEditor.focus()

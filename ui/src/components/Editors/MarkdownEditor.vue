@@ -206,6 +206,9 @@ export default class MarkdownEditor extends Vue {
     if (isCtrlEnter(e)) {
       this.$emit('submit')
     }
+    if (e.keyCode === 27) {
+      this.$emit('cancel')
+    }
   }
 
   insert(ins: string) {

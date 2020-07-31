@@ -73,7 +73,7 @@ export default class CommentView extends mixins(PostCommons) {
   }
 
   get commentEditor() {
-    return this.$refs.commentEditor
+    return this.$refs.commentEditor as HTMLTextAreaElement
   }
 
   get author() {
@@ -115,7 +115,6 @@ export default class CommentView extends mixins(PostCommons) {
     return this.$store.dispatch('questions/editCommentToAnswer', payload)
   }
 
-  
   handleSave() {
     if (this.body.trim() === '') {
       this.error = "Comment can't be empty"

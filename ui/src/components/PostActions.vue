@@ -1,13 +1,13 @@
 <template>
   <div class="post-actions">
     <a @click.prevent="handleEdit" href="#">
-      edit
+      <i class="fas fa-edit"></i> edit
     </a>
     <a v-if="!isDeleted" @click.prevent="handleDelete" href="#">
-      delete
+      <i class="fas fa-trash"></i> delete
     </a>
     <a v-else @click.prevent="handleRestore" href="#">
-      restore
+      <i class="fas fa-trash-restore"></i> restore
     </a>
   </div>
 </template>
@@ -36,5 +36,19 @@ export default class PostActions extends Vue {
 
 <style lang="scss">
 .post-actions {
+  padding: 2px 0;
+  a {
+    font-size: 14px;
+    color: black;
+    text-decoration: none;
+    &:hover {
+      color: #426d98;
+    }
+    i.fas,
+    i.far {
+      font-size: 0.75em;
+    }
+    margin-right: 0.5em;
+  }
 }
 </style>

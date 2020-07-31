@@ -1,16 +1,17 @@
 <template>
   <div class="question-edit">
     <input
-      class="form-control form-control-sm title"
+      class="form-control form-control-sm question-edit_title"
       type="text"
       v-model="title"
     />
     <MarkdownEditor
       ref="editor"
-      :autofocus="false"
+      :autofocus="true"
       :error="!!error"
       :disabled="false"
       v-model="body"
+      @cancel="handleCancel"
     />
     <div v-if="error" class="error-msg">{{ error }}</div>
 
@@ -35,7 +36,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import MarkdownEditor from '@/components/Editors/MarkdownEditor.vue'
 import TagEditor from '@/components/Editors/TagEditor.vue'
-import { Question, Answer, Comment, User } from '@/store/types'
+import { Question } from '@/store/types'
 import PostEditorActions from '@/components/PostEditorActions.vue'
 
 @Component({
@@ -56,7 +57,7 @@ export default class QuestionEdit extends Vue {
   private tagsError: string | null = null
 
   get questionEditor() {
-    return this.$refs.editor as QuestionEdit
+    return this.$refs.editor as MarkdownEditor
   }
 
   get tagEditor() {
@@ -99,7 +100,12 @@ export default class QuestionEdit extends Vue {
 </script>
 
 <style lang="scss">
-.title {
-  margin: 10px 0;
+.question-edit {
+  .question-edit_title {
+    margin: 10px 0;
+  }
+  .markdown-editor {
+    margin: 10px 0;
+  }
 }
 </style>

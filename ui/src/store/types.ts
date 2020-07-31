@@ -22,6 +22,7 @@ export interface Question {
   tags: string[]
   author_id: string
   answers_count: number
+  deleted: boolean
   has_accepted_answer: boolean
   human_readable_id: string
   type?: 'question'
@@ -32,6 +33,7 @@ export interface Answer {
   body: string
   parent_id: string
   accepted: boolean
+  deleted: boolean
   author_id: string
   flash?: boolean
   type?: 'answer'
