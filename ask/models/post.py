@@ -14,6 +14,7 @@ from ask.errors import (InvalidUser, InvalidParent, InvalidQuestion,
                         InvalidTags, HasReferences, AlreadyDeleted, NotDeleted)
 from ask.tasks import SyncTagsTask, PostIndexerTask, NewPostTask
 from ask.unmark import unmark, extract_usernames
+from ask.translit import hrid
 
 
 class BasePost(StorableSubmodel):
@@ -209,9 +210,12 @@ class Question(BasePost):
     has_accepted_answer: BoolField(required=True, default=False, rejected=True, index=True)
     last_activity_at: DatetimeField(required=True, default=now, rejected=True, index=-1)
     closed: BoolField(required=True, default=False, rejected=True)
+    human_readable_id: StringField(required=True, default="", index=True, rejected=True)
 
     SUBMODEL = "question"
     USE_INITIAL_STATE = True
+
+    KEY_FIELD = "human_readable_id"
 
     INDEXES = (
         [[("tags", 1), ("points", -1)], {}],
@@ -247,10 +251,23 @@ class Question(BasePost):
         """
         Tag.sync(self.tags)
 
+    def setup_hrid(self):
+        inc = 0
+        orig_id = hrid(self.title, 80)
+        human_readable_id = orig_id
+        ex = Question.find_one({"human_readable_id": human_readable_id})
+        while ex and ex._id != self._id:
+            inc += 1
+            human_readable_id = f"{orig_id}_{inc}"
+            ex = Question.find_one({"human_readable_id": human_readable_id})
+        self.human_readable_id = human_readable_id
+
     def _before_save(self) -> None:
         from .tag import TAG_NAME_RE
 
         super()._before_save()
+        self.setup_hrid()
+
         new_tags = set(self.tags)
         if len(self.tags) != len(new_tags):
             raise InvalidTags("tags must be unique")

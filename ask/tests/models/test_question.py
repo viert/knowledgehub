@@ -56,3 +56,24 @@ class TestQuestion(MongoMockTest):
         q.destroy()
         self.run_tasks()
         self.assertEqual(Tag.find().count(), 4)  # tags are not deleted automatically anymore
+
+    def test_hrid(self):
+        q = Question.create(
+            author_id=self.user._id,
+            title='How to patch KDE on FreeBSD?',
+            body="subjxxxxxx",
+            tags=["kde", "freebsd", "anime"],
+        )
+        q.save()
+        self.run_tasks()
+        self.assertEqual(q.human_readable_id, "how-to-patch-kde-on-freebsd")
+
+        q = Question.create(
+            author_id=self.user._id,
+            title='How to patch KDE on FreeBSD?',
+            body="subjxxxxxx",
+            tags=["kde", "freebsd", "anime"],
+        )
+        q.save()
+        self.run_tasks()
+        self.assertEqual(q.human_readable_id, "how-to-patch-kde-on-freebsd_1")
