@@ -3,7 +3,8 @@ from glasskit import ctx
 from glasskit.queue import BaseWorker
 from glasskit.queue.task import BaseTask
 
-from ask.models.post import BasePost, Question, Answer, Comment
+from ask.models.post import BasePost
+from ask.utils import cut
 
 from .sync_tags_task import SyncTagsTask
 from .post_indexer_task import PostIndexerTask
@@ -55,5 +56,5 @@ class Worker(BaseWorker):
         if not post:
             ctx.log.error("error processing new post %s: post not found", task.post_id)
             return
-
+        ctx.log.info("generating events for a new post %s body='%s'", task.post_id, cut(post.body, max_len=50))
         post.generate_new_post_events()

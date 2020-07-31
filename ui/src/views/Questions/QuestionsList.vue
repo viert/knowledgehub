@@ -39,7 +39,9 @@
         />
       </div>
     </main>
-    <aside>aside</aside>
+    <aside>
+      <EventsBlock />
+    </aside>
   </div>
 </template>
 
@@ -48,7 +50,7 @@ import { Vue, Component, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { Question } from '@/store/types'
 import QuestionsListItem from './QuestionsListItem.vue'
-
+import EventsBlock from '@/views/Events/EventsBlock.vue'
 import Pagination from '@/components/Pagination.vue'
 
 const questions = namespace('questions')
@@ -56,7 +58,8 @@ const questions = namespace('questions')
 @Component({
   components: {
     QuestionsListItem,
-    Pagination
+    Pagination,
+    EventsBlock
   }
 })
 export default class QuestionsList extends Vue {

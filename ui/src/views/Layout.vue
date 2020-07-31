@@ -42,7 +42,8 @@ export default class Layout extends Vue {}
     aside {
       margin-left: 12px;
       background: white;
-      min-width: 260px;
+      width: 300px;
+      min-width: 300px;
     }
   }
 }

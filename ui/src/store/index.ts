@@ -4,6 +4,7 @@ import usersStore from './users'
 import questionsStore from './questions'
 import tagsStore from './tags'
 import messagesStore from './messages'
+import eventsStore from './events'
 import dataStore from './data'
 
 Vue.use(Vuex)
@@ -16,6 +17,7 @@ export default new Vuex.Store({
     questions: questionsStore,
     tags: tagsStore,
     messages: messagesStore,
-    data: dataStore
+    data: dataStore,
+    events: eventsStore
   }
 })

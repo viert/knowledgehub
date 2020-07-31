@@ -442,7 +442,7 @@ class Question(BasePost):
             del doc["votes"]
             if doc["deleted"]:
                 # skip deleted answers unless user is the author or a moderator
-                if not user.moderator and user._id != doc["author_id"]:
+                if not user or (not user.moderator and user._id != doc["author_id"]):
                     continue
             results["comments"].append(doc)
             author_ids.add(doc["author_id"])

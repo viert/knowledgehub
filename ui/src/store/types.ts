@@ -1,5 +1,14 @@
 import { AuthState } from '@/constants'
 
+export class MaxPage extends Error {
+  maxPage: number
+
+  constructor(maxPage: number) {
+    super('maximum page number exceeded')
+    this.maxPage = maxPage
+  }
+}
+
 export interface User {
   _id: string
   username: string
@@ -66,6 +75,61 @@ export interface Message {
   text: string
 }
 
+export interface TagNewQuestionEvent {
+  _id: string
+  tags: string[]
+  question_id: string
+  question_title: string
+  created_at: string
+  type: 'tag_new_question_event'
+}
+
+export interface QuestionNewAnswerEvent {
+  _id: string
+  question_id: string
+  question_title: string
+  answer_id: string
+  author_username: string
+  created_at: string
+  type: 'question_new_answer_event'
+}
+
+export interface PostNewCommentEvent {
+  _id: string
+  post_id: string
+  post_type: 'question' | 'answer' | 'comment'
+  root_id: string
+  title: string
+  comment_id: string
+  created_at: string
+  author_username: string
+  type: 'post_new_comment_event'
+}
+
+export interface MentionEvent {
+  _id: string
+  post_id: string
+  post_type: 'question' | 'answer' | 'comment'
+  author_username: string
+  created_at: string
+  type: 'mention_event'
+}
+
+export interface AnswerAcceptedEvent {
+  _id: string
+  answer_id: string
+  accepted_by_username: string
+  created_at: string
+  type: 'answer_accepted_event'
+}
+
+export type AnyEvent =
+  | TagNewQuestionEvent
+  | QuestionNewAnswerEvent
+  | PostNewCommentEvent
+  | MentionEvent
+  | AnswerAcceptedEvent
+
 interface MongoDBShardInfo {
   allocator: string
   bits: number
@@ -130,6 +194,14 @@ export interface QuestionsState {
   page: number
   totalPages: number
   count: number
+}
+
+export interface EventsState {
+  eventsList: AnyEvent[]
+  page: number
+  totalPages: number
+  count: number
+  loading: boolean
 }
 
 export interface DataState {

@@ -1,15 +1,13 @@
 import { Module } from 'vuex'
-import { RootState, QuestionsState, Question, Answer, Comment } from './types'
+import {
+  RootState,
+  QuestionsState,
+  Question,
+  Answer,
+  Comment,
+  MaxPage
+} from './types'
 import Api from '@/api'
-
-class MaxPage extends Error {
-  maxPage: number
-
-  constructor(maxPage: number) {
-    super('maximum page number exceeded')
-    this.maxPage = maxPage
-  }
-}
 
 const questionsStore: Module<QuestionsState, RootState> = {
   namespaced: true,
@@ -20,7 +18,7 @@ const questionsStore: Module<QuestionsState, RootState> = {
     comments: [],
     searchResults: [],
     page: 1,
-    totalPages: 1,
+    totalPages: 0,
     count: 0
   },
   getters: {

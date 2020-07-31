@@ -5,6 +5,7 @@ import Questions from './questions'
 import Answers from './answers'
 import Comments from './comments'
 import Search from './search'
+import Events from './events'
 import Users from './users'
 import Tags from './tags'
 
@@ -13,6 +14,7 @@ const Api = {
   Questions,
   Answers,
   Comments,
+  Events,
   Search,
   Users,
   Tags,
