@@ -13,6 +13,14 @@
         v-else-if="event.type === 'answer_accepted_event'"
         :event="event"
       />
+      <MentionEventView
+        v-else-if="event.type === 'mention_event'"
+        :event="event"
+      />
+      <TagNewQuestionEventView
+        v-else-if="event.type === 'tag_new_question_event'"
+        :event="event"
+      />
       <div class="event-dismiss">
         <a href="#" @click.prevent="handleDismiss(event._id)">
           <i class="fas fa-trash"></i>
@@ -29,13 +37,17 @@ import { AnyEvent, MaxPage } from '@/store/types'
 import NewCommentEventView from './Items/NewCommentEventView.vue'
 import NewAnswerEventView from './Items/NewAnswerEventView.vue'
 import AnswerAcceptedEventView from './Items/AnswerAcceptedEventView.vue'
+import MentionEventView from './Items/MentionEventView.vue'
+import TagNewQuestionEventView from './Items/TagNewQuestionEventView.vue'
 
 const events = namespace('events')
 @Component({
   components: {
     NewCommentEventView,
     NewAnswerEventView,
-    AnswerAcceptedEventView
+    AnswerAcceptedEventView,
+    MentionEventView,
+    TagNewQuestionEventView
   }
 })
 export default class EventsList extends Vue {

@@ -59,8 +59,9 @@ class TagNewQuestionEvent(Event):
 
     API_FIELDS = (
         'tags',
-        'question_id',
+        'question_human_readable_id',
         'question_title',
+        'author_username'
     )
 
     tags: ListField(required=True, rejected=True, min_length=1)
@@ -73,6 +74,14 @@ class TagNewQuestionEvent(Event):
     @property
     def question_title(self) -> str:
         return self.question.title
+
+    @property
+    def author_username(self) -> str:
+        return self.question.author.username
+
+    @property
+    def question_human_readable_id(self):
+        return self.question.human_readable_id
 
 
 class QuestionNewAnswerEvent(Event):
@@ -171,6 +180,7 @@ class MentionEvent(Event):
     API_FIELDS = (
         "post_id",
         "post_type",
+        "root_id",
         "author_username"
     )
 
@@ -189,6 +199,20 @@ class MentionEvent(Event):
     @property
     def author_username(self) -> str:
         return self.author.username
+
+    @property
+    def root_id(self):
+        if self.post_type == "question":
+            root = self.post
+        elif self.post_type == "answer":
+            root = self.post.question
+        else:
+            parent = self.post.parent
+            if parent.type == "question":
+                root = parent
+            else:
+                root = parent.question
+        return root.human_readable_id
 
 
 class AnswerAcceptedEvent(Event):

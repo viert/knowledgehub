@@ -12,7 +12,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { QuestionNewAnswerEvent } from '@/store/types'
 
 @Component
-export default class NewCommentEventView extends Vue {
+export default class NewAnswerEventView extends Vue {
   @Prop({ type: Object, required: true }) event!: QuestionNewAnswerEvent
 
   get answerLink() {

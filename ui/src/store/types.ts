@@ -80,6 +80,7 @@ export interface TagNewQuestionEvent {
   _id: string
   tags: string[]
   question_id: string
+  question_human_readable_id: string
   question_title: string
   created_at: string
   type: 'tag_new_question_event'
@@ -112,6 +113,7 @@ export interface MentionEvent {
   _id: string
   post_id: string
   post_type: 'question' | 'answer' | 'comment'
+  root_id: string
   author_username: string
   created_at: string
   type: 'mention_event'
