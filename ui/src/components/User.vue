@@ -1,12 +1,11 @@
 <template>
-  <router-link :to="userLink" class="user">
-    @{{ username
+  <router-link :to="userLink" class="user"
+    >@{{ username
     }}<div
       class="user--moderator"
       v-if="moderator"
       :title="'@' + username + ' is moderator'"
-    >
-      <i class="fas fa-sun"></i>
+      ><i class="fas fa-sun"></i>
     </div>
   </router-link>
 </template>

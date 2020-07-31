@@ -89,6 +89,7 @@ export interface QuestionNewAnswerEvent {
   _id: string
   question_id: string
   question_title: string
+  question_human_readable_id: string
   answer_id: string
   author_username: string
   created_at: string
@@ -120,6 +121,7 @@ export interface AnswerAcceptedEvent {
   _id: string
   answer_id: string
   accepted_by_username: string
+  question_id: string
   created_at: string
   type: 'answer_accepted_event'
 }

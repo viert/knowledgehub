@@ -81,6 +81,7 @@ class QuestionNewAnswerEvent(Event):
 
     API_FIELDS = (
         'question_id',
+        'question_human_readable_id',
         'question_title',
         'answer_id',
         'author_username',
@@ -97,6 +98,10 @@ class QuestionNewAnswerEvent(Event):
     @property
     def question_title(self) -> str:
         return self.question.title
+
+    @property
+    def question_human_readable_id(self) -> str:
+        return self.question.human_readable_id
 
     @property
     def answer(self) -> 'Answer':

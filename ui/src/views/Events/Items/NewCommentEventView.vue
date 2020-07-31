@@ -20,4 +20,3 @@ export default class NewCommentEventView extends Vue {
 }
 </script>
 
-<style scoped></style>

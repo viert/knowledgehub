@@ -5,6 +5,14 @@
         v-if="event.type === 'post_new_comment_event'"
         :event="event"
       />
+      <NewAnswerEventView
+        v-else-if="event.type === 'question_new_answer_event'"
+        :event="event"
+      />
+      <AnswerAcceptedEventView
+        v-else-if="event.type === 'answer_accepted_event'"
+        :event="event"
+      />
       <div class="event-dismiss">
         <a href="#" @click.prevent="handleDismiss(event._id)">
           <i class="fas fa-trash"></i>
@@ -19,9 +27,17 @@ import { Vue, Component } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { AnyEvent, MaxPage } from '@/store/types'
 import NewCommentEventView from './Items/NewCommentEventView.vue'
+import NewAnswerEventView from './Items/NewAnswerEventView.vue'
+import AnswerAcceptedEventView from './Items/AnswerAcceptedEventView.vue'
 
 const events = namespace('events')
-@Component({ components: { NewCommentEventView } })
+@Component({
+  components: {
+    NewCommentEventView,
+    NewAnswerEventView,
+    AnswerAcceptedEventView
+  }
+})
 export default class EventsList extends Vue {
   @events.State('eventsList') events!: AnyEvent[]
   @events.State('page') readonly page!: number
@@ -70,6 +86,9 @@ export default class EventsList extends Vue {
 
     .event-body {
       flex-grow: 1;
+      b {
+        font-weight: 600;
+      }
     }
     .event-dismiss {
       font-size: 0.8em;
