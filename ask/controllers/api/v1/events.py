@@ -25,3 +25,10 @@ def dismiss(event_id):
     if not event.dismissed:
         event.dismiss()
     return json_response({"data": event.api_dict()})
+
+
+@events_ctrl.route("/dismiss_all", methods=["POST"])
+def dismiss_all():
+    user: User = get_user_from_app_context()
+    Event.update_many({"user_id": user._id, "dismissed": False}, {"$set": {"dismissed": True}})
+    return json_response({"status": "dismissed"})

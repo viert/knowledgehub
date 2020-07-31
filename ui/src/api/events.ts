@@ -9,6 +9,9 @@ const Events = {
   },
   Dismiss(eventId: string) {
     return wrap(Axios.post(`${API_PREFIX}/${eventId}/dismiss`))
+  },
+  DismissAll() {
+    return wrap(Axios.post(`${API_PREFIX}/dismiss_all`))
   }
 }
 

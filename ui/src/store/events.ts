@@ -57,6 +57,11 @@ const eventsStore: Module<EventsState, RootState> = {
       return Api.Events.Dismiss(eventId).then(() => {
         commit('removeEvent', eventId)
       })
+    },
+    async dismissAll({ commit }) {
+      return Api.Events.DismissAll().then(() => {
+        commit('clearEvents')
+      })
     }
   }
 }
