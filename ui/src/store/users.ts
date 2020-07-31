@@ -53,6 +53,12 @@ const usersStore: Module<UsersState, RootState> = {
       return (id: string) => {
         return state.users[id]
       }
+    },
+    authReady(state) {
+      return (
+        state.authState === AuthState.LoggedIn ||
+        state.authState === AuthState.LoggedOut
+      )
     }
   },
   mutations: {

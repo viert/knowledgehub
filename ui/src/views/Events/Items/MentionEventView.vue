@@ -1,7 +1,8 @@
 <template>
   <div class="event-body">
     You were mentioned in
-    <router-link :to="postLink">{{ postType }}</router-link> by
+    <router-link :to="postLink">{{ postType }}</router-link>
+    by
     <User :username="event.author_username" :load="true" />
     {{ event.created_at | duration }}
   </div>

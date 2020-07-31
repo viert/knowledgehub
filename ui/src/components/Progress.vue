@@ -1,5 +1,5 @@
 <template>
-  <div class="prg">
+  <div class="prg" :class="{ 'prg--mini': mini }">
     <div class="prg-text">{{ text }}</div>
     <div class="prg-animation">
       <div class="prg-elem prg-elem--1"></div>
@@ -17,6 +17,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component
 export default class Progress extends Vue {
   @Prop({ type: String, default: 'loading' }) readonly text!: string
+  @Prop({ type: Boolean, default: false }) readonly mini!: boolean
 }
 </script>
 
@@ -25,46 +26,59 @@ export default class Progress extends Vue {
   width: 200px;
   margin: auto;
   text-align: center;
-}
 
-.prg-text {
-  font-size: 2em;
-  font-family: Montserrat;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
+  &.prg--mini .prg-text {
+    font-size: 1em;
+  }
 
-.prg-animation {
-  display: flex;
-  justify-content: space-between;
-  width: 100px;
-  height: 20px;
-  margin: auto;
-}
+  .prg-text {
+    font-size: 2em;
+    font-family: Montserrat;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
 
-.prg-elem {
-  background-color: #cccccc;
-  border: 1px solid #999999;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  animation: heartbeat 1s linear infinite;
-}
+  .prg-animation {
+    display: flex;
+    justify-content: space-between;
+    width: 100px;
+    height: 20px;
+    margin: auto;
+  }
 
-.prg-elem--1 {
-  animation-delay: 0.1s;
-}
-.prg-elem--2 {
-  animation-delay: 0.2s;
-}
-.prg-elem--3 {
-  animation-delay: 0.3s;
-}
-.prg-elem--4 {
-  animation-delay: 0.4s;
-}
-.prg-elem--5 {
-  animation-delay: 0.5s;
+  &.prg--mini .prg-animation {
+    width: 60px;
+  }
+
+  .prg-elem {
+    background-color: #cccccc;
+    border: 1px solid #999999;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: heartbeat 1s linear infinite;
+  }
+
+  &.prg--mini .prg-elem {
+    width: 5px;
+    height: 5px;
+  }
+
+  .prg-elem--1 {
+    animation-delay: 0.1s;
+  }
+  .prg-elem--2 {
+    animation-delay: 0.2s;
+  }
+  .prg-elem--3 {
+    animation-delay: 0.3s;
+  }
+  .prg-elem--4 {
+    animation-delay: 0.4s;
+  }
+  .prg-elem--5 {
+    animation-delay: 0.5s;
+  }
 }
 
 @keyframes heartbeat {

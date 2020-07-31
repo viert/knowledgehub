@@ -36,7 +36,9 @@
         </fragment>
       </div>
     </main>
-    <aside>aside</aside>
+    <aside>
+      <EventsBlock />
+    </aside>
   </div>
 </template>
 
@@ -48,6 +50,7 @@ import AnswerView from './Partial/AnswerView.vue'
 
 import AnswerForm from '@/components/Editors/AnswerForm.vue'
 import SigninBanner from '@/components/SignIn/SigninBanner.vue'
+import EventsBlock from '@/views/Events/EventsBlock.vue'
 
 import { namespace } from 'vuex-class'
 import { countable } from '@/filters'
@@ -61,7 +64,8 @@ const users = namespace('users')
     QuestionView,
     AnswerView,
     AnswerForm,
-    SigninBanner
+    SigninBanner,
+    EventsBlock
   }
 })
 export default class QuestionPage extends Vue {

@@ -1,33 +1,38 @@
 <template>
-  <ul class="events-list">
-    <li class="events-list_item" v-for="event in events" :key="event._id">
-      <NewCommentEventView
-        v-if="event.type === 'post_new_comment_event'"
-        :event="event"
-      />
-      <NewAnswerEventView
-        v-else-if="event.type === 'question_new_answer_event'"
-        :event="event"
-      />
-      <AnswerAcceptedEventView
-        v-else-if="event.type === 'answer_accepted_event'"
-        :event="event"
-      />
-      <MentionEventView
-        v-else-if="event.type === 'mention_event'"
-        :event="event"
-      />
-      <TagNewQuestionEventView
-        v-else-if="event.type === 'tag_new_question_event'"
-        :event="event"
-      />
-      <div class="event-dismiss">
-        <a href="#" @click.prevent="handleDismiss(event._id)">
-          <i class="fas fa-trash"></i>
-        </a>
-      </div>
-    </li>
-  </ul>
+  <fragment>
+    <div class="events-list_loading" v-if="loading">
+      <Progress :mini="true" />
+    </div>
+    <ul v-else class="events-list">
+      <li class="events-list_item" v-for="event in events" :key="event._id">
+        <NewCommentEventView
+          v-if="event.type === 'post_new_comment_event'"
+          :event="event"
+        />
+        <NewAnswerEventView
+          v-else-if="event.type === 'question_new_answer_event'"
+          :event="event"
+        />
+        <AnswerAcceptedEventView
+          v-else-if="event.type === 'answer_accepted_event'"
+          :event="event"
+        />
+        <MentionEventView
+          v-else-if="event.type === 'mention_event'"
+          :event="event"
+        />
+        <TagNewQuestionEventView
+          v-else-if="event.type === 'tag_new_question_event'"
+          :event="event"
+        />
+        <div class="event-dismiss">
+          <a href="#" @click.prevent="handleDismiss(event._id)">
+            <i class="fas fa-trash"></i>
+          </a>
+        </div>
+      </li>
+    </ul>
+  </fragment>
 </template>
 
 <script lang="ts">
@@ -89,7 +94,7 @@ export default class EventsList extends Vue {
     display: flex;
 
     &:hover {
-      background-color: #eeeeee;
+      background-color: #f9f9f9;
     }
 
     &:not(:last-child) {
@@ -100,6 +105,11 @@ export default class EventsList extends Vue {
       flex-grow: 1;
       b {
         font-weight: 600;
+      }
+      a {
+        &:not(.user) {
+          font-weight: bold;
+        }
       }
     }
     .event-dismiss {
@@ -115,5 +125,9 @@ export default class EventsList extends Vue {
       }
     }
   }
+}
+
+.events-list_loading {
+  margin: 20px 0;
 }
 </style>

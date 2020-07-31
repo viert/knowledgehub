@@ -4,7 +4,7 @@
     <div v-if="me">
       <EventsList />
     </div>
-    <div v-else class="events-signin">
+    <div v-else-if="authReady" class="events-signin">
       Please <router-link to="/signin">Sign in</router-link> to see your events
     </div>
   </div>
@@ -17,9 +17,11 @@ import { User } from '@/store/types'
 import EventsList from './EventsList.vue'
 
 const users = namespace('users')
+
 @Component({ components: { EventsList } })
 export default class EventsBlock extends Vue {
   @users.Getter('me') readonly me!: User
+  @users.Getter('authReady') readonly authReady!: boolean
 }
 </script>
 
