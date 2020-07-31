@@ -25,6 +25,7 @@ export interface Question {
   deleted: boolean
   has_accepted_answer: boolean
   human_readable_id: string
+  last_activity_at: Date
   type?: 'question'
 }
 
@@ -44,6 +45,7 @@ export interface Comment {
   body: string
   parent_id: string
   author_id: string
+  deleted: boolean
   flash?: boolean
   type?: 'comment'
 }

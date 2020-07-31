@@ -109,6 +109,8 @@ def restore_post(post):
 
 @questions_ctrl.route("/", methods=["GET"])
 def index():
+    u: User = get_user_from_app_context()
+
     if "_sort" in request.values:
         srt = request.values["_sort"]
     else:
@@ -118,11 +120,14 @@ def index():
     if sortExpr is None:
         raise ApiError(f"unknown sort operator \"{srt}\"")
 
-    query = {"deleted": False}
-    if get_boolean_request_param("_mine"):
-        u: User = get_user_from_app_context()
-        if u:
-            query["author_id"] = u._id
+    query = {
+        "$or": [
+            {"deleted": False},
+        ]
+    }
+
+    if u:
+        query["$or"].append({"author_id": u._id})
 
     questions = Question.find(query).sort(sortExpr)
     results = paginated(questions,
