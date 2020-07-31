@@ -11,9 +11,7 @@
         <div class="question-list_list-item_tags">
           <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
         </div>
-        <div class="question-list_list-item_date"
-          >active {{ question.last_activity_at | duration }}</div
-        >
+        <div class="question-list_list-item_date">active {{ question.last_activity_at | duration }}</div>
       </div>
     </div>
     <div class="question-list_list-item_counters">
@@ -49,7 +47,7 @@ export default class QuestionsListItem extends Vue {
   @users.Getter('user') private getUser!: (id: string) => User
 
   get questionLink() {
-    return `/questions/${this.question._id}`
+    return `/questions/${this.question.human_readable_id}`
   }
 
   get answerCounterType() {

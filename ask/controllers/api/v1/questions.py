@@ -27,6 +27,7 @@ QUESTION_LIST_FIELDS = (
     "answers_count",
     "has_accepted_answer",
     "last_activity_at",
+    "human_readable_id",
     "closed",
 )
 

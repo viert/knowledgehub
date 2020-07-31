@@ -222,7 +222,11 @@ class Question(BasePost):
     )
 
     def setup_initial_state(self) -> Dict[str, Any]:
-        return {"tags": self.tags[:]}
+        return {
+            "tags": self.tags[:],
+            "title": self.title,
+            "body": self.body,
+        }
 
     @property
     def answers(self) -> ObjectsCursor:

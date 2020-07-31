@@ -23,6 +23,7 @@ export interface Question {
   author_id: string
   answers_count: number
   has_accepted_answer: boolean
+  human_readable_id: string
   type?: 'question'
 }
 
