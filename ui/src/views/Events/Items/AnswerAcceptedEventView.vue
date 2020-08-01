@@ -20,4 +20,3 @@ export default class AnswerAcceptedEventView extends Vue {
   }
 }
 </script>
-

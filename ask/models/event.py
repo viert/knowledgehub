@@ -13,7 +13,7 @@ class Event(StorableSubmodel):
 
     user_id: ObjectIdField(required=True, rejected=True, index=True)
     dismissed: BoolField(required=True, default=False)
-    sent: DictField(required=True, rejected=True, default=dict)
+    sent: DictField(required=True, rejected=True, default=lambda: {"telegram": False, "icq": False})
     created_at: DatetimeField(required=True, rejected=True, default=now)
 
     INDEXES = (
@@ -31,15 +31,6 @@ class Event(StorableSubmodel):
     def user(self) -> Union['User', None]:
         return User.find_one({"_id": self.user_id})
 
-    @classmethod
-    def find_pending(cls, send_with: Union[None, str] = None) -> ObjectsCursor:
-        key = "sent"
-        if send_with:
-            key = key + "." + send_with
-
-        query = {key: False}
-        return cls.find(query)
-
     def _after_save(self, is_new) -> None:
         if is_new:
             ctx.log.debug("%s created: %s", self.__class__.__name__, self.to_dict())
@@ -51,6 +42,21 @@ class Event(StorableSubmodel):
     def dismiss(self):
         self.dismissed = True
         self.save(skip_callback=True)
+
+    @classmethod
+    def find_ready_to_send(cls, network_type: str):
+        query = {
+            "dismissed": False,
+            f"sent.{network_type}": False
+        }
+        return cls.find(query).sort("created_at", 1)
+
+    @staticmethod
+    def base_uri():
+        return ctx.cfg.get("base_uri", "http://localhost:8080")
+
+    def telegram_text(self) -> str:
+        pass
 
 
 class TagNewQuestionEvent(Event):
@@ -82,6 +88,12 @@ class TagNewQuestionEvent(Event):
     @property
     def question_human_readable_id(self):
         return self.question.human_readable_id
+
+    def telegram_text(self) -> str:
+        question_link = f"{self.base_uri()}/#/questions/{self.question_human_readable_id}?dismiss={self._id}"
+        tags = ", ".join([f"*{tag}*" for tag in self.tags])
+        return f"A new question [{self.question_title}]({question_link}) tagged with {tags} " \
+               f"was published by *{self.author_username}*"
 
 
 class QuestionNewAnswerEvent(Event):
@@ -123,6 +135,11 @@ class QuestionNewAnswerEvent(Event):
     @property
     def author_username(self) -> str:
         return self.author.username
+
+    def telegram_text(self) -> str:
+        answer_link = f"{self.base_uri()}/#/questions/{self.question_human_readable_id}?" \
+                      f"answer={self.answer_id}&dismiss={self._id}"
+        return f"Your question *{self.question_title}* got a new [answer]({answer_link}) by *{self.author_username}*"
 
 
 class PostNewCommentEvent(Event):
@@ -172,6 +189,10 @@ class PostNewCommentEvent(Event):
         else:
             return self.post.question.human_readable_id
 
+    def telegram_text(self) -> str:
+        comment_link = f"{self.base_uri()}/questions/{self.root_id}?comment={self.comment_id}&dismiss={self._id}"
+        return f"You got a new [comment]({comment_link}) by *{self.author_username}*"
+
 
 class MentionEvent(Event):
 
@@ -214,6 +235,20 @@ class MentionEvent(Event):
                 root = parent.question
         return root.human_readable_id
 
+    def telegram_text(self) -> str:
+        post_link = f"{self.base_uri()}/#/questions/{self.root_id}"
+        text = "You were mentioned in ["
+        if self.post_type == "question":
+            post_link += f"?dismiss={self._id}"
+            text += "a question"
+        elif self.post_type == "answer":
+            post_link += f"?answer={self.post_id}&dismiss={self._id}"
+            text += "an answer"
+        else:
+            post_link += f"?comment={self.post_id}&dismiss={self._id}"
+            text += "a comment"
+        text += f"]({post_link}) by *{self.author_username}*"
+
 
 class AnswerAcceptedEvent(Event):
 
@@ -243,6 +278,11 @@ class AnswerAcceptedEvent(Event):
     @property
     def question_id(self):
         return self.answer.question.human_readable_id
+
+    def telegram_text(self) -> str:
+        answer_link = f"{self.base_uri()}/#/questions/{self.question_id}?answer={self.answer_id}&dismiss={self._id}"
+        return f"Your [answer]({answer_link}) to question *{self.answer.question.title}* was " \
+               f"accepted by *{self.accepted_by_username}*"
 
 
 Event.register_submodel(TagNewQuestionEvent.SUBMODEL, TagNewQuestionEvent)

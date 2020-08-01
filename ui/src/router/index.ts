@@ -59,7 +59,7 @@ router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
   next()
 })
 
-router.afterEach((to: Route, from: Route) => {
+router.afterEach((to: Route) => {
   if (to.query.dismiss) {
     store.dispatch('events/dismiss', to.query.dismiss)
   }

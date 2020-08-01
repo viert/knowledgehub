@@ -2,3 +2,5 @@ glasskit>=3.10.7
 line_profiler
 elasticsearch
 markdown
+python-telegram-bot
+mailru-im-bot

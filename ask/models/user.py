@@ -1,3 +1,4 @@
+from typing import Optional
 from glasskit.utils import now
 from glasskit.uorm.models.storable_model import StorableModel
 from glasskit.uorm.models.fields import StringField, BoolField, DatetimeField, IntField
@@ -15,7 +16,7 @@ class User(StorableModel):
     updated_at: DatetimeField(required=True, rejected=True, default=now)
     moderator: BoolField(required=True, default=False, rejected=True)
     email: StringField(default="", restricted=True)
-    telegram_id: IntField(default=None, restricted=True)
+    telegram_id: StringField(default=None, restricted=True)
     icq_id: StringField(default=None, restricted=True)
     notify_by_email: BoolField(required=True, restricted=True, default=False)
     notify_by_telegram: BoolField(required=True, restricted=True, default=False)
@@ -100,7 +101,26 @@ class User(StorableModel):
     def get_new_events(self):
         return Event.find({"user_id": self._id, "dismissed": False})
 
+    @classmethod
+    def find_by_telegram_id(cls, telegram_id: str) -> Optional['User']:
+        return cls.find_one({
+            "$or": [
+                {"telegram_id": telegram_id},
+                {"telegram_id": "@" + telegram_id},
+            ]
+        })
+
+    def chat(self, network_type: str) -> Optional['Chat']:
+        return Chat.find_one({"user_id": self._id, "network_type": network_type})
+
+    def telegram(self):
+        return self.chat("telegram")
+
+    def icq(self):
+        return self.chat("icq")
+
 
 from .tag_subscription import TagSubscription
 from .user_subscription import UserSubscription
 from .event import Event
+from .chat import Chat

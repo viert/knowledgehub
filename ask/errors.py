@@ -73,3 +73,7 @@ class NotDeleted(IntegrityError):
 
 class NotAccepted(IntegrityError):
     pass
+
+
+class InvalidChatType(ApiError):
+    pass

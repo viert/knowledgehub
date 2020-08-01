@@ -5,3 +5,4 @@ from .vote import Vote
 from .post import Question, Answer, Comment
 from .tag_subscription import TagSubscription
 from .user_subscription import UserSubscription
+from .chat import Chat

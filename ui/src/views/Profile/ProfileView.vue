@@ -33,7 +33,6 @@
               :disabled="saving"
             />
             <hr />
-            <FormRow label="Email" v-model="user.email" :disabled="saving" />
             <FormRow
               label="Telegram ID"
               v-model="user.telegram_id"
@@ -76,7 +75,7 @@ const users = namespace('users')
 @Component({ components: { FormRow } })
 export default class ProfileView extends mixins(RequireAuth) {
   private user: User | null = null
-  private notificationOptions = { email: true, telegram: false, icq: false }
+  private notificationOptions = { telegram: false, icq: false }
   private loading = false
   private saving = false
 
@@ -85,7 +84,6 @@ export default class ProfileView extends mixins(RequireAuth) {
   handleSave() {
     const settings = {
       ...this.user,
-      notify_by_email: this.notificationOptions.email,
       notify_by_icq: this.notificationOptions.icq,
       notify_by_telegram: this.notificationOptions.telegram
     }
@@ -104,7 +102,6 @@ export default class ProfileView extends mixins(RequireAuth) {
   fillUser() {
     this.user = { ...this.me }
     this.notificationOptions = {
-      email: this.me.notify_by_email,
       telegram: this.me.notify_by_telegram,
       icq: this.me.notify_by_icq
     }
