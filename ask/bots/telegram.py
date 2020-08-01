@@ -1,31 +1,22 @@
 from glasskit import ctx
-from glasskit.errors import ConfigurationError
 from telegram.bot import Bot
 from telegram.error import TimedOut, TelegramError
 from telegram.parsemode import ParseMode
 
 from ask.models import User, Chat
-from .event_emitter import EventEmitter
+from .abstract_bot import AbstractBot
 
 
-class TelegramBot:
+class TelegramBot(AbstractBot):
+
+    NETWORK_NAME = "telegram"
+    NETWORK_BASE_URL = "https://api.telegram.org/bot"
 
     def __init__(self):
-        botcfg = ctx.cfg.get("bot")
-        if not botcfg:
-            raise ConfigurationError("no bot configuration section found")
+        super(TelegramBot, self).__init__()
+        self.bot = Bot(token=self.token, base_url=self.base_url)
 
-        tgcfg = botcfg.get("telegram")
-        if not tgcfg:
-            raise ConfigurationError("no telegram configuration provided")
-
-        token = tgcfg.get("token")
-        base_url = tgcfg.get("base_url", "https://api.telegram.org/bot")
-
-        self.bot = Bot(token=token, base_url=base_url)
-        self.poller = EventEmitter(self, "telegram")
-
-    def poll(self):
+    def start(self):
         self.poller.start()
         me = self.bot.getMe()
         ctx.log.info("starting telegram bot %s", me)
@@ -52,7 +43,7 @@ class TelegramBot:
             self.poller.stopped = True
             self.poller.join()
 
-    def send_message(self, where, what):
+    def send_message(self, where: str, what: str):
         self.bot.send_message(where, what, parse_mode=ParseMode.MARKDOWN)
 
     def process_update(self, update):
@@ -83,8 +74,8 @@ class TelegramBot:
     def cmd_start(self, message):
         ctx.log.debug("running command 'start' by request from %s", message.chat.to_dict())
         if message.chat.type != "private":
-            self.bot.send_message(message.chat.id, "Hey there! Unfortunately I'm not capable of working in groups. "
-                                                   "Please add me privately")
+            self.send_message(message.chat.id, "Hey there! Unfortunately I'm not capable of working in groups. "
+                                               "Please add me privately")
             return
         chat = Chat.find_one({"chat_id": message.chat.id})
         if chat is None:
@@ -111,7 +102,7 @@ class TelegramBot:
         chat = Chat.find_one({"chat_id": message.chat.id})
         if chat is None:
             return
-        self.bot.send_message(message.chat.id, "pong")
+        self.send_message(message.chat.id, "pong")
 
     def _new_user_message(self, message):
         base_url = ctx.cfg.get("base_url", "http://localhost:8000")
@@ -122,18 +113,17 @@ class TelegramBot:
                "of fixing that. The first one is broken and the second one is to fill in " \
                "your telegram id on [profile page]({link}) properly and run /start once again. " \
                "I'll be waiting right here. Not going anywhere. Honestly."
-        self.bot.send_message(message.chat.id, text.format(link=link), parse_mode=ParseMode.MARKDOWN)
+        self.send_message(message.chat.id, text.format(link=link))
 
     def _new_user_confirmed_message(self, message):
-        self.bot.send_message(message.chat.id, "Hey there, I'm a KnowledgeHub bot. Looks, like you "
-                                               "did it all right, I have found your account and connected "
-                                               "it to this chat. Here's where your notifications will go to. "
-                                               "If you're fed up, this chat can be muted. Or just type /stop "
-                                               "and the nightmare is over. But remember that I'll forget you "
-                                               "in that case. Forever. Well, at least until you type /start once again.")
+        self.send_message(message.chat.id, "Hey there, I'm a KnowledgeHub bot. Looks, like you "
+                                           "did it all right, I have found your account and connected "
+                                           "it to this chat. Here's where your notifications will go to. "
+                                           "If you're fed up, this chat can be muted. Or just type /stop "
+                                           "and the nightmare is over. But remember that I'll forget you "
+                                           "in that case. Forever. Well, at least until you type /start once again.")
 
     def _user_stop_message(self, message):
-        self.bot.send_message(message.chat.id, "Bye! It's a pity we couldn't settle. If you "
-                                               "change your mind, I'm always here. Just type in "
-                                               "/start and we'll try to start from scratch")
-
+        self.send_message(message.chat.id, "Bye! It's a pity we couldn't settle. If you "
+                                           "change your mind, I'm always here. Just type in "
+                                           "/start and we'll try to start from scratch")

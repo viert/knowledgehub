@@ -1,5 +1,6 @@
 from glasskit.commands import Command
 from ask.bots.telegram import TelegramBot
+from ask.bots.icq import ICQBot
 from ask import force_init_app
 
 
@@ -13,4 +14,7 @@ class Bot(Command):
         bot_type = self.args.bot_type[0]
         if bot_type == "telegram":
             bot = TelegramBot()
-            bot.poll()
+            bot.start()
+        elif bot_type == "icq":
+            bot = ICQBot()
+            bot.start()

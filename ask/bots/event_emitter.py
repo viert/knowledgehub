@@ -3,13 +3,14 @@ from threading import Thread
 from glasskit import ctx
 from ask.models.event import Event
 from ask.models import User
+from .abstract_bot import AbstractBot
 
 DB_POLLER_PERIOD = 1  # seconds
 
 
 class EventEmitter(Thread):
 
-    def __init__(self, bot, network_type: str, *args, **kwargs):
+    def __init__(self, bot: 'AbstractBot', network_type: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.stopped = False
         self.bot = bot
@@ -38,12 +39,15 @@ class EventEmitter(Thread):
     def run(self) -> None:
         ctx.log.debug("%s bot db poller started", self.network_type)
         while not self.stopped:
-            sleep(DB_POLLER_PERIOD)
-            for event in Event.find_ready_to_send(self.network_type):
-                try:
-                    self.process_event(event)
-                except Exception as e:
-                    ctx.log.exception("Could not process event #%s in %s bot: %s",
-                                      event._id, self.network_type, e)
+            try:
+                sleep(DB_POLLER_PERIOD)
+                for event in Event.find_ready_to_send(self.network_type):
+                    try:
+                        self.process_event(event)
+                    except Exception as e:
+                        ctx.log.exception("Could not process event #%s in %s bot: %s",
+                                          event._id, self.network_type, e)
+            except KeyboardInterrupt:
+                continue
 
         ctx.log.debug("%s bot db poller is exiting", self.network_type)
