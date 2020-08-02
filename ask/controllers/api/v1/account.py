@@ -88,6 +88,7 @@ def oauth_callback():
     user = User.find_one({"ext_id": user_data["ext_id"]})
     if not user:
         user = User(user_data)
+        user.fixup_username()
         user.save()
     session["user_id"] = user._id
     session.modified = True

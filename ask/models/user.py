@@ -1,8 +1,8 @@
 from typing import Optional
 from glasskit.utils import now
 from glasskit.uorm.models.storable_model import StorableModel
-from glasskit.uorm.models.fields import StringField, BoolField, DatetimeField, IntField
-from ask.errors import AlreadySubscribed, NotSubscribed
+from glasskit.uorm.models.fields import StringField, BoolField, DatetimeField
+from ask.errors import AlreadySubscribed, NotSubscribed, IntegrityError
 
 
 class User(StorableModel):
@@ -27,7 +27,22 @@ class User(StorableModel):
     def touch(self):
         self.updated_at = now()
 
+    def fixup_username(self):
+        idx = 0
+        while True:
+            username = self.username
+            if idx > 0:
+                username = username + f"_{idx}"
+            ex = User.find_one({"username": username})
+            if not ex or ex._id == self._id:
+                self.username = username
+                break
+            idx += 1
+
     def _before_save(self):
+        ex = User.find_one({"username": self.username})
+        if ex and ex._id != self._id:
+            raise IntegrityError("username has already been taken")
         self.touch()
 
     def _after_save(self, is_new):
