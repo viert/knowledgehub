@@ -86,6 +86,22 @@ const questionsStore: Module<QuestionsState, RootState> = {
       state.answers = state.answers.map(item => {
         return answer._id === item._id ? answer : item
       })
+    },
+    flashAnswer(state, answerId: string) {
+      state.answers = state.answers.map(answer => {
+        if (answer._id === answerId) {
+          answer.flash = true
+        }
+        return answer
+      })
+    },
+    flashComment(state, commentId: string) {
+      state.comments = state.comments.map(comment => {
+        if (comment._id === commentId) {
+          comment.flash = true
+        }
+        return comment
+      })
     }
   },
   actions: {

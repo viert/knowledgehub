@@ -47,7 +47,7 @@ export default class User extends Vue {
   .user--moderator {
     position: relative;
     display: inline-block;
-    top: -7px;
+    top: -0.5em;
     font-size: 0.7em;
     color: #3377cc;
   }
