@@ -77,7 +77,7 @@ class TelegramBot(AbstractBot):
             self.send_message(message.chat.id, "Hey there! Unfortunately I'm not capable of working in groups. "
                                                "Please add me privately")
             return
-        chat = Chat.find_one({"chat_id": message.chat.id})
+        chat = Chat.find_one({"chat_id": message.chat.id, "network_type": "telegram"})
         if chat is None:
             user = User.find_by_telegram_id(message.chat.username)
             if user is None:
@@ -105,8 +105,8 @@ class TelegramBot(AbstractBot):
         self.send_message(message.chat.id, "pong")
 
     def _new_user_message(self, message):
-        base_url = ctx.cfg.get("base_url", "http://localhost:8000")
-        link = f"{base_url}/#/profile"
+        base_url = ctx.cfg.get("base_uri", "http://localhost:8000/")
+        link = f"{base_url}#/profile"
         text = "Hey there, I'm a KnowledgeHub bot. You may have forgotten to " \
                "fill in your telegram id on your profile page. Or may have misspelled it. " \
                "A typo or something, a common thing, no worries. Well, you have two options " \

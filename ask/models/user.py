@@ -110,6 +110,10 @@ class User(StorableModel):
             ]
         })
 
+    @classmethod
+    def find_by_icq_id(cls, icq_id: str) -> Optional['User']:
+        return cls.find_one({"icq_id": icq_id})
+
     def chat(self, network_type: str) -> Optional['Chat']:
         return Chat.find_one({"user_id": self._id, "network_type": network_type})
 
