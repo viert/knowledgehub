@@ -13,7 +13,8 @@ const dataStore: Module<DataState, RootState> = {
     }
   },
   actions: {
-    loadAppInfo({ commit }) {
+    loadAppInfo({ commit, dispatch }) {
+      dispatch('events/loadBots', null, { root: true })
       return Api.AppInfo().then(response => {
         commit('setAppInfo', response.data.app_info)
       })

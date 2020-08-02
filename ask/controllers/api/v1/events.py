@@ -1,3 +1,4 @@
+from glasskit import ctx
 from glasskit.api import json_response, paginated
 from glasskit.utils import get_user_from_app_context
 from glasskit.errors import NotFound
@@ -32,3 +33,16 @@ def dismiss_all():
     user: User = get_user_from_app_context()
     Event.update_many({"user_id": user._id, "dismissed": False}, {"$set": {"dismissed": True}})
     return json_response({"status": "dismissed"})
+
+
+@events_ctrl.route("/bots", methods=["GET"])
+def bots():
+    bot_cfg = ctx.cfg.get("bot")
+    if bot_cfg is None:
+        raise NotFound("no bots are configured")
+
+    bots = []
+    for net_type, conf in bot_cfg.items():
+        bots.append({"network_type": net_type, "link": conf["link"], "name": conf["name"]})
+
+    return json_response({"bots": bots})

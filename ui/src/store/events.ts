@@ -1,11 +1,18 @@
 import { Module } from 'vuex'
-import { EventsState, RootState, AnyEvent, MaxPage } from './types'
+import {
+  EventsState,
+  RootState,
+  AnyEvent,
+  MaxPage,
+  BotDescription
+} from './types'
 import Api from '@/api'
 
 const eventsStore: Module<EventsState, RootState> = {
   namespaced: true,
   state: {
     eventsList: [],
+    bots: {},
     page: 1,
     totalPages: 0,
     count: 0,
@@ -32,9 +39,24 @@ const eventsStore: Module<EventsState, RootState> = {
     },
     removeEvent(state, eventId: string) {
       state.eventsList = state.eventsList.filter(item => item._id !== eventId)
+    },
+    storeBots(state, botList: BotDescription[]) {
+      state.bots = botList.reduce(
+        (acc: { [key: string]: BotDescription }, botDesc) => {
+          acc[botDesc.network_type] = botDesc
+          return acc
+        },
+        {}
+      )
     }
   },
   actions: {
+    async loadBots({ commit }) {
+      console.log('loading bots')
+      return Api.Events.BotList().then(response => {
+        commit('storeBots', response.data.bots)
+      })
+    },
     async loadEvents({ commit }, page: number) {
       commit('clearEvents')
       commit('setLoading', true)

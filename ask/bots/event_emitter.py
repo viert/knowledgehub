@@ -15,7 +15,6 @@ class EventEmitter(Thread):
         self.stopped = False
         self.bot = bot
         self.network_type = network_type
-        self.user_settings_field = f"notify_by_{self.network_type}"
 
     def send_event(self, user: 'User', event: 'Event'):
         chat = user.chat(self.network_type)
@@ -30,9 +29,7 @@ class EventEmitter(Thread):
     def process_event(self, event):
         ctx.log.info("processing event %s(%s)", event.__class__.__name__, event._id)
         user = event.user
-        need_to_send = getattr(user, self.user_settings_field)
-        if need_to_send:
-            self.send_event(user, event)
+        self.send_event(user, event)
         event.sent[self.network_type] = True
         event.save()
 

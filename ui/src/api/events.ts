@@ -12,6 +12,9 @@ const Events = {
   },
   DismissAll() {
     return wrap(Axios.post(`${API_PREFIX}/dismiss_all`))
+  },
+  BotList() {
+    return wrap(Axios.get(`${API_PREFIX}/bots`))
   }
 }
 

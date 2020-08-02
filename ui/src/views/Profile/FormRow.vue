@@ -17,6 +17,7 @@
         :class="{ 'form-control--readonly': readonly }"
         @input="$emit('input', $event.target.value)"
       />
+      <div class="input-info"><slot name="info"></slot></div>
     </div>
   </div>
 </template>
@@ -47,5 +48,10 @@ export default class FormRow extends Vue {
   border: transparent;
   outline: none;
   box-shadow: none;
+}
+
+.input-info {
+  color: gray;
+  font-size: 0.8em;
 }
 </style>

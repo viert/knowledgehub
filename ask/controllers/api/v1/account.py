@@ -27,9 +27,6 @@ ACCOUNT_RESTRICTED_FIELDS = (
     "email",
     "telegram_id",
     "icq_id",
-    "notify_by_email",
-    "notify_by_telegram",
-    "notify_by_icq",
 )
 
 

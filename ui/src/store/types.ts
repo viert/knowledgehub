@@ -201,8 +201,15 @@ export interface QuestionsState {
   count: number
 }
 
+export interface BotDescription {
+  name: string
+  link: string
+  network_type: string
+}
+
 export interface EventsState {
   eventsList: AnyEvent[]
+  bots: { icq?: BotDescription; telegram?: BotDescription }
   page: number
   totalPages: number
   count: number

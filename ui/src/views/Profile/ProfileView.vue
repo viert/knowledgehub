@@ -2,7 +2,7 @@
   <div class="page-layout">
     <main>
       <h3 class="page-title">Profile</h3>
-      <div v-if="loading" class="loading loading--user-settings">
+      <div v-if="isLoading" class="loading loading--user-settings">
         <Progress text="loading" />
       </div>
       <fragment v-else>
@@ -14,33 +14,52 @@
             <FormRow
               label="Your ID"
               v-model="user.ext_id"
-              :disabled="saving"
+              :disabled="isSaving"
               :readonly="true"
             />
             <FormRow
               label="Username"
               v-model="user.username"
-              :disabled="saving"
+              :disabled="isSaving"
             />
             <FormRow
               label="First Name"
               v-model="user.first_name"
-              :disabled="saving"
+              :disabled="isSaving"
             />
             <FormRow
               label="Last Name"
               v-model="user.last_name"
-              :disabled="saving"
+              :disabled="isSaving"
             />
             <hr />
             <FormRow
+              v-if="bots.telegram"
               label="Telegram ID"
               v-model="user.telegram_id"
-              :disabled="saving"
-            />
-            <FormRow label="ICQ ID" v-model="user.icq_id" :disabled="saving" />
-            <FormRow label="Notifications">
-              <ButtonSwitch v-model="notificationOptions" :disabled="saving" />
+              :disabled="isSaving"
+            >
+              <template v-slot:info>
+                To get telegram notifications, set your ID here, then add
+                <a target="_blank" :href="bots.telegram.link"
+                  >@{{ bots.telegram.name }}</a
+                >
+                to your contact list and type <code>/start</code>
+              </template>
+            </FormRow>
+            <FormRow
+              v-if="bots.icq"
+              label="ICQ ID"
+              v-model="user.icq_id"
+              :disabled="isSaving"
+            >
+              <template v-slot:info>
+                To get ICQ notifications, set your ID here, then add
+                <a target="_blank" :href="bots.icq.link"
+                  >@{{ bots.icq.name }}</a
+                >
+                to your contact list and type <code>/start</code>
+              </template>
             </FormRow>
             <p>
               To get Telegram and/or ICQ notifications, set your account ID
@@ -50,7 +69,7 @@
             <div class="post-form-control">
               <SpinnerButton
                 type="submit"
-                :loading="saving"
+                :loading="isSaving"
                 class="btn btn-primary"
                 >Save Settings</SpinnerButton
               >
@@ -68,44 +87,39 @@ import FormRow from './FormRow.vue'
 import RequireAuth from '@/mixins/RequireAuth'
 import { namespace } from 'vuex-class'
 import { mixins } from 'vue-class-component'
-import { User } from '@/store/types'
+import { User, BotDescription } from '@/store/types'
 
 const users = namespace('users')
+const events = namespace('events')
 
 @Component({ components: { FormRow } })
 export default class ProfileView extends mixins(RequireAuth) {
   private user: User | null = null
-  private notificationOptions = { telegram: false, icq: false }
-  private loading = false
-  private saving = false
+  private isLoading = true
+  private isSaving = false
 
   @users.Getter('me') me!: User
+  @events.State('bots') bots!: {
+    icq?: BotDescription
+    telegram?: BotDescription
+  }
 
   handleSave() {
-    const settings = {
-      ...this.user,
-      notify_by_icq: this.notificationOptions.icq,
-      notify_by_telegram: this.notificationOptions.telegram
-    }
-    this.saving = true
+    this.isSaving = true
     this.$store
-      .dispatch('users/saveSettings', settings)
+      .dispatch('users/saveSettings', this.user)
       .then(() => {
         this.fillUser()
         this.$store.dispatch('messages/info', 'Settings saved successfully')
       })
       .finally(() => {
-        this.saving = false
+        this.isSaving = false
       })
   }
 
   fillUser() {
     this.user = { ...this.me }
-    this.notificationOptions = {
-      telegram: this.me.notify_by_telegram,
-      icq: this.me.notify_by_icq
-    }
-    this.loading = false
+    this.isLoading = false
   }
 
   onReady() {

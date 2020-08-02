@@ -18,9 +18,6 @@ class User(StorableModel):
     email: StringField(default="", restricted=True)
     telegram_id: StringField(default=None, restricted=True)
     icq_id: StringField(default=None, restricted=True)
-    notify_by_email: BoolField(required=True, restricted=True, default=False)
-    notify_by_telegram: BoolField(required=True, restricted=True, default=False)
-    notify_by_icq: BoolField(required=True, restricted=True, default=False)
 
     KEY_FIELD = "username"
 
