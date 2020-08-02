@@ -38,7 +38,8 @@ const eventsStore: Module<EventsState, RootState> = {
       state.count = count
     },
     removeEvent(state, eventId: string) {
-      state.eventsList = state.eventsList.filter(item => item._id !== eventId)
+      if (state.eventsList)
+        state.eventsList = state.eventsList.filter(item => item._id !== eventId)
     },
     storeBots(state, botList: BotDescription[]) {
       state.bots = botList.reduce(
