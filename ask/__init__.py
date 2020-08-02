@@ -1,4 +1,7 @@
 import os
+import importlib
+import inspect
+
 from elasticsearch import Elasticsearch, TransportError, ImproperlyConfigured
 
 from lazy_object_proxy import Proxy
@@ -49,14 +52,24 @@ class App(Base):
             ctx.log.debug("Controller[%s] @ %s/", ep["name"], ep["prefix"])
             self.flask.register_blueprint(ep["ctrl"], url_prefix=ep["prefix"])
 
-    @staticmethod
-    def setup_oauth():
+    def setup_oauth(self):
         from ask.idconnect.config import get_conf
-        from ask.idconnect.facebook import FacebookProvider
-        from ask.idconnect.yandex import YandexProvider
-        from ask.idconnect.github import GithubProvider
+        from ask.idconnect.provider import BaseProvider
 
-        for provider in (FacebookProvider, YandexProvider, GithubProvider):
+        providers = []
+        idconnect_dir = os.path.join(self.app_dir, "idconnect")
+
+        for filename in os.listdir(idconnect_dir):
+            if filename.endswith(".py") and not filename.startswith("__"):
+                module_name = filename[:-3]
+                module_name = f"ask.idconnect.{module_name}"
+                module = importlib.import_module(module_name)
+                for obj_name in dir(module):
+                    obj = getattr(module, obj_name)
+                    if inspect.isclass(obj) and issubclass(obj, BaseProvider) and obj != BaseProvider:
+                        providers.append(obj)
+
+        for provider in providers:
             if get_conf(provider.PROVIDER_NAME):
                 provider().register()
             else:
