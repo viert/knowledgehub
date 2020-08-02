@@ -26,10 +26,9 @@ function extractUserData(data: { [key: string]: any }): User {
     email: data.email,
     telegram_id: data.telegram_id,
     icq_id: data.icq_id,
-    notify_by_email: data.notify_by_email,
-    notify_by_telegram: data.notify_by_telegram,
-    notify_by_icq: data.notify_by_icq,
-    moderator: data.moderator
+    moderator: data.moderator,
+    tag_subscription: data.tag_subscription,
+    user_subscription: data.user_subscription
   }
 }
 
@@ -93,7 +92,7 @@ const usersStore: Module<UsersState, RootState> = {
         [username]: { promise, resolver }
       }
     },
-    setTagSubscriptions(state, tags: Array<string>) {
+    setTagSubscriptions(state, tags: string[]) {
       state.tagSubscriptions = tags
     },
     setUserSubscriptions(state, users) {
@@ -139,12 +138,17 @@ const usersStore: Module<UsersState, RootState> = {
         })
     },
     subscribeToTag({ commit }, tag) {
-      Api.Tags.Subscribe(tag).then(response => {
+      return Api.Tags.Subscribe(tag).then(response => {
         commit('setTagSubscriptions', response.data.data.tags)
       })
     },
     unsubscribeFromTag({ commit }, tag) {
-      Api.Tags.Unsubscribe(tag).then(response => {
+      return Api.Tags.Unsubscribe(tag).then(response => {
+        commit('setTagSubscriptions', response.data.data.tags)
+      })
+    },
+    replaceTagSubscription({ commit }, tags) {
+      return Api.Tags.Replace(tags).then(response => {
         commit('setTagSubscriptions', response.data.data.tags)
       })
     },

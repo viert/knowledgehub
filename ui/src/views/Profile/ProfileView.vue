@@ -65,8 +65,28 @@
               <SpinnerButton
                 type="submit"
                 :loading="isSaving"
-                class="btn btn-primary"
+                class="btn btn-primary btn-150"
                 >Save Settings</SpinnerButton
+              >
+            </div>
+          </form>
+        </div>
+        <h3 class="page-title">Subscriptions</h3>
+        <div class="tags-settings">
+          <form @submit.prevent="handleSaveTags" class="tags-settings_form">
+            <FormRow label="tags" :disabled="tagsAreSaving">
+              <TagEditor
+                :tags="tags"
+                @add="handleAddTag"
+                @remove="handleRemoveTag"
+              />
+            </FormRow>
+            <div class="post-form-control">
+              <SpinnerButton
+                type="submit"
+                :loading="tagsAreSaving"
+                class="btn btn-primary btn-150"
+                >Save Tags</SpinnerButton
               >
             </div>
           </form>
@@ -80,6 +100,7 @@
 import { Component } from 'vue-property-decorator'
 import FormRow from './FormRow.vue'
 import RequireAuth from '@/mixins/RequireAuth'
+import TagEditor from '@/components/Editors/TagEditor.vue'
 import { namespace } from 'vuex-class'
 import { mixins } from 'vue-class-component'
 import { User, BotDescription } from '@/store/types'
@@ -87,14 +108,17 @@ import { User, BotDescription } from '@/store/types'
 const users = namespace('users')
 const events = namespace('events')
 
-@Component({ components: { FormRow } })
+@Component({ components: { FormRow, TagEditor } })
 export default class ProfileView extends mixins(RequireAuth) {
   private user: User | null = null
+  private tags: string[] | null = null
   private isLoading = true
   private isSaving = false
+  private tagsAreSaving = false
 
-  @users.Getter('me') me!: User
-  @events.State('bots') bots!: {
+  @users.Getter('me') readonly me!: User
+  @users.State('tagSubscriptions') readonly tagSubscriptions!: string[]
+  @events.State('bots') readonly bots!: {
     icq?: BotDescription
     telegram?: BotDescription
   }
@@ -113,8 +137,34 @@ export default class ProfileView extends mixins(RequireAuth) {
   }
 
   fillUser() {
-    this.user = { ...this.me }
+    this.user = {
+      ...this.me
+    }
+    this.tags = [...this.tagSubscriptions]
     this.isLoading = false
+  }
+
+  handleAddTag(tag: string) {
+    if (this.tags) this.tags = [...this.tags, tag]
+  }
+
+  handleRemoveTag(tag: string) {
+    if (this.tags) this.tags = this.tags.filter(t => t !== tag)
+  }
+
+  handleSaveTags() {
+    if (this.user) {
+      this.tagsAreSaving = true
+      this.$store
+        .dispatch('users/replaceTagSubscription', this.tags)
+        .then(() => {
+          this.fillUser()
+          this.$store.dispatch('messages/info', 'Tags subscription updated')
+        })
+        .finally(() => {
+          this.tagsAreSaving = false
+        })
+    }
   }
 
   onReady() {
@@ -131,9 +181,17 @@ export default class ProfileView extends mixins(RequireAuth) {
   height: calc(100vh - 220px);
 }
 
-.user-settings {
+.user-settings,
+.tags-settings {
   padding: 2em;
   box-sizing: border-box;
+  label {
+    font-family: Montserrat;
+    text-transform: uppercase;
+  }
+}
+
+.user-settings {
   display: flex;
 
   .user-settings_avatar {
@@ -149,14 +207,14 @@ export default class ProfileView extends mixins(RequireAuth) {
       height: 150px;
     }
   }
-
   .user-settings_form {
-    flex-grow: 1;
+    width: 100%;
   }
+}
 
-  label {
-    font-family: Montserrat;
-    text-transform: uppercase;
+.tags-settings {
+  .tags-settings_form {
+    margin-left: calc(3em + 150px);
   }
 }
 </style>

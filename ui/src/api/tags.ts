@@ -10,6 +10,9 @@ const Tags = {
   },
   Unsubscribe(tagName: string) {
     return wrap(Axios.post(`/api/v1/tags/${tagName}/unsubscribe`))
+  },
+  Replace(tags: string[]) {
+    return wrap(Axios.post(`/api/v1/tags/`, { tags }))
   }
 }
 

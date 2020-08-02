@@ -19,10 +19,9 @@ export interface User {
   avatar_url: string
   telegram_id: string
   icq_id: string
-  notify_by_email: boolean
-  notify_by_telegram: boolean
-  notify_by_icq: boolean
   moderator: boolean
+  tag_subscription: { tags: string[] }
+  user_subscription: { subs_user_ids: string[] }
 }
 
 export interface Question {

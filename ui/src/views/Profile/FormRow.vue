@@ -28,7 +28,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 @Component
 export default class FormRow extends Vue {
   @Prop({ type: String, required: true }) readonly label!: string
-  @Prop({ type: String, required: true }) readonly value!: string
+  @Prop({ type: String }) readonly value!: string
   @Prop({ type: Boolean, default: false }) readonly readonly!: boolean
   @Prop({ type: Boolean, default: false }) readonly disabled!: boolean
 

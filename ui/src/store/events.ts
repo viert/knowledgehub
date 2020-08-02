@@ -53,7 +53,6 @@ const eventsStore: Module<EventsState, RootState> = {
   },
   actions: {
     async loadBots({ commit }) {
-      console.log('loading bots')
       return Api.Events.BotList().then(response => {
         commit('storeBots', response.data.bots)
       })

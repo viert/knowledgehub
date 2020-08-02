@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from glasskit.utils import now
 from glasskit.uorm.models.storable_model import StorableModel
 from glasskit.uorm.models.fields import StringField, BoolField, DatetimeField
@@ -108,6 +108,11 @@ class User(StorableModel):
         if tag not in ts.tags:
             raise NotSubscribed("you are not subscribed to this tag")
         ts.tags.remove(tag)
+        ts.save()
+
+    def replace_tags(self, tags: List[str]) -> None:
+        ts = self.tag_subscription
+        ts.tags = tags
         ts.save()
 
     def get_new_events(self):
