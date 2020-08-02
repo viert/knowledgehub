@@ -1,7 +1,6 @@
 from typing import Union, Optional, Dict
 from glasskit import ctx
 from glasskit.utils import now
-from glasskit.uorm.db import ObjectsCursor
 from glasskit.uorm.models.submodel import StorableSubmodel
 from glasskit.uorm.models.fields import ListField, StringField, ObjectIdField, BoolField, DictField, DatetimeField
 
@@ -58,6 +57,9 @@ class Event(StorableSubmodel):
     def telegram_text(self) -> str:
         pass
 
+    def icq_text(self) -> str:
+        pass
+
 
 class TagNewQuestionEvent(Event):
 
@@ -94,6 +96,12 @@ class TagNewQuestionEvent(Event):
         tags = ", ".join([f"*{tag}*" for tag in self.tags])
         return f"A new question [{self.question_title}]({question_link}) tagged with {tags} " \
                f"was published by *{self.author_username}*"
+
+    def icq_text(self) -> str:
+        question_link = f"{self.base_uri()}/#/questions/{self.question_human_readable_id}?dismiss={self._id}"
+        tags = ", ".join([f"'{tag}'" for tag in self.tags])
+        return f"A new question '{self.question_title}' tagged with {tags} was published " \
+               f"by {self.author_username}:\n{question_link}"
 
 
 class QuestionNewAnswerEvent(Event):
@@ -140,6 +148,11 @@ class QuestionNewAnswerEvent(Event):
         answer_link = f"{self.base_uri()}/#/questions/{self.question_human_readable_id}?" \
                       f"answer={self.answer_id}&dismiss={self._id}"
         return f"Your question *{self.question_title}* got a new [answer]({answer_link}) by *{self.author_username}*"
+
+    def icq_text(self) -> str:
+        answer_link = f"{self.base_uri()}/#/questions/{self.question_human_readable_id}?" \
+                      f"answer={self.answer_id}&dismiss={self._id}"
+        return f"Your question '{self.question_title}' got a new answer by {self.author_username}: {answer_link}"
 
 
 class PostNewCommentEvent(Event):
@@ -192,6 +205,10 @@ class PostNewCommentEvent(Event):
     def telegram_text(self) -> str:
         comment_link = f"{self.base_uri()}/questions/{self.root_id}?comment={self.comment_id}&dismiss={self._id}"
         return f"You got a new [comment]({comment_link}) by *{self.author_username}*"
+
+    def icq_text(self) -> str:
+        comment_link = f"{self.base_uri()}/questions/{self.root_id}?comment={self.comment_id}&dismiss={self._id}"
+        return f"You got a new comment by {self.author_username}: {comment_link}"
 
 
 class MentionEvent(Event):
@@ -248,6 +265,22 @@ class MentionEvent(Event):
             post_link += f"?comment={self.post_id}&dismiss={self._id}"
             text += "a comment"
         text += f"]({post_link}) by *{self.author_username}*"
+        return text
+
+    def icq_text(self) -> str:
+        post_link = f"{self.base_uri()}/#/questions/{self.root_id}"
+        text = "You were mentioned in "
+        if self.post_type == "question":
+            post_link += f"?dismiss={self._id}"
+            text += "a question"
+        elif self.post_type == "answer":
+            post_link += f"?answer={self.post_id}&dismiss={self._id}"
+            text += "an answer"
+        else:
+            post_link += f"?comment={self.post_id}&dismiss={self._id}"
+            text += "a comment"
+        text += f" by {self.author_username}: {post_link}"
+        return text
 
 
 class AnswerAcceptedEvent(Event):
@@ -283,6 +316,11 @@ class AnswerAcceptedEvent(Event):
         answer_link = f"{self.base_uri()}/#/questions/{self.question_id}?answer={self.answer_id}&dismiss={self._id}"
         return f"Your [answer]({answer_link}) to question *{self.answer.question.title}* was " \
                f"accepted by *{self.accepted_by_username}*"
+
+    def icq_text(self) -> str:
+        answer_link = f"{self.base_uri()}/#/questions/{self.question_id}?answer={self.answer_id}&dismiss={self._id}"
+        return f"Your answer to question '{self.answer.question.title}' was " \
+               f"accepted by {self.accepted_by_username}: {answer_link}"
 
 
 Event.register_submodel(TagNewQuestionEvent.SUBMODEL, TagNewQuestionEvent)
