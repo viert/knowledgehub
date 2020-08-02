@@ -2,8 +2,16 @@
   <div class="page-layout">
     <main>
       <div class="question-view">
-        <div v-if="loading" class="question-loading">
+        <div v-if="isLoading" class="question-loading">
           <Progress />
+        </div>
+        <div v-else-if="notFound" class="not-found">
+          <h2>404 Not Found</h2>
+          <p>
+            Looks like the post you're trying to reach does not exist.<br />
+            Check your link once again, or do some searching using the search
+            field on the top of the page.
+          </p>
         </div>
         <fragment v-else>
           <QuestionView
@@ -69,10 +77,11 @@ const users = namespace('users')
   }
 })
 export default class QuestionPage extends Vue {
-  private loading = true
+  private isLoading = true
+  private isSaving = false
   private answerBody = ''
   private answerBodyError = ''
-  private isSaving = false
+  private notFound = false
 
   @questions.State('question') readonly question!: Question
   @questions.State('answers') readonly answers!: Answer[]
@@ -125,11 +134,17 @@ export default class QuestionPage extends Vue {
   }
 
   reload() {
-    this.loading = true
+    this.isLoading = true
+    this.notFound = false
     this.$store
       .dispatch('questions/getQuestion', this.$route.params.questionId)
+      .catch(err => {
+        if (err.status === 404) {
+          this.notFound = true
+        }
+      })
       .finally(() => {
-        this.loading = false
+        this.isLoading = false
       })
   }
 

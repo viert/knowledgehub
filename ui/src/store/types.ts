@@ -208,7 +208,7 @@ export interface BotDescription {
 }
 
 export interface EventsState {
-  eventsList: AnyEvent[]
+  eventsList: AnyEvent[] | null
   bots: { icq?: BotDescription; telegram?: BotDescription }
   page: number
   totalPages: number

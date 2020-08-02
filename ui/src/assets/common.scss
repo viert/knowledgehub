@@ -67,3 +67,29 @@ $flash-color: #ffffcc;
 .aside-section {
   padding: 20px;
 }
+
+a.icon-link {
+  font-size: 14px;
+  color: black;
+  text-decoration: none;
+  &:hover {
+    color: #426d98;
+  }
+  i.fas,
+  i.far {
+    font-size: 0.75em;
+    position: relative;
+    top: -0.05em;
+  }
+  margin-right: 0.5em;
+}
+
+.not-found {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  margin: 7em 0;
+  h2 {
+    margin-bottom: 1em;
+  }
+}

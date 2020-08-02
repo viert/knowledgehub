@@ -3,35 +3,61 @@
     <div class="events-list_loading" v-if="loading">
       <Progress :mini="true" />
     </div>
-    <ul v-else class="events-list">
-      <li class="events-list_item" v-for="event in events" :key="event._id">
-        <NewCommentEventView
-          v-if="event.type === 'post_new_comment_event'"
-          :event="event"
-        />
-        <NewAnswerEventView
-          v-else-if="event.type === 'question_new_answer_event'"
-          :event="event"
-        />
-        <AnswerAcceptedEventView
-          v-else-if="event.type === 'answer_accepted_event'"
-          :event="event"
-        />
-        <MentionEventView
-          v-else-if="event.type === 'mention_event'"
-          :event="event"
-        />
-        <TagNewQuestionEventView
-          v-else-if="event.type === 'tag_new_question_event'"
-          :event="event"
-        />
-        <div class="event-dismiss">
-          <a href="#" @click.prevent="handleDismiss(event._id)">
-            <i class="fas fa-trash"></i>
+    <div v-else-if="events && events.length > 0">
+      <ul class="events-list">
+        <li class="events-list_item" v-for="event in events" :key="event._id">
+          <NewCommentEventView
+            v-if="event.type === 'post_new_comment_event'"
+            :event="event"
+          />
+          <NewAnswerEventView
+            v-else-if="event.type === 'question_new_answer_event'"
+            :event="event"
+          />
+          <AnswerAcceptedEventView
+            v-else-if="event.type === 'answer_accepted_event'"
+            :event="event"
+          />
+          <MentionEventView
+            v-else-if="event.type === 'mention_event'"
+            :event="event"
+          />
+          <TagNewQuestionEventView
+            v-else-if="event.type === 'tag_new_question_event'"
+            :event="event"
+          />
+          <div class="event-dismiss">
+            <a href="#" @click.prevent="handleDismiss(event._id)">
+              <i class="fas fa-trash"></i>
+            </a>
+          </div>
+        </li>
+      </ul>
+      <div v-if="totalPages > 1" class="pagination-tiny">
+        <div class="pagination-tiny_left">
+          <a v-if="page > 1" href="#" @click.prevent="pageChanged(page - 1)">
+            &larr;
           </a>
         </div>
-      </li>
-    </ul>
+        <div class="pagination-tiny_right">
+          <a
+            v-if="page < totalPages"
+            href="#"
+            @click.prevent="pageChanged(page + 1)"
+          >
+            &rarr;
+          </a>
+        </div>
+      </div>
+      <div class="events-ctrl">
+        <a href="#" @click.prevent="handleDismissAll" class="icon-link">
+          <i class="fas fa-trash"></i> dismiss all
+        </a>
+      </div>
+    </div>
+    <div v-else>
+      You do not have any events
+    </div>
   </fragment>
 </template>
 
@@ -71,6 +97,10 @@ export default class EventsList extends Vue {
 
   handleDismiss(eventId: string) {
     this.$store.dispatch('events/dismiss', eventId)
+  }
+
+  handleDismissAll() {
+    this.$store.dispatch('events/dismissAll')
   }
 
   pageChanged(page: number) {
@@ -129,5 +159,32 @@ export default class EventsList extends Vue {
 
 .events-list_loading {
   margin: 20px 0;
+}
+
+.pagination-tiny {
+  display: flex;
+  a {
+    text-decoration: none;
+  }
+
+  & > div {
+    width: 50%;
+  }
+  .pagination-tiny_left {
+    text-align: left;
+  }
+  .pagination-tiny_right {
+    text-align: right;
+  }
+}
+
+.events-ctrl {
+  a {
+    text-decoration: none;
+    color: black;
+  }
+  a:hover {
+    color: #123d68;
+  }
 }
 </style>

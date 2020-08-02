@@ -11,7 +11,7 @@ import Api from '@/api'
 const eventsStore: Module<EventsState, RootState> = {
   namespaced: true,
   state: {
-    eventsList: [],
+    eventsList: null,
     bots: {},
     page: 1,
     totalPages: 0,
