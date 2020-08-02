@@ -1,97 +1,99 @@
 <template>
   <div class="page-layout">
     <main>
-      <h3 class="page-title">Profile</h3>
-      <div v-if="isLoading" class="loading loading--user-settings">
-        <Progress text="loading" />
-      </div>
-      <fragment v-else>
-        <div class="user-settings">
-          <div class="user-settings_avatar">
-            <img :src="user.avatar_url" />
-          </div>
-          <form @submit.prevent="handleSave" class="user-settings_form">
-            <FormRow
-              label="Your ID"
-              v-model="user.ext_id"
-              :disabled="isSaving"
-              :readonly="true"
-            />
-            <FormRow
-              label="Username"
-              v-model="user.username"
-              :disabled="isSaving"
-            />
-            <FormRow
-              label="First Name"
-              v-model="user.first_name"
-              :disabled="isSaving"
-            />
-            <FormRow
-              label="Last Name"
-              v-model="user.last_name"
-              :disabled="isSaving"
-            />
-            <hr />
-            <FormRow
-              v-if="bots.telegram"
-              label="Telegram ID"
-              v-model="user.telegram_id"
-              :disabled="isSaving"
-            >
-              <template v-slot:info>
-                To get telegram notifications, set your ID here, then add
-                <a target="_blank" :href="bots.telegram.link"
-                  >@{{ bots.telegram.name }}</a
-                >
-                to your contact list and type <code>/start</code>
-              </template>
-            </FormRow>
-            <FormRow
-              v-if="bots.icq"
-              label="ICQ ID"
-              v-model="user.icq_id"
-              :disabled="isSaving"
-            >
-              <template v-slot:info>
-                To get ICQ notifications, set your ID here, then add
-                <a target="_blank" :href="bots.icq.link"
-                  >@{{ bots.icq.name }}</a
-                >
-                to your contact list and type <code>/start</code>
-              </template>
-            </FormRow>
-            <div class="post-form-control">
-              <SpinnerButton
-                type="submit"
-                :loading="isSaving"
-                class="btn btn-primary btn-150"
-                >Save Settings</SpinnerButton
-              >
-            </div>
-          </form>
+      <div class="profile-page">
+        <h3 class="page-title">Profile</h3>
+        <div v-if="isLoading" class="loading loading--user-settings">
+          <Progress text="loading" />
         </div>
-        <h3 class="page-title">Subscriptions</h3>
-        <div class="tags-settings">
-          <form @submit.prevent="handleSaveTags" class="tags-settings_form">
-            <FormRow label="tags" :disabled="tagsAreSaving">
-              <TagEditor
-                :tags="tags"
-                @add="handleAddTag"
-                @remove="handleRemoveTag"
+        <fragment v-else>
+          <div class="user-settings">
+            <div class="user-settings_avatar">
+              <img :src="user.avatar_url" />
+            </div>
+            <form @submit.prevent="handleSave" class="user-settings_form">
+              <FormRow
+                label="Your ID"
+                v-model="user.ext_id"
+                :disabled="isSaving"
+                :readonly="true"
               />
-            </FormRow>
-            <div class="post-form-control">
-              <SpinnerButton
-                type="submit"
-                :loading="tagsAreSaving"
-                class="btn btn-primary btn-150"
-                >Save Tags</SpinnerButton
+              <FormRow
+                label="Username"
+                v-model="user.username"
+                :disabled="isSaving"
+              />
+              <FormRow
+                label="First Name"
+                v-model="user.first_name"
+                :disabled="isSaving"
+              />
+              <FormRow
+                label="Last Name"
+                v-model="user.last_name"
+                :disabled="isSaving"
+              />
+              <hr />
+              <FormRow
+                v-if="bots.telegram"
+                label="Telegram ID"
+                v-model="user.telegram_id"
+                :disabled="isSaving"
               >
-            </div>
-          </form>
-        </div>
-      </fragment>
+                <template v-slot:info>
+                  To get telegram notifications, set your ID here, then add
+                  <a target="_blank" :href="bots.telegram.link"
+                    >@{{ bots.telegram.name }}</a
+                  >
+                  to your contact list and type <code>/start</code>
+                </template>
+              </FormRow>
+              <FormRow
+                v-if="bots.icq"
+                label="ICQ ID"
+                v-model="user.icq_id"
+                :disabled="isSaving"
+              >
+                <template v-slot:info>
+                  To get ICQ notifications, set your ID here, then add
+                  <a target="_blank" :href="bots.icq.link"
+                    >@{{ bots.icq.name }}</a
+                  >
+                  to your contact list and type <code>/start</code>
+                </template>
+              </FormRow>
+              <div class="post-form-control">
+                <SpinnerButton
+                  type="submit"
+                  :loading="isSaving"
+                  class="btn btn-primary btn-150"
+                  >Save Settings</SpinnerButton
+                >
+              </div>
+            </form>
+          </div>
+          <h3 class="page-title">Subscriptions</h3>
+          <div class="tags-settings">
+            <form @submit.prevent="handleSaveTags" class="tags-settings_form">
+              <FormRow label="tags" :disabled="tagsAreSaving">
+                <TagEditor
+                  :tags="tags"
+                  @add="handleAddTag"
+                  @remove="handleRemoveTag"
+                />
+              </FormRow>
+              <div class="post-form-control">
+                <SpinnerButton
+                  type="submit"
+                  :loading="tagsAreSaving"
+                  class="btn btn-primary btn-150"
+                  >Save Tags</SpinnerButton
+                >
+              </div>
+            </form>
+          </div>
+        </fragment>
+      </div>
     </main>
   </div>
 </template>
@@ -174,6 +176,10 @@ export default class ProfileView extends mixins(RequireAuth) {
 </script>
 
 <style lang="scss">
+.profile-page {
+  padding: 8px;
+}
+
 .loading--user-settings {
   display: flex;
   flex-direction: column;
