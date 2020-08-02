@@ -61,11 +61,6 @@
                 to your contact list and type <code>/start</code>
               </template>
             </FormRow>
-            <p>
-              To get Telegram and/or ICQ notifications, set your account ID
-              here, then add %TODO_BOT_ACCOUNT% and run
-              <code>/start</code> command.
-            </p>
             <div class="post-form-control">
               <SpinnerButton
                 type="submit"
