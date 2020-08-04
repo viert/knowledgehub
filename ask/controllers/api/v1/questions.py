@@ -4,7 +4,7 @@ from typing import Optional
 
 from glasskit.api import (json_response, paginated, default_transform,
                           json_body_required, get_boolean_request_param)
-from glasskit.utils import get_user_from_app_context, resolve_id
+from glasskit.utils import get_user_from_app_context, resolve_id, NilObjectId
 from glasskit.errors import ApiError, NotFound, Forbidden
 
 from ask.controllers import AuthController
@@ -120,14 +120,23 @@ def index():
     if sortExpr is None:
         raise ApiError(f"unknown sort operator \"{srt}\"")
 
-    query = {
-        "$or": [
-            {"deleted": False},
-        ]
-    }
-
-    if u:
-        query["$or"].append({"author_id": u._id})
+    if get_boolean_request_param("_mine"):
+        if u:
+            # only mine posts
+            query = {"author_id": u._id}
+        else:
+            # nothing to show, user is not logged in
+            query = {"_id": NilObjectId}
+    else:
+        # otherwise show all not deleted posts
+        query = {
+            "$or": [
+                {"deleted": False},
+            ]
+        }
+        if u:
+            # if user is logged in, he can view his own deleted posts
+            query["$or"].append({"author_id": u._id})
 
     questions = Question.find(query).sort(sortExpr)
     results = paginated(questions,

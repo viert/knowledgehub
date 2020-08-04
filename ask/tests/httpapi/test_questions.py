@@ -41,9 +41,11 @@ class TestQuestions(HTTPAPITestCase):
 
     def test_questions_list_mine(self):
         self.create_questions()
+
         resp = self.get("/api/v1/questions/?_mine=true", user=self.user2)
         self.assertEqual(resp.status_code, 200, resp.data)
         data = resp.json
+
         self.assertIn("authors", data)
         self.assertIn("questions", data)
 
