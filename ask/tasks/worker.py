@@ -31,7 +31,7 @@ class Worker(BaseWorker):
 
     @staticmethod
     def rt_post_indexer(task: PostIndexerTask):
-        if not hasattr(ctx, "es"):
+        if not hasattr(ctx, "es") or ctx.es is None:
             ctx.log.error("elasticsearch is not configured, indexing skipped")
             return
 
