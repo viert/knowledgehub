@@ -22,7 +22,12 @@
           <div class="question-meta">
             <div class="question-meta__wrapper">
               <div class="question-tags">
-                <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
+                <Tag
+                  v-for="tag in question.tags"
+                  :link="`/search?q=[${tag}]`"
+                  :key="tag"
+                  :name="tag"
+                />
               </div>
               <div class="question-actions" v-if="isMyQuestion">
                 <PostActions

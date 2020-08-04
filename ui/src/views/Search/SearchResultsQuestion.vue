@@ -19,7 +19,12 @@
     </div>
     <div class="question-meta">
       <div class="question-tags">
-        <Tag v-for="tag in item.tags" :key="tag" :name="tag" />
+        <Tag
+          v-for="tag in item.tags"
+          :key="tag"
+          :name="tag"
+          :link="`/search?q=[${tag}]`"
+        />
       </div>
       <div class="question-author">
         Asked {{ item.created_at | duration }} by

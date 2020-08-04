@@ -9,7 +9,12 @@
       </h4>
       <div class="question-list_list-item_meta">
         <div class="question-list_list-item_tags">
-          <Tag v-for="tag in question.tags" :key="tag" :name="tag" />
+          <Tag
+            v-for="tag in question.tags"
+            :key="tag"
+            :name="tag"
+            :link="`/search?q=[${tag}]`"
+          />
         </div>
         <div class="question-list_list-item_date"
           >active {{ question.last_activity_at | duration }}</div

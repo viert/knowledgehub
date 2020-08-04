@@ -1,14 +1,20 @@
 <template>
   <div
     class="tag"
-    :class="{ 'tag--clickable': clickable }"
     @click.self="tagClick"
     @mouseenter="showDetails = true"
     @mouseleave="showDetails = false"
   >
     <transition v-if="expandable" name="expand">
       <div v-if="showDetails" class="tag-expand">
-        <div class="tag-expand_name">{{ (tag && tag.name) || name }}</div>
+        <div v-if="link" class="tag-expand_name">
+          <router-link :to="link" class="search-link">
+            {{ (tag && tag.name) || name }}
+          </router-link>
+        </div>
+        <div v-else class="tag-expand_name">{{
+          (tag && tag.name) || name
+        }}</div>
         <div class="tag-expand_content">
           <div class="tag-expand_loading" v-if="tagLoading">
             <i class="fa fa-spinner fa-spin fa-2x"></i>
@@ -52,7 +58,10 @@
         </div>
       </div>
     </transition>
-    {{ name }}
+    <router-link v-if="link" :to="link" class="search-link">
+      {{ name }}
+    </router-link>
+    <span v-else>{{ name }}</span>
     <a v-if="cross" class="tag-cross" href="#" @click.prevent="crossClick">
       <i class="fa fa-times"></i>
     </a>
@@ -62,7 +71,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { User } from '../store/types'
+import { User } from '@/store/types'
 const users = namespace('users')
 const tags = namespace('tags')
 
@@ -71,7 +80,7 @@ export default class Tag extends Vue {
   @Prop({ type: String, required: true }) readonly name!: string
   @Prop({ type: Boolean, default: false }) readonly cross!: boolean
   @Prop({ type: Boolean, default: true }) readonly expandable!: boolean
-  @Prop({ type: Boolean, default: false }) readonly clickable!: boolean
+  @Prop({ type: String, default: null }) readonly link!: string | null
 
   private showDetails = false
   private tagLoading = false
@@ -142,8 +151,9 @@ export default class Tag extends Vue {
   background: #f9f9f9;
   border: 1px solid #ccc;
 
-  &.tag--clickable {
-    cursor: pointer;
+  a.search-link {
+    color: black;
+    text-decoration: none;
   }
 
   a.tag-cross {

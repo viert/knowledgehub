@@ -41,8 +41,9 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { User } from '../store/types'
-import { AuthState } from '../constants'
+import { User } from '@/store/types'
+import { AuthState } from '@/constants'
+import EventBus from '@/eventbus'
 const users = namespace('users')
 
 @Component
@@ -61,20 +62,29 @@ export default class PageHeader extends Vue {
     return this.me.avatar_url ? this.me.avatar_url : '/images/default_user.png'
   }
 
+  onQueryChanged(query: string) {
+    this.searchQuery = query
+    this.$nextTick(() => {
+      const search = this.$refs.search as HTMLInputElement
+      search.focus()
+    })
+  }
+
   get q() {
-    const { query } = this.$route
-    if (typeof query.q === 'string') return query.q
+    const q = this.$route.query.q
+    if (typeof q === 'string') return q
     return ''
   }
 
   mounted() {
     if (this.$route.name === 'SearchResults') {
-      this.searchQuery = this.q
-      this.$nextTick(() => {
-        const search = this.$refs.search as HTMLInputElement
-        search.focus()
-      })
+      this.onQueryChanged(this.q)
     }
+    EventBus.$on('queryChanged', this.onQueryChanged)
+  }
+
+  beforeDestroy() {
+    EventBus.$off('queryChanged', this.onQueryChanged)
   }
 
   handleSearch() {

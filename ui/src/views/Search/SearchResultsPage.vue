@@ -34,7 +34,12 @@
       <div class="aside-section">
         <h4>Related Tags</h4>
         <div class="tag-list">
-          <Tag v-for="tag in relatedTags" :key="tag" :name="tag" />
+          <Tag
+            v-for="tag in relatedTags"
+            :key="tag"
+            :name="tag"
+            :link="`/search?q=[${tag}]`"
+          />
         </div>
       </div>
     </aside>
@@ -42,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
+import { Component, Watch } from 'vue-property-decorator'
 import Paginated from '@/mixins/Paginated'
 import Pagination from '@/components/Pagination.vue'
 import Progress from '@/components/Progress.vue'
@@ -51,6 +56,7 @@ import SearchResultsAnswer from './SearchResultsAnswer.vue'
 import { namespace } from 'vuex-class'
 import { Answer, Question } from '@/store/types'
 import { mixins } from 'vue-class-component'
+import EventBus from '@/eventbus'
 
 const questions = namespace('questions')
 
@@ -73,6 +79,7 @@ export default class SearchResultsPage extends mixins(Paginated) {
 
   mounted() {
     this.$store.commit('questions/storeSearchResults', [])
+    this.onQueryChanged()
     this.reload()
   }
 
@@ -104,6 +111,12 @@ export default class SearchResultsPage extends mixins(Paginated) {
       return this.$route.query.q
     }
     return ''
+  }
+
+  @Watch('q')
+  onQueryChanged() {
+    EventBus.$emit('queryChanged', this.q)
+    this.reload()
   }
 }
 </script>
