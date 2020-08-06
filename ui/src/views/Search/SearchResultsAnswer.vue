@@ -41,7 +41,7 @@ export default class SearchResultsQuestion extends mixins(PostCommons) {
   }
 
   get questionLink() {
-    return `/questions/${this.item.parent_id}`
+    return `/questions/${this.item.parent_id}?answer=${this.item._id}`
   }
 }
 </script>
