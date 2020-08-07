@@ -52,8 +52,10 @@ import { Question } from '@/store/types'
 import QuestionsListItem from './QuestionsListItem.vue'
 import EventsBlock from '@/views/Events/EventsBlock.vue'
 import Pagination from '@/components/Pagination.vue'
+import EventBus from '@/eventbus'
 
 const questions = namespace('questions')
+const data = namespace('data')
 
 @Component({
   components: {
@@ -68,6 +70,7 @@ export default class QuestionsList extends Vue {
   @questions.State('questionsList') readonly questions!: Question[]
   @questions.State('page') readonly currentPage!: number
   @questions.State('totalPages') readonly totalPages!: number
+  @data.State('trigger') readonly trigger!: boolean
 
   get currentSort() {
     return this.$route.query.sort ? this.$route.query.sort : 'rating'
@@ -100,7 +103,7 @@ export default class QuestionsList extends Vue {
     this.dataLoading = true
     const sort = this.currentSort
     const page = this.page
-    this.$store
+    return this.$store
       .dispatch('questions/loadQuestions', { sort, page })
       .catch(err => {
         if (err && err.maxPage) {
@@ -113,7 +116,13 @@ export default class QuestionsList extends Vue {
   }
 
   mounted() {
-    this.reload()
+    this.reload().finally(() => {
+      EventBus.$on('mainPageForceReload', this.reload)
+    })
+  }
+
+  beforeDestroy() {
+    EventBus.$off('mainPageForceReload', this.reload)
   }
 
   @Watch('$route.query')

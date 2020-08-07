@@ -74,7 +74,6 @@ export default class CommentView extends mixins(PostCommons) {
 
   focus() {
     const element = this.$refs.root as HTMLElement
-    console.log(element)
     this.$nextTick(() => {
       this.$store.commit('questions/flashComment', this.comment._id)
       element.scrollIntoView({ block: 'center' })

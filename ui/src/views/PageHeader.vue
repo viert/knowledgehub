@@ -2,7 +2,7 @@
   <div class="page-header">
     <div class="logo">
       <!--prettyhtml-ignore-->
-      <router-link to="/">
+      <router-link @click.native="forceReload" to="/">
         knowledge<span style="color: #fc2c38;">hub</span>
       </router-link>
     </div>
@@ -60,6 +60,10 @@ export default class PageHeader extends Vue {
 
   get avatarURL() {
     return this.me.avatar_url ? this.me.avatar_url : '/images/default_user.png'
+  }
+
+  forceReload() {
+    EventBus.$emit('mainPageForceReload')
   }
 
   onQueryChanged(query: string) {
