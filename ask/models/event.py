@@ -203,11 +203,11 @@ class PostNewCommentEvent(Event):
             return self.post.question.human_readable_id
 
     def telegram_text(self) -> str:
-        comment_link = f"{self.base_uri()}/questions/{self.root_id}?comment={self.comment_id}&dismiss={self._id}"
+        comment_link = f"{self.base_uri()}/#/questions/{self.root_id}?comment={self.comment_id}&dismiss={self._id}"
         return f"You got a new [comment]({comment_link}) by *{self.author_username}*"
 
     def icq_text(self) -> str:
-        comment_link = f"{self.base_uri()}/questions/{self.root_id}?comment={self.comment_id}&dismiss={self._id}"
+        comment_link = f"{self.base_uri()}/#/questions/{self.root_id}?comment={self.comment_id}&dismiss={self._id}"
         return f"You got a new comment by {self.author_username}: {comment_link}"
 
 
