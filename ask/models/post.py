@@ -367,6 +367,9 @@ class Question(BasePost):
                 {"_id": self._id},
                 {"parent_id": self._id, "submodel": "answer"},
             ]}},
+            {
+                "$sort": {"accepted": -1, "created_at": -1},
+            },
             {"$lookup": {
                 "from": "votes",
                 "let": {"post_id": "$_id"},
@@ -415,6 +418,9 @@ class Question(BasePost):
         c_pipeline = [
             {
                 "$match": {"parent_id": {"$in": doc_ids}, "submodel": "comment"},
+            },
+            {
+                "$sort": {"created_at": 1},
             },
             {
                 "$lookup": {
