@@ -92,6 +92,21 @@ export default class AnswerView extends mixins(PostCommons) {
   private isSaving: boolean | false = false
   private bodyError: string | null = null
 
+  mounted() {
+    const { answer } = this.$route.query
+    if (answer === this.answer._id) {
+      this.focus()
+    }
+  }
+
+  focus() {
+    const element = this.$refs.root as HTMLElement
+    this.$nextTick(() => {
+      this.$store.commit('questions/flashAnswer', this.answer._id)
+      element.scrollIntoView({ block: 'center' })
+    })
+  }
+
   handleVote(value: 1 | 0 | -1) {
     this.$store.dispatch('questions/voteAnswer', {
       answerId: this.answer._id,

@@ -65,6 +65,22 @@ export default class CommentView extends mixins(PostCommons) {
   private body = this.comment.body
   private error: string | null = null
 
+  mounted() {
+    const { comment } = this.$route.query
+    if (comment === this.comment._id) {
+      this.focus()
+    }
+  }
+
+  focus() {
+    const element = this.$refs.root as HTMLElement
+    console.log(element)
+    this.$nextTick(() => {
+      this.$store.commit('questions/flashComment', this.comment._id)
+      element.scrollIntoView({ block: 'center' })
+    })
+  }
+
   handleVote(value: 1 | 0) {
     this.$store.dispatch('questions/voteComment', {
       commentId: this.comment._id,
