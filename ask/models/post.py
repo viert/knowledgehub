@@ -123,7 +123,6 @@ class BasePost(StorableSubmodel):
             raise InvalidUser("edited_by_id is invalid or user not found")
         if self.deleted_by_id is not None and self.deleted_by is None:
             raise InvalidUser("deleted_by_id is invalid or user not found")
-        self.body = substitute(self.body)
 
     def reindex(self):
         PostIndexerTask.create(self._id, self.deleted).publish()
@@ -272,6 +271,7 @@ class Question(BasePost):
         from .tag import TAG_NAME_RE
 
         super()._before_save()
+        self.body = substitute(self.body)
         self.setup_hrid()
 
         new_tags = set(self.tags)
@@ -511,6 +511,7 @@ class Answer(BasePost):
         if self.question is None:
             raise InvalidQuestion("parent_id is invalid or question not found")
 
+        self.body = substitute(self.body)
         if self.accepted and self.accepted_at is None:
             self.accepted_at = now()
         if self.accepted_at is not None and not self.accepted:

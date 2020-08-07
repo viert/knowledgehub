@@ -64,6 +64,4 @@ class TestPost(MongoMockTest):
         self.run_tasks()
 
         self.assertEqual(c.body,
-                         "[MYPROJ-338](https://jira.example.com/browse/MYPROJ-338) "
-                         "looks more promising. Well, "
-                         "[MYPROJ-42](https://jira.example.com/browse/MYPROJ-42) is OK too.")
+                         "MYPROJ-338 looks more promising. Well, MYPROJ-42 is OK too.")
