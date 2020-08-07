@@ -15,6 +15,7 @@ from ask.errors import (InvalidUser, InvalidParent, InvalidQuestion,
 from ask.tasks import SyncTagsTask, PostIndexerTask, NewPostTask
 from ask.unmark import unmark, extract_usernames
 from ask.translit import hrid
+from ask.substitute import substitute
 
 
 class BasePost(StorableSubmodel):
@@ -122,6 +123,7 @@ class BasePost(StorableSubmodel):
             raise InvalidUser("edited_by_id is invalid or user not found")
         if self.deleted_by_id is not None and self.deleted_by is None:
             raise InvalidUser("deleted_by_id is invalid or user not found")
+        self.body = substitute(self.body)
 
     def reindex(self):
         PostIndexerTask.create(self._id, self.deleted).publish()
@@ -571,6 +573,7 @@ class Comment(BasePost):
         return q
 
     def _before_save(self) -> None:
+        super(Comment, self)._before_save()
         p = self.parent
         if p is None:
             raise InvalidParent("invalid parent_id or parent not found")
