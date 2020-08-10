@@ -55,4 +55,8 @@ export default class AnswerEdit extends mixins(PostCommons) {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.answer-edit {
+  flex-grow: 1;
+}
+</style>
