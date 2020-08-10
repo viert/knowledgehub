@@ -4,3 +4,4 @@ __pycache__
 config/*.py
 /.idea
 /venv
+.DS_Store
