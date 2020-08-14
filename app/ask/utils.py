@@ -1,5 +1,4 @@
 
-
 def cut(text: str, max_len: int = 250) -> str:
     if len(text) <= max_len:
         return text

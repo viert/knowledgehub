@@ -1,0 +1,6 @@
+FROM python:3
+RUN mkdir -p /opt
+ADD requirements.txt /opt/
+
+WORKDIR /opt
+RUN pip install -r requirements.txt

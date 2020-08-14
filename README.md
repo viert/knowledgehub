@@ -8,12 +8,13 @@ the UI is a vue.js SPA.
 ## Bootstrap
 
 1. Clone the repository
-2. Create a virtualenv
-3. Install dependencies with `pip install -r requirements.txt`
-4. Run the backend dev server with `./glass.py run`
-5. Open another terminal and run background task server with `./glass.py tasks`
-6. To make search engine work install elasticsearch and run it with a default configuration. Then you have to run `./glass.py elastic index -a -d` at least once to create indexes. New posts are re-indexed automatically with the background task server.
-7. Open another terminal and cd to `ui` directory.
-8. Run `yarn` or `npm i` to install dependencies
-9. Run `yarn serve` or `npm run serve` to build and serve the UI.
-10. Open `http://localhost:8080` to see the result
+2. Copy `app/config/development.py.example` to `app/config/development.py` and make changes mentioned in comment on top of the file. Basically you need to fill up settings for at least one OAuth provider and disable those you don't need (i.e. remove them from configuration completely)
+3. Run `docker-compose up --build`. This will build and run containers for database, elasticsearch, memcached, backend and the task server. The backend is exposed on port 5000 to your localhost.
+   
+   3a. If you're running the dev server for the first time you have to prepare indexes in elasticsearch. You're going to need to run a command in your backend container:
+   `docker exec -it ask_backend /opt/app/glass.py elastic index -a -d`.
+   
+4. Open another terminal and cd into `ui` directory.
+5. Run `yarn` or `npm i` to install dependencies
+6. Run `yarn serve` or `npm run serve` to build and serve the UI.
+7. Open `http://localhost:8080` to see the result

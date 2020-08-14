@@ -1,0 +1,84 @@
+#
+# This is a default development configuration file example. It doesn't contain
+# OAuth credentials so you have to add one yourself and disable all the providers you don't
+# need. Without those you're going to miss any authentication.
+#
+# All the hosts given here, like db/elasticsearch/cache match docker-compose configuration
+# so after completing the oauth quest you just need to start docker-compose up --build
+# and you're golden.
+#
+# The source code is provided as a volume, so auto-restarting in case of code changes should
+# work like you would expect.
+#
+# ATTENTION: This file must be renamed to development.py. This file will be ignored in git
+# to keep your oauth secrets safe.
+#
+
+documents_per_page = 10
+app_secret_key = "_some_secret_key_"
+
+flask_settings = {
+    "SESSION_COOKIE_NAME": "_knowledgehub_session_id",
+    "SESSION_COOKIE_HTTPONLY": True,
+    "SESSION_COOKIE_SAMESITE": "Lax",
+}
+
+session_expiration_time = 86400 * 7 * 2  # 2 weeks
+token_expiration_time = 86400 * 7 * 2  # 2 weeks
+token_auto_prolongation = True
+
+pymongo_extra = {
+    "serverSelectionTimeoutMS": 1100,
+    "socketTimeoutMS": 1100,
+    "connectTimeoutMS": 1100,
+}
+
+database = {
+    "meta": {
+        "uri": "mongodb://db/ask_dev",
+        "pymongo_extra": pymongo_extra,
+    },
+    "shards": {}
+}
+
+log_level = "debug"
+log_format = "[%(asctime)s] %(levelname)s\t%(module)-8.8s:%(lineno)-3d %(request_id)-8s %(message)s"
+debug = False
+
+base_uri = "http://localhost:8080/"
+oauth = {
+    "_global": {
+        "redirect_uri": "http://localhost:8080/api/v1/account/oauth_callback",
+    },
+    "facebook": {
+        "client_id": "...",
+        "client_secret": "...",
+        "btn_class": "btn-primary",
+        "fa_icon": "fab fa-facebook"
+    },
+    "yandex": {
+        "client_id": "...",
+        "client_secret": "...",
+        "btn_class": "btn-yandex",
+        "fa_icon": "fab fa-yandex"
+    },
+    "github": {
+        "client_id": "...",
+        "client_secret": "...",
+        "btn_class": "btn-dark",
+        "fa_icon": "fab fa-github",
+    }
+}
+
+search = {
+    "nodes": ["elastic"],
+    "options": {
+        "sniff_on_start": False,
+        "sniff_on_connection_fail": True,
+        "sniffer_timeout": 60,
+    }
+}
+
+memcached_backends = [
+    "cache:11211",
+]

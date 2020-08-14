@@ -1,0 +1,4 @@
+/venv
+/ui/node_modules
+__pycache__
+*.pyc
