@@ -10,6 +10,7 @@ services:
     environment:
       discovery.type: single-node
   cache:
+    restart: always
     image: library/memcached:alpine
 
   backend:
@@ -22,15 +23,22 @@ services:
       - cache
     volumes:
       - "./app:/opt/app"
+    restart: always
     ports:
       - "5000:5000"
     working_dir: /opt/app
-    entrypoint: ./glass.py run
-#  knowledgehub:
-#    hostname: knowledge-front
-#    image: knowledgehub
-#    ports:
-#    - 27017:27017
-#    volumes:
-#    - ./config:/opt/khub/config
+    entrypoint: ./glass.py run -H 0.0.0.0 -P 5000
 
+  task-server:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./app
+    depends_on:
+      - db
+      - elastic
+      - cache
+    volumes:
+      - "./app:/opt/app"
+    restart: always
+    working_dir: /opt/app
+    entrypoint: ./glass.py tasks

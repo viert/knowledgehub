@@ -1,4 +1,4 @@
-glasskit>=3.11.3
+glasskit>=3.11.4
 elasticsearch
 markdown
 python-telegram-bot
