@@ -2,18 +2,21 @@ version: "3.6"
 
 services:
   db:
+    container_name: ask_db
     image: library/mongo:4.4-bionic
     restart: always
   elastic:
+    container_name: ask_elastic
     image: library/elasticsearch:7.8.1
     restart: always
     environment:
       discovery.type: single-node
   cache:
+    container_name: ask_cache
     restart: always
     image: library/memcached:alpine
-
   backend:
+    container_name: ask_backend
     build:
       dockerfile: Dockerfile.dev
       context: ./app
@@ -28,8 +31,8 @@ services:
       - "5000:5000"
     working_dir: /opt/app
     entrypoint: ./glass.py run -H 0.0.0.0 -P 5000
-
   task-server:
+    container_name: ask_task_server
     build:
       dockerfile: Dockerfile.dev
       context: ./app
