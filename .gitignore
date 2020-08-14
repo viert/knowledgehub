@@ -2,6 +2,6 @@
 __pycache__
 
 config/*.py
-/.idea
+.idea
 venv
 .DS_Store
