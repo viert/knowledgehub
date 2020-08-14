@@ -1,0 +1,36 @@
+version: "3.6"
+
+services:
+  db:
+    image: library/mongo:4.4-bionic
+    restart: always
+  elastic:
+    image: library/elasticsearch:7.8.1
+    restart: always
+    environment:
+      discovery.type: single-node
+  cache:
+    image: library/memcached:alpine
+
+  backend:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./app
+    depends_on:
+      - db
+      - elastic
+      - cache
+    volumes:
+      - "./app:/opt/app"
+    ports:
+      - "5000:5000"
+    working_dir: /opt/app
+    entrypoint: ./glass.py run
+#  knowledgehub:
+#    hostname: knowledge-front
+#    image: knowledgehub
+#    ports:
+#    - 27017:27017
+#    volumes:
+#    - ./config:/opt/khub/config
+

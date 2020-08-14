@@ -1,5 +1,4 @@
-glasskit>=3.10.7
-line_profiler
+glasskit>=3.11.3
 elasticsearch
 markdown
 python-telegram-bot
