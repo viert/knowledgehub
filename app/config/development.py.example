@@ -70,6 +70,19 @@ oauth = {
     }
 }
 
+bot = {
+    "telegram": {
+        "name": "knowledgehub_<YOUR_COMPANY>_bot",
+        "link": "https://t.me/knowledgehub_<YOUR_COMPANY>_bot",
+        "token": "<YOUR_TOKEN>",
+    },
+    "icq": {
+        "name": "knowledgehub_<YOUR_COMPANY>_bot",
+        "link": "https://t.me/knowledgehub_<YOUR_COMPANY>_bot",
+        "token": "<YOUR_TOKEN>",
+    }
+}
+
 search = {
     "nodes": ["elastic"],
     "options": {

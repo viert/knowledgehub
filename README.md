@@ -8,7 +8,7 @@ the UI is a vue.js SPA.
 ## Bootstrap
 
 1. Clone the repository
-2. Copy `app/config/development.py.example` to `app/config/development.py` and make changes mentioned in comment on top of the file. Basically you need to fill up settings for at least one OAuth provider and disable those you don't need (i.e. remove them from configuration completely)
+2. Copy `app/config/development.py.example` to `app/config/development.py` and make changes mentioned in comment on top of the file. Basically you need to fill up settings for at least one OAuth provider and disable those you don't need (i.e. remove them from configuration completely). The same thing should be done to the `bot` section of configuration file to enable/disable particular messenger bots.
 3. Run `docker-compose up --build`. This will build and run containers for database, elasticsearch, memcached, backend and the task server. The backend is exposed on port 5000 to your localhost.
    
    3a. If you're running the dev server for the first time you have to prepare indexes in elasticsearch. You're going to need to run a command in your backend container:
