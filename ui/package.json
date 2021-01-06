@@ -12,7 +12,7 @@
     "@types/lodash": "^4.14.157",
     "@types/showdown": "^1.9.3",
     "@types/xregexp": "^4.3.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "lodash": "^4.17.19",
     "showdown": "^1.9.1",
