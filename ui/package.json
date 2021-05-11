@@ -14,7 +14,7 @@
     "@types/xregexp": "^4.3.0",
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.4",
     "vue": "^2.6.11",
